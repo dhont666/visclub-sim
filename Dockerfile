@@ -1,4 +1,4 @@
-# Use Node.js LTS
+# Use Node.js LTS version 18
 FROM node:18-alpine
 
 # Set working directory

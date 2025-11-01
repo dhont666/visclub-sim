@@ -284,3 +284,17 @@ To switch to backend API mode:
 - Use `npm run dev` in bot directory for hot-reload
 - Configure all API keys before testing social media features
 - Email testing can be done with fake SMTP servers (e.g., Mailtrap)
+- ❌ Server startup error: TypeError [ERR_INVALID_URL]: Invalid URL
+    at new NodeError (node:internal/errors:405:5)
+    at new URL (node:internal/url:676:13)
+    at startServer (/app/server/api.js:22:23)
+    at Object.<anonymous> (/app/server/api.js:508:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49 {
+  input: 'undefined',
+  code: 'ERR_INVALID_URL'
+}

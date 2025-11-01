@@ -2,57 +2,113 @@
  * Visclub SiM Backend API
  * Express.js REST API with PostgreSQL database
  * Supports JWT authentication and CRUD operations
+ *
+ * IMPORTANT: This file is deprecated. Use server/api-supabase.js instead for better compatibility.
  */
 
 require('dotenv').config();
+
+// Check if we should use Supabase Client instead
+if (!process.env.DATABASE_URL && (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY)) {
+    console.log('⚠️  DATABASE_URL not found, but SUPABASE_URL and SUPABASE_SERVICE_KEY are set');
+    console.log('   Redirecting to Supabase Client API (server/api-supabase.js)');
+    console.log('   This uses HTTPS and works on all platforms!\n');
+    require('./api-supabase.js');
+    return;
+}
+
+if (!process.env.DATABASE_URL) {
+    console.error('❌ ERROR: DATABASE_URL environment variable is not set');
+    console.error('');
+    console.error('Options:');
+    console.error('  1. Set DATABASE_URL for direct PostgreSQL connection:');
+    console.error('     DATABASE_URL=postgresql://user:pass@host:port/db');
+    console.error('');
+    console.error('  2. OR use Supabase Client API (recommended):');
+    console.error('     SUPABASE_URL=https://xxx.supabase.co');
+    console.error('     SUPABASE_SERVICE_KEY=eyJ...');
+    console.error('     Then run: npm start (uses server/api-supabase.js)');
+    console.error('');
+    console.error('See MIGRATION-GUIDE.md for details');
+    console.error('');
+    process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
-const { URL } = require('url');
-const dns = require('dns');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     try {
-        console.log('Starting server...');
-        const dbUrl = new URL(process.env.DATABASE_URL);
-        console.log('Original DB hostname:', dbUrl.hostname);
+        console.log('Starting server (PostgreSQL mode)...');
 
-        const dbHost = await new Promise((resolve, reject) => {
-            dns.lookup(dbUrl.hostname, { family: 4 }, (err, address) => {
-                if (err) return reject(err);
-                resolve(address);
-            });
-        });
-        console.log('Resolved DB host (IPv4):', dbHost);
-
-        const newConnectionString = `postgresql://${dbUrl.username}:${dbUrl.password}@${dbHost}:${dbUrl.port}${dbUrl.pathname}${dbUrl.search}`;
-        console.log('New connection string (host replaced with IP):', newConnectionString.replace(dbUrl.password, '********'));
-
+        // Use DATABASE_URL directly without modification
         const pool = new Pool({
-            connectionString: newConnectionString,
-            ssl: process.env.NODE_ENV === 'production' ? {
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
                 rejectUnauthorized: false
-            } : false
+            }
         });
 
-        // Test database connection
-        try {
-            const client = await pool.connect();
+        // Test database connection with retry logic
+        let connected = false;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        while (!connected && attempts < maxAttempts) {
+            attempts++;
             try {
-                const res = await client.query('SELECT NOW()');
-                console.log('✅ Database connected successfully');
-                console.log('   Server time:', res.rows[0].now);
-            } finally {
-                client.release();
+                console.log(`Database connection attempt ${attempts}/${maxAttempts}...`);
+                const client = await pool.connect();
+                try {
+                    const res = await client.query('SELECT NOW()');
+                    console.log('✅ Database connected successfully');
+                    console.log('   Server time:', res.rows[0].now);
+                    connected = true;
+                } finally {
+                    client.release();
+                }
+            } catch (err) {
+                console.error(`❌ Database connection attempt ${attempts} failed:`, err.message);
+
+                // Specific error handling based on error code
+                if (err.code === 'ECONNREFUSED') {
+                    console.error('\n🔥 CONNECTION REFUSED ERROR - Common fixes:');
+                    console.error('  1. Use Supabase TRANSACTION pooler (port 6543) instead of Session pooler (port 5432)');
+                    console.error('     ❌ Wrong: postgresql://...@db.xxx.supabase.co:5432/postgres');
+                    console.error('     ✅ Right: postgresql://...@aws-0-eu-west-1.pooler.supabase.com:6543/postgres');
+                    console.error('  2. Get connection string from: Supabase Dashboard → Database → Connection Pooling → Transaction');
+                    console.error('  3. Railway/Render often block direct PostgreSQL port (5432)\n');
+                } else if (err.code === '28P01') {
+                    console.error('\n🔑 AUTHENTICATION ERROR:');
+                    console.error('  1. Check DATABASE_URL password is correct');
+                    console.error('  2. Verify you\'re using the pooler username (postgres.projectref) not just "postgres"');
+                    console.error('  3. Reset database password in Supabase if needed\n');
+                } else if (err.code === 'ENOTFOUND') {
+                    console.error('\n🌐 DNS/NETWORK ERROR:');
+                    console.error('  1. Check internet connection');
+                    console.error('  2. Verify Supabase hostname is correct');
+                    console.error('  3. Try different network or VPN\n');
+                }
+
+                if (attempts >= maxAttempts) {
+                    console.error('\n❌ All database connection attempts failed after', maxAttempts, 'tries');
+                    console.error('\nGeneral troubleshooting:');
+                    console.error('  • DATABASE_URL format: postgresql://user:password@host:port/database');
+                    console.error('  • Check environment variables are loaded (process.env.DATABASE_URL)');
+                    console.error('  • Verify Supabase project is not paused');
+                    console.error('  • Check deployment platform firewall/network settings\n');
+                    process.exit(1);
+                } else {
+                    console.log(`   Retrying in 2 seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
             }
-        } catch (err) {
-            console.error('❌ Database connection error:', err);
-            process.exit(1);
         }
 
         // =============================================

@@ -4,10 +4,6 @@
  * Supports JWT authentication and CRUD operations
  */
 
-// Force IPv4 DNS resolution (Railway IPv6 issue fix)
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -22,26 +18,12 @@ const PORT = process.env.PORT || 3000;
 // DATABASE CONNECTION
 // =============================================
 
-// Parse DATABASE_URL and force IPv4
-const dbConfig = {
+const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: false
     } : false
-};
-
-// Override with explicit config to force IPv4
-if (process.env.DATABASE_URL) {
-    const url = new URL(process.env.DATABASE_URL);
-    dbConfig.user = url.username;
-    dbConfig.password = url.password;
-    dbConfig.host = url.hostname;
-    dbConfig.port = url.port || 5432;
-    dbConfig.database = url.pathname.slice(1);
-    delete dbConfig.connectionString; // Use individual params instead
-}
-
-const pool = new Pool(dbConfig);
+});
 
 // Test database connection
 pool.query('SELECT NOW()', (err, res) => {

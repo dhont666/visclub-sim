@@ -4,6 +4,10 @@
  * Supports JWT authentication and CRUD operations
  */
 
+// Force IPv4 DNS resolution (Railway IPv6 issue fix)
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

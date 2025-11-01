@@ -18,14 +18,26 @@ const PORT = process.env.PORT || 3000;
 // DATABASE CONNECTION
 // =============================================
 
-const pool = new Pool({
+// Parse DATABASE_URL and force IPv4
+const dbConfig = {
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: false
-    } : false,
-    // Force IPv4 to avoid IPv6 connection issues on Railway
-    host: 'db.pvdebaqcqlkhibnxnwpf.supabase.co'
-});
+    } : false
+};
+
+// Override with explicit config to force IPv4
+if (process.env.DATABASE_URL) {
+    const url = new URL(process.env.DATABASE_URL);
+    dbConfig.user = url.username;
+    dbConfig.password = url.password;
+    dbConfig.host = url.hostname;
+    dbConfig.port = url.port || 5432;
+    dbConfig.database = url.pathname.slice(1);
+    delete dbConfig.connectionString; // Use individual params instead
+}
+
+const pool = new Pool(dbConfig);
 
 // Test database connection
 pool.query('SELECT NOW()', (err, res) => {

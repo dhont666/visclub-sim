@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visclub SiM - Wedstrijdkalender 2026</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            line-height: 1.2;
+            padding: 10px;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #2c5f7d;
+        }
+
+        .header h1 {
+            font-size: 18pt;
+            color: #2c5f7d;
+            margin-bottom: 3px;
+        }
+
+        .header p {
+            font-size: 10pt;
+            color: #666;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2c5f7d;
+            font-size: 8pt;
+        }
+
+        .info-box strong {
+            color: #2c5f7d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+
+        th {
+            background-color: #2c5f7d;
+            color: white;
+            padding: 5px 4px;
+            text-align: left;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 3px 4px;
+            border-bottom: 1px solid #ddd;
+            font-size: 8pt;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .month-header {
+            background-color: #e9ecef;
+            font-weight: bold;
+            color: #2c5f7d;
+            padding: 5px 4px !important;
+            font-size: 10pt;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 7pt;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .club { background: #e3f2fd; color: #1976d2; }
+        .vrije { background: #e8f5e9; color: #388e3c; }
+        .koppel { background: #fff3e0; color: #f57c00; }
+        .avond { background: #f3e5f5; color: #7b1fa2; }
+        .criterium { background: #fce4ec; color: #c2185b; }
+        .veteranen { background: #fff9c4; color: #f57f17; }
+        .nacht { background: #263238; color: #fff; }
+        .special { background: #ffebee; color: #c62828; }
+
+        .footer {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 2px solid #2c5f7d;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 7pt;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #2c5f7d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .print-btn:hover {
+            background: #1e4056;
+        }
+
+        @media screen {
+            body {
+                padding: 20px;
+                background: #f5f5f5;
+            }
+
+            .container {
+                background: white;
+                padding: 20px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">🖨️ Printen</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎣 Visclub SiM Merksplas</h1>
+            <p>Wedstrijdkalender 2026</p>
+        </div>
+
+        <div class="info-box">
+            <strong>Belangrijke info:</strong>
+            Inschrijven tot 24u voor aanvang • Betaling ter plaatse of vooraf •
+            Criterium: beste 3/5 tellen mee • Clubkampioenschap: beste 15/20 tellen mee
+        </div>
+
+        <div class="info-box" style="border-left-color: #28a745;">
+            <strong>Wedstrijdformats:</strong>
+            <div style="margin-top: 4px;">
+                <strong style="color: #1976d2;">Vrije & Clubwedstrijden:</strong> Start 11:00u - 2x 2,5u vissen met 1u pauze<br>
+                <strong style="color: #f57c00;">Koppelwedstrijden:</strong> Start 11:00u - 3x 2,5u vissen met 2x 1u pauze<br>
+                <strong style="color: #263238;">Nachtkoppel:</strong> Start 20:00u - 3x 3u vissen met 2x 1u pauze
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><span class="type-badge club">Clubwedstrijd</span></div>
+            <div class="legend-item"><span class="type-badge vrije">Vrije Gewone</span></div>
+            <div class="legend-item"><span class="type-badge koppel">Koppelwedstrijd</span></div>
+            <div class="legend-item"><span class="type-badge avond">Avondwedstrijd</span></div>
+            <div class="legend-item"><span class="type-badge criterium">Criterium</span></div>
+            <div class="legend-item"><span class="type-badge veteranen">Veteranen</span></div>
+            <div class="legend-item"><span class="type-badge nacht">Nachtkoppel</span></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">Datum</th>
+                    <th style="width: 50px;">Dag</th>
+                    <th>Wedstrijd</th>
+                    <th style="width: 45px;">Tijd</th>
+                    <th style="width: 50px;">Prijs</th>
+                </tr>
+            </thead>
+            <tbody id="calendarBody">
+                <!-- Data wordt ingeladen via JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p><strong>Visclub SiM</strong> • Nijverheidsstraat 6, 2330 Merksplas</p>
+            <p>📧 SimVisclub@gmail.com • 🌐 www.visclubsim.be • 🏦 BE05 9731 3241 8875</p>
+        </div>
+    </div>
+
+    <script>
+        const calendarData = [
+            { datum: "23-01-2026", dag: "Vrijdag", wedstrijdtype: "Statutaire vergadering", maand: "Januari", tijd: "19:00u", prijs: "Gratis", type: "vergadering" },
+            { datum: "21-02-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Februari", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "28-02-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Februari", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "07-03-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Maart", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "14-03-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Koppelwedstrijd", maand: "Maart", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "21-03-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Maart", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "28-03-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Maart", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "30-03-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 1", maand: "Maart", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "04-04-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "April", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "06-04-2026", dag: "Maandag", wedstrijdtype: "Koppelwedstrijd (Paasmaandag)", maand: "April", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "11-04-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "April", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "13-04-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 2", maand: "April", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "18-04-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Koppelwedstrijd", maand: "April", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "20-04-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 3", maand: "April", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "25-04-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "April", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "01-05-2026", dag: "Vrijdag", wedstrijdtype: "Koppelwedstrijd (Dag v/d Arbeid)", maand: "Mei", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "02-05-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Mei", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "09-05-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Mei", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "14-05-2026", dag: "Donderdag", wedstrijdtype: "Koppelwedstrijd (O.L.H.)", maand: "Mei", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "16-05-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Koppelwedstrijd", maand: "Mei", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "23-05-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Mei", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "25-05-2026", dag: "Maandag", wedstrijdtype: "Veteranen Koppel (Pinkstermaandag)", maand: "Mei", tijd: "10:00u", prijs: "€20", type: "veteranen" },
+            { datum: "30-05-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Mei", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "01-06-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 4", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "03-06-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juni", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "06-06-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "08-06-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 5", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "10-06-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juni", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "13-06-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "15-06-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 6", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "17-06-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juni", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "20-06-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Koppelwedstrijd", maand: "Juni", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "24-06-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juni", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "27-06-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Juni", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "01-07-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juli", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "04-07-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "06-07-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 7", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "08-07-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juli", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "11-07-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "15-07-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juli", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "18-07-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone + BBQ", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "21-07-2026", dag: "Dinsdag", wedstrijdtype: "Koppelwedstrijd (Nat. Feestdag)", maand: "Juli", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "22-07-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juli", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "25-07-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "27-07-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 8", maand: "Juli", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "29-07-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Juli", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "01-08-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "05-08-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Augustus", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "08-08-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Gewone Wedstrijd", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "vrije-gewone" },
+            { datum: "10-08-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 9", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "12-08-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Augustus", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "14-08-2026", dag: "Vrijdag", wedstrijdtype: "Nachtkoppel (3x3u, 2x1u pauze)", maand: "Augustus", tijd: "20:00u", prijs: "€30", type: "nachtkoppel" },
+            { datum: "17-08-2026", dag: "Maandag", wedstrijdtype: "Veteranenwedstrijd 10", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "19-08-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Augustus", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "22-08-2026", dag: "Zaterdag", wedstrijdtype: "Vrije Koppelwedstrijd", maand: "Augustus", tijd: "11:00u", prijs: "€20", type: "vrije-koppel" },
+            { datum: "26-08-2026", dag: "Woensdag", wedstrijdtype: "Avondwedstrijd", maand: "Augustus", tijd: "18:00u", prijs: "€10", type: "avondwedstrijd" },
+            { datum: "29-08-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "31-08-2026", dag: "Maandag", wedstrijdtype: "Sluitingsprijs Veteranen", maand: "Augustus", tijd: "11:00u", prijs: "€10", type: "veteranen" },
+            { datum: "05-09-2026", dag: "Zaterdag", wedstrijdtype: "Criterium 1", maand: "September", tijd: "11:00u", prijs: "€10", type: "criterium" },
+            { datum: "12-09-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "September", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "19-09-2026", dag: "Zaterdag", wedstrijdtype: "Criterium 2", maand: "September", tijd: "11:00u", prijs: "€10", type: "criterium" },
+            { datum: "26-09-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "September", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "27-09-2026", dag: "Zondag", wedstrijdtype: "Criterium 3", maand: "September", tijd: "11:00u", prijs: "€10", type: "criterium" },
+            { datum: "03-10-2026", dag: "Zaterdag", wedstrijdtype: "Criterium 4", maand: "Oktober", tijd: "11:00u", prijs: "€10", type: "criterium" },
+            { datum: "06-10-2026", dag: "Dinsdag", wedstrijdtype: "Kermiswedstrijd", maand: "Oktober", tijd: "11:00u", prijs: "€10", type: "kermis" },
+            { datum: "10-10-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Oktober", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "17-10-2026", dag: "Zaterdag", wedstrijdtype: "Criterium 5", maand: "Oktober", tijd: "11:00u", prijs: "€10", type: "criterium" },
+            { datum: "24-10-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "Oktober", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "07-11-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "November", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "14-11-2026", dag: "Zaterdag", wedstrijdtype: "Clubwedstrijd", maand: "November", tijd: "11:00u", prijs: "€10", type: "clubwedstrijd" },
+            { datum: "04-12-2026", dag: "Vrijdag", wedstrijdtype: "Statutaire vergadering", maand: "December", tijd: "19:00u", prijs: "Gratis", type: "vergadering" }
+        ];
+
+        function getTypeClass(type) {
+            if (type === 'clubwedstrijd') return 'club';
+            if (type === 'vrije-gewone') return 'vrije';
+            if (type.includes('koppel')) return 'koppel';
+            if (type === 'avondwedstrijd') return 'avond';
+            if (type === 'criterium') return 'criterium';
+            if (type === 'veteranen') return 'veteranen';
+            if (type === 'nachtkoppel') return 'nacht';
+            return 'special';
+        }
+
+        function loadCalendar() {
+            const tbody = document.getElementById('calendarBody');
+            let currentMonth = '';
+
+            calendarData.forEach(event => {
+                // Add month header
+                if (event.maand !== currentMonth) {
+                    currentMonth = event.maand;
+                    const monthRow = document.createElement('tr');
+                    monthRow.innerHTML = `<td colspan="5" class="month-header">${currentMonth}</td>`;
+                    tbody.appendChild(monthRow);
+                }
+
+                // Add event row
+                const row = document.createElement('tr');
+                const typeClass = getTypeClass(event.type);
+
+                row.innerHTML = `
+                    <td>${event.datum}</td>
+                    <td>${event.dag}</td>
+                    <td><span class="type-badge ${typeClass}">${event.wedstrijdtype}</span></td>
+                    <td>${event.tijd}</td>
+                    <td><strong>${event.prijs}</strong></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        loadCalendar();
+    </script>
+</body>
+</html>

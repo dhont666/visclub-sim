@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chat - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 2px solid #2c5f7d;
+        }
+
+        .chat-header h1 {
+            margin: 0 0 5px 0;
+            color: #2c5f7d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .online-admins {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .admin-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #2c5f7d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .admin-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .admin-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-group.own {
+            align-items: flex-end;
+        }
+
+        .message {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-group:not(.own) .message {
+            background: #f0f2f5;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-group.own .message {
+            background: #2c5f7d;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message-group.own .message-sender {
+            color: #2c5f7d;
+        }
+
+        .message-text {
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .message-actions {
+            opacity: 0;
+            transition: opacity 0.3s;
+            position: absolute;
+            top: 5px;
+            right: -100px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-action-btn {
+            background: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .message-action-btn:hover {
+            transform: scale(1.1);
+            background: #f8f9fa;
+        }
+
+        .chat-input-container {
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            max-height: 120px;
+            min-height: 45px;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #2c5f7d;
+        }
+
+        .chat-send-btn {
+            background: #2c5f7d;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+
+        .chat-send-btn:hover {
+            background: #1e4a5f;
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 16px;
+            background: #f0f2f5;
+            border-radius: 15px;
+            width: fit-content;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-chat {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-chat i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 6px 12px;
+            background: #f0f2f5;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .quick-action-btn:hover {
+            background: #e0e2e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Terug naar overzicht knop -->
+        <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;">
+            <i class="fas fa-arrow-left"></i> Terug naar overzicht
+        </a>
+
+        <div class="chat-header">
+            <h1>
+                <i class="fas fa-comments"></i>
+                Admin Chat
+            </h1>
+            <p>Intern communicatiekanaal voor administratoren</p>
+
+            <div class="online-admins">
+                <small style="color: #666;">Online admins:</small>
+                <div class="admin-avatar online" title="Admin (Jij)">
+                    <i class="fas fa-user"></i>
+                </div>
+                <!-- More admins will be shown here when online -->
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="empty-chat">
+                <i class="fas fa-comments"></i>
+                <h3>Nog geen berichten</h3>
+                <p>Begin een conversatie met je mede-admins</p>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <small style="margin-left: 5px;">Admin is aan het typen...</small>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="insertQuickMessage('👍 Oke')">👍 Oke</button>
+                <button class="quick-action-btn" onclick="insertQuickMessage('✅ Klaar')">✅ Klaar</button>
+                <button class="quick-action-btn" onclick="insertQuickMessage('⏰ Straks verder')">⏰ Straks verder</button>
+                <button class="quick-action-btn" onclick="insertQuickMessage('❓ Vraag')">❓ Vraag</button>
+                <button class="quick-action-btn" onclick="insertQuickMessage('🎣 Goed vangst!')">🎣 Goed vangst!</button>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <textarea
+                    id="chatInput"
+                    class="chat-input"
+                    placeholder="Type een bericht voor andere admins..."
+                    rows="1"
+                    onkeydown="handleKeyPress(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+                <button class="chat-send-btn" onclick="sendMessage()" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-auth.js"></script>
+    <script>
+        // Store in localStorage (in production, use real-time database)
+        let chatMessages = JSON.parse(localStorage.getItem('admin_chat_messages') || '[]');
+        let currentAdmin = localStorage.getItem('admin_name') || 'Admin';
+
+        // Load messages on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+            scrollToBottom();
+
+            // Auto-refresh every 5 seconds to simulate real-time
+            setInterval(loadMessages, 5000);
+        });
+
+        function loadMessages() {
+            const container = document.getElementById('chatMessages');
+            const messages = JSON.parse(localStorage.getItem('admin_chat_messages') || '[]');
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <h3>Nog geen berichten</h3>
+                        <p>Begin een conversatie met je mede-admins</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group messages by sender
+            let html = '';
+            let lastSender = null;
+
+            messages.forEach((msg, index) => {
+                const isOwn = msg.sender === currentAdmin;
+
+                // Start new group if sender changed
+                if (msg.sender !== lastSender) {
+                    if (lastSender !== null) {
+                        html += '</div>'; // Close previous group
+                    }
+                    html += `<div class="message-group ${isOwn ? 'own' : ''}">`;
+
+                    if (!isOwn) {
+                        html += `
+                            <div class="message-sender">
+                                <i class="fas fa-user-circle"></i>
+                                <strong>${msg.sender}</strong>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `
+                    <div class="message">
+                        <div class="message-text">${escapeHtml(msg.text)}</div>
+                        <div class="message-time">${formatTime(msg.timestamp)}</div>
+                        <div class="message-actions">
+                            ${isOwn ? `
+                                <button class="message-action-btn" onclick="editMessage(${index})" title="Bewerken">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="message-action-btn" onclick="deleteMessage(${index})" title="Verwijderen">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : `
+                                <button class="message-action-btn" onclick="replyToMessage(${index})" title="Beantwoorden">
+                                    <i class="fas fa-reply"></i>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                lastSender = msg.sender;
+
+                // Close group if last message or next sender is different
+                if (index === messages.length - 1 || messages[index + 1]?.sender !== msg.sender) {
+                    html += '</div>';
+                    lastSender = null;
+                }
+            });
+
+            // Only update if content changed (prevent scroll jump)
+            if (container.innerHTML.trim() !== html.trim()) {
+                const wasAtBottom = isScrolledToBottom();
+                container.innerHTML = html;
+                if (wasAtBottom) {
+                    scrollToBottom();
+                }
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const message = {
+                id: Date.now(),
+                sender: currentAdmin,
+                text: text,
+                timestamp: new Date().toISOString()
+            };
+
+            chatMessages.push(message);
+            localStorage.setItem('admin_chat_messages', JSON.stringify(chatMessages));
+
+            input.value = '';
+            autoResize(input);
+            loadMessages();
+            scrollToBottom();
+        }
+
+        function deleteMessage(index) {
+            if (confirm('Weet je zeker dat je dit bericht wilt verwijderen?')) {
+                chatMessages.splice(index, 1);
+                localStorage.setItem('admin_chat_messages', JSON.stringify(chatMessages));
+                loadMessages();
+            }
+        }
+
+        function editMessage(index) {
+            const newText = prompt('Bewerk bericht:', chatMessages[index].text);
+            if (newText !== null && newText.trim() !== '') {
+                chatMessages[index].text = newText.trim();
+                chatMessages[index].edited = true;
+                localStorage.setItem('admin_chat_messages', JSON.stringify(chatMessages));
+                loadMessages();
+            }
+        }
+
+        function replyToMessage(index) {
+            const input = document.getElementById('chatInput');
+            const originalText = chatMessages[index].text;
+            const sender = chatMessages[index].sender;
+
+            input.value = `@${sender}: `;
+            input.focus();
+        }
+
+        function insertQuickMessage(text) {
+            const input = document.getElementById('chatInput');
+            input.value = text;
+            input.focus();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function isScrolledToBottom() {
+            const container = document.getElementById('chatMessages');
+            return container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) {
+                // Today - show time
+                return date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            } else if (days === 1) {
+                return 'Gisteren ' + date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            } else if (days < 7) {
+                const weekdays = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+                return weekdays[date.getDay()] + ' ' + date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ' ' +
+                       date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Clear all messages (admin function)
+        function clearAllMessages() {
+            if (confirm('Weet je zeker dat je ALLE chatberichten wilt verwijderen?')) {
+                localStorage.removeItem('admin_chat_messages');
+                chatMessages = [];
+                loadMessages();
+            }
+        }
+
+        // Export chat history
+        function exportChatHistory() {
+            const messages = JSON.parse(localStorage.getItem('admin_chat_messages') || '[]');
+            const text = messages.map(m =>
+                `[${new Date(m.timestamp).toLocaleString('nl-NL')}] ${m.sender}: ${m.text}`
+            ).join('\n');
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `admin-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

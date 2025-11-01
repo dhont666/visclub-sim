@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weersvoorspelling - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bot/bot-chat-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="kalender.html" class="nav-link">Kalender</a></li>
+                <li><a href="inschrijven.html" class="nav-link">Inschrijven</a></li>
+                <li><a href="visvergunning.html" class="nav-link">Visvergunning</a></li>
+                <li><a href="weer.html" class="nav-link active">Weer</a></li>
+                <li><a href="gallerij.html" class="nav-link">Gallerij</a></li>
+                <li><a href="route.html" class="nav-link">Route</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Weather Section -->
+    <section class="weather-section" style="padding-top: 120px; min-height: 80vh;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Weersvoorspelling Merksplas</h2>
+                <div class="section-line"></div>
+                <p>Plan je visdag met de actuele weersvoorspelling</p>
+            </div>
+
+            <div class="weather-widget">
+                <div id="weatherContainer" class="weather-container">
+                    <div class="weather-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Weersgegevens laden...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fishing Weather Tips -->
+            <div class="weather-tips" style="margin-top: 40px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h3 style="margin-bottom: 24px; color: #2c5f7d;"><i class="fas fa-lightbulb"></i> Vistips op basis van weer</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                    <div style="padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #28a745;">
+                        <h4 style="color: #28a745; margin-bottom: 12px;"><i class="fas fa-arrow-down"></i> Lage Luchtdruk</h4>
+                        <p style="font-size: 14px; line-height: 1.6; color: #666;">Uitstekend voor vissen! Bij lage luchtdruk (< 1010 hPa) zijn vissen actiever en zoeken meer voedsel. Perfect moment om te gaan vissen!</p>
+                    </div>
+                    <div style="padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #ffc107;">
+                        <h4 style="color: #ffc107; margin-bottom: 12px;"><i class="fas fa-arrow-up"></i> Hoge Luchtdruk</h4>
+                        <p style="font-size: 14px; line-height: 1.6; color: #666;">Moeilijker om te vissen. Bij hoge luchtdruk (> 1020 hPa) zijn vissen passiever. Meer geduld nodig voor een beet.</p>
+                    </div>
+                    <div style="padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #17a2b8;">
+                        <h4 style="color: #17a2b8; margin-bottom: 12px;"><i class="fas fa-wind"></i> Wind Richting</h4>
+                        <p style="font-size: 14px; line-height: 1.6; color: #666;">Zuid-west wind is ideaal! Wind duwt aasvisjes naar de windkant waar roofvissen jagen. Zoek de windkant op!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Visclub SiM</h3>
+                    <p>Gepassioneerd vissen in Merksplas sinds jaren. Lid worden of meedoen aan onze wedstrijden? Neem contact op!</p>
+                    <p><small>Nijverheidsstraat 6, 2330 Merksplas</small></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="kalender.html">Kalender</a></li>
+                        <li><a href="inschrijven.html">Inschrijven</a></li>
+                        <li><a href="inschrijvingen.html">Inschrijvingen</a></li>
+                        <li><a href="visvergunning.html">Visvergunning</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Volg ons</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/visclubsim" target="_blank" title="Volg ons op Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@visclubsim" target="_blank" title="Bekijk onze YouTube kanaal"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Blijf op de hoogte van al ons nieuws!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Vis Advies Bot Scripts -->
+    <script src="bot/weer-vangst-bot.js"></script>
+    <script src="bot/bot-chat-interface.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

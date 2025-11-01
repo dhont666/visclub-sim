@@ -1,0 +1,84 @@
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Database
+database/*.db
+database/*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Railway
+.railway/
+
+# Supabase
+.supabase/
+
+# Sensitive data
+secrets/
+credentials/
+*.pem
+*.key
+*.cert
+
+# Python (for test scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+ENV/
+
+# Testing
+tests/screenshots/*.png
+tests/reports/
+
+# Don't ignore these important files
+!.env.example
+!.gitignore
+!.htaccess

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inschrijven - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bot/bot-chat-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="kalender.html" class="nav-link">Kalender</a></li>
+                <li><a href="inschrijven.html" class="nav-link active">Inschrijven</a></li>
+                <li><a href="leden.html" class="nav-link">Leden</a></li>
+                <li><a href="visvergunning.html" class="nav-link">Visvergunning</a></li>
+                <li><a href="weer.html" class="nav-link">Weer</a></li>
+                <li><a href="gallerij.html" class="nav-link">Gallerij</a></li>
+                <li><a href="route.html" class="nav-link">Route</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Section -->
+    <section class="registration-section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Inschrijven voor Wedstrijd</h2>
+                <div class="section-line"></div>
+                <p>Eenvoudige inschrijving - alleen naam en wedstrijd keuze</p>
+            </div>
+
+            <!-- Quick Links -->
+            <div style="text-align: center; margin-bottom: 40px;">
+                <a href="inschrijvingen.html" class="btn btn-secondary" style="margin: 0 10px;">
+                    <i class="fas fa-list"></i> Bekijk Inschrijvingen
+                </a>
+            </div>
+
+            <div class="registration-container">
+                <div class="registration-info">
+                    <h3>Inschrijfgelden 2026</h3>
+                    <ul class="price-list">
+                        <li>
+                            <span class="price-type">Vrije Gewone Wedstrijd</span>
+                            <span class="price-amount">€10,00</span>
+                        </li>
+                        <li>
+                            <span class="price-type">Vrije Koppelwedstrijd</span>
+                            <span class="price-amount">€20,00</span>
+                        </li>
+                        <li>
+                            <span class="price-type">Nachtkoppelwedstrijd</span>
+                            <span class="price-amount">€30,00</span>
+                        </li>
+                        <li>
+                            <span class="price-type">Clubwedstrijd (alleen leden)</span>
+                            <span class="price-amount">€10,00</span>
+                        </li>
+                        <li>
+                            <span class="price-type">Avondwedstrijd</span>
+                            <span class="price-amount">€10,00</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="registration-form-container">
+                    <form class="registration-form" id="registrationForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">Voornaam *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Achternaam *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <!-- Partner fields for koppelwedstrijden -->
+                        <div id="partnerGroup" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="partnerFirstName">Voornaam partner *</label>
+                                    <input type="text" id="partnerFirstName" name="partnerFirstName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="partnerLastName">Achternaam partner *</label>
+                                    <input type="text" id="partnerLastName" name="partnerLastName">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="competition">Wedstrijd *</label>
+                            <select id="competition" name="competition" required>
+                                <option value="">Kies een wedstrijd</option>
+                                <!-- Options will be populated via JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="remarks">Opmerkingen</label>
+                            <textarea id="remarks" name="remarks" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label><strong>Betaalwijze *</strong></label>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                                    <input type="radio" name="paymentMethod" value="qr" checked required>
+                                    <div>
+                                        <strong><i class="fas fa-qrcode"></i> Betalen via QR code</strong>
+                                        <small style="display: block; color: #666; margin-top: 4px;">Scan de QR code met je bankapp</small>
+                                    </div>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                                    <input type="radio" name="paymentMethod" value="onsite" required>
+                                    <div>
+                                        <strong><i class="fas fa-money-bill-wave"></i> Betalen ter plaatse</strong>
+                                        <small style="display: block; color: #666; margin-top: 4px;">Betaal op de dag van de wedstrijd</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <span>Ik ga akkoord met de wedstrijdreglementen *</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large">
+                            <i class="fas fa-paper-plane"></i> Verzenden
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-qrcode"></i> Betaling via QR Code</h2>
+                <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="payment-info">
+                    <div class="payment-success">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Inschrijving Ontvangen!</h3>
+                        <p>Je inschrijving is succesvol geregistreerd.</p>
+                    </div>
+
+                    <div class="payment-details">
+                        <h4>Te betalen bedrag</h4>
+                        <div class="amount" id="paymentAmount">€10,00</div>
+
+                        <div class="qr-section">
+                            <p><strong>Scan de QR code met je bankapp om te betalen:</strong></p>
+                            <div id="qrcode" class="qr-code-container"></div>
+                            <p class="qr-hint">
+                                <i class="fas fa-mobile-alt"></i> Open je bankapp en scan deze QR code
+                            </p>
+                        </div>
+
+                        <div class="manual-payment">
+                            <h4>Of overmaken naar:</h4>
+                            <div class="bank-details">
+                                <div class="bank-detail-item">
+                                    <strong>Rekeningnummer:</strong>
+                                    <span id="bankAccount">BE00 0000 0000 0000</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('bankAccount')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="bank-detail-item">
+                                    <strong>Op naam van:</strong>
+                                    <span>Visclub SiM</span>
+                                </div>
+                                <div class="bank-detail-item">
+                                    <strong>Mededeling:</strong>
+                                    <span id="paymentReference">INS-2026-001</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('paymentReference')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-note">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Je ontvangt een bevestigingsmail zodra je betaling is ontvangen.
+                               Betaal uiterlijk 1 uur voor aanvang van de wedstrijd.</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="closePaymentModal()">
+                            <i class="fas fa-check"></i> Begrepen
+                        </button>
+                        <button class="btn btn-secondary" onclick="printPayment()">
+                            <i class="fas fa-print"></i> Print Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Visclub SiM</h3>
+                    <p>Gepassioneerd vissen in Merksplas sinds jaren. Lid worden of meedoen aan onze wedstrijden? Neem contact op!</p>
+                    <p><small>Nijverheidsstraat 6, 2330 Merksplas</small></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="kalender.html">Kalender</a></li>
+                        <li><a href="inschrijven.html">Inschrijven</a></li>
+                        <li><a href="inschrijvingen.html">Inschrijvingen</a></li>
+                        <li><a href="visvergunning.html">Visvergunning</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Volg ons</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/visclubsim" target="_blank" title="Volg ons op Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@visclubsim" target="_blank" title="Bekijk onze YouTube kanaal"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Blijf op de hoogte van al ons nieuws!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Vis Advies Bot Scripts -->
+    <script src="bot/weer-vangst-bot.js"></script>
+    <script src="bot/bot-chat-interface.js"></script>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Highlight selected payment option
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for preselected competition from calendar
+            const preselectedData = sessionStorage.getItem('preselectedCompetition');
+            if (preselectedData) {
+                try {
+                    const competition = JSON.parse(preselectedData);
+                    console.log('📅 Preselectie vanuit kalender:', competition);
+
+                    // Find and select the competition in dropdown
+                    const competitionSelect = document.getElementById('competition');
+                    if (competitionSelect) {
+                        const options = competitionSelect.options;
+                        for (let i = 0; i < options.length; i++) {
+                            if (options[i].textContent.includes(competition.date)) {
+                                competitionSelect.selectedIndex = i;
+                                console.log('✅ Wedstrijd geselecteerd:', options[i].textContent);
+
+                                // Trigger change event to update partner fields if needed
+                                competitionSelect.dispatchEvent(new Event('change'));
+
+                                // Scroll to form
+                                setTimeout(() => {
+                                    const formSection = document.getElementById('inschrijven');
+                                    if (formSection) {
+                                        const navHeight = 80;
+                                        window.scrollTo({
+                                            top: formSection.offsetTop - navHeight,
+                                            behavior: 'smooth'
+                                        });
+                                    }
+                                }, 300);
+
+                                break;
+                            }
+                        }
+                    }
+
+                    // Clear the session storage
+                    sessionStorage.removeItem('preselectedCompetition');
+                } catch (e) {
+                    console.error('Error loading preselected competition:', e);
+                    sessionStorage.removeItem('preselectedCompetition');
+                }
+            }
+
+            const paymentOptions = document.querySelectorAll('.payment-option');
+
+            paymentOptions.forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+
+                // Initial state
+                if (radio.checked) {
+                    option.style.borderColor = '#2c5f7d';
+                    option.style.backgroundColor = '#f0f8ff';
+                }
+
+                option.addEventListener('click', function() {
+                    // Reset all
+                    paymentOptions.forEach(opt => {
+                        opt.style.borderColor = '#ddd';
+                        opt.style.backgroundColor = 'transparent';
+                    });
+
+                    // Highlight selected
+                    if (radio.checked) {
+                        option.style.borderColor = '#2c5f7d';
+                        option.style.backgroundColor = '#f0f8ff';
+                    }
+                });
+
+                radio.addEventListener('change', function() {
+                    // Reset all
+                    paymentOptions.forEach(opt => {
+                        opt.style.borderColor = '#ddd';
+                        opt.style.backgroundColor = 'transparent';
+                    });
+
+                    // Highlight selected
+                    if (this.checked) {
+                        option.style.borderColor = '#2c5f7d';
+                        option.style.backgroundColor = '#f0f8ff';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

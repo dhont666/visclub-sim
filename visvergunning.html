@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visvergunning Aanvragen - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bot/bot-chat-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="kalender.html" class="nav-link">Kalender</a></li>
+                <li><a href="inschrijven.html" class="nav-link">Inschrijven</a></li>
+                <li><a href="leden.html" class="nav-link">Leden</a></li>
+                <li><a href="visvergunning.html" class="nav-link active">Visvergunning</a></li>
+                <li><a href="weer.html" class="nav-link">Weer</a></li>
+                <li><a href="gallerij.html" class="nav-link">Gallerij</a></li>
+                <li><a href="route.html" class="nav-link">Route</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Fishing Permit Section -->
+    <section class="permit-section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Visvergunning Aanvragen</h2>
+                <div class="section-line"></div>
+                <p>Verkrijg je visvergunning voor ons water in Merksplas</p>
+            </div>
+
+            <div class="permit-container">
+                <div class="permit-info">
+                    <div class="info-card highlight">
+                        <div class="info-icon">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <h3>Prijzen 2026</h3>
+                        <ul class="permit-prices">
+                            <li>
+                                <span>Jaarvergunning (vrij vissen alle vijvers)</span>
+                                <span class="price">€75,00</span>
+                            </li>
+                            <li>
+                                <span>Wedstrijdvissers</span>
+                                <span class="price">€60,00</span>
+                            </li>
+                            <li>
+                                <span>Jongeren (tot 16 jaar)</span>
+                                <span class="price">€30,00</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Inbegrepen</h3>
+                        <ul>
+                            <li>Toegang tot ons viswater</li>
+                            <li>Vissen op karper, snoek, baars en witvis</li>
+                            <li>Gebruik van faciliteiten</li>
+                            <li>Deelname aan vrije wedstrijden</li>
+                            <li>Nieuwsbrief en updates</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3>Belangrijke Info</h3>
+                        <ul>
+                            <li>Huisreglement naleven</li>
+                            <li>Max. 2 hengels per persoon</li>
+                            <li>Catch & Release aangeraden</li>
+                            <li>Respect voor natuur en medestanders</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="info-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h3>Automatisch Lidmaatschap</h3>
+                        <p style="margin-bottom: 1rem;">Bij aankoop van een visvergunning word je automatisch geregistreerd als lid van Visclub SiM!</p>
+                        <ul>
+                            <li>Persoonlijk lidnummer</li>
+                            <li>Opname in ledenlijst</li>
+                            <li>Wedstrijdgeschiedenis tracking</li>
+                            <li>Klassement deelname</li>
+                            <li>Bekijk je profiel op <a href="leden.html" style="color: var(--primary-color); font-weight: bold;">Leden pagina</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="permit-form-container">
+                    <form class="permit-form" id="permitForm">
+                        <h3>Aanvraagformulier</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="permitFirstName">Voornaam *</label>
+                                <input type="text" id="permitFirstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="permitLastName">Achternaam *</label>
+                                <input type="text" id="permitLastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="permitEmail">E-mailadres *</label>
+                            <input type="email" id="permitEmail" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="permitPhone">Telefoonnummer *</label>
+                            <input type="tel" id="permitPhone" name="phone" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="permitStreet">Straat en nummer *</label>
+                                <input type="text" id="permitStreet" name="street" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="permitCity">Gemeente *</label>
+                                <input type="text" id="permitCity" name="city" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="permitPostal">Postcode *</label>
+                                <input type="text" id="permitPostal" name="postal" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="permitBirthdate">Geboortedatum *</label>
+                                <input type="date" id="permitBirthdate" name="birthdate" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="permitType">Type Vergunning *</label>
+                            <select id="permitType" name="permitType" required>
+                                <option value="">Kies een vergunning</option>
+                                <option value="year">Jaarvergunning (vrij vissen alle vijvers) - €75,00</option>
+                                <option value="competition">Wedstrijdvissers - €60,00</option>
+                                <option value="youth">Jongeren (tot 16 jaar) - €30,00</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="permitRemarks">Opmerkingen</label>
+                            <textarea id="permitRemarks" name="remarks" rows="4" placeholder="Eventuele vragen of opmerkingen..."></textarea>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="permitTerms" name="terms" required>
+                                <span>Ik ga akkoord met het huisreglement en de voorwaarden *</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large">
+                            <i class="fas fa-paper-plane"></i> Aanvraag Indienen
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div style="margin-top: 60px; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h3 style="color: #2c5f7d; margin-bottom: 20px;"><i class="fas fa-book"></i> Huisreglement</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                    <div>
+                        <h4 style="color: #2c5f7d; margin-bottom: 12px;">Algemeen</h4>
+                        <ul style="line-height: 1.8; color: #666;">
+                            <li>Respecteer de natuur en het viswater</li>
+                            <li>Neem je afval mee</li>
+                            <li>Houd de visstekken netjes</li>
+                            <li>Wees respectvol naar medestanders</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f7d; margin-bottom: 12px;">Vistechnieken</h4>
+                        <ul style="line-height: 1.8; color: #666;">
+                            <li>Maximum 2 hengels per persoon</li>
+                            <li>Weerhaakloze haken aangeraden</li>
+                            <li>Landingsnetten verplicht</li>
+                            <li>Catch & Release sterk aangeraden</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f7d; margin-bottom: 12px;">Toegang</h4>
+                        <ul style="line-height: 1.8; color: #666;">
+                            <li>Toon je vergunning op verzoek</li>
+                            <li>Toegang van zonsopgang tot zonsondergang</li>
+                            <li>Nachtvissen alleen met toestemming</li>
+                            <li>Parkeren op aangewezen plaatsen</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Visclub SiM</h3>
+                    <p>Gepassioneerd vissen in Merksplas sinds jaren. Lid worden of meedoen aan onze wedstrijden? Neem contact op!</p>
+                    <p><small>Nijverheidsstraat 6, 2330 Merksplas</small></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="kalender.html">Kalender</a></li>
+                        <li><a href="inschrijven.html">Inschrijven</a></li>
+                        <li><a href="inschrijvingen.html">Inschrijvingen</a></li>
+                        <li><a href="visvergunning.html">Visvergunning</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Volg ons</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/visclubsim" target="_blank" title="Volg ons op Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@visclubsim" target="_blank" title="Bekijk onze YouTube kanaal"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Blijf op de hoogte van al ons nieuws!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Vis Advies Bot Scripts -->
+    <script src="bot/weer-vangst-bot.js"></script>
+    <script src="bot/bot-chat-interface.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

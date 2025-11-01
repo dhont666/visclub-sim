@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedstrijdkalender 2026 - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bot/bot-chat-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="kalender.html" class="nav-link active">Kalender</a></li>
+                <li><a href="inschrijven.html" class="nav-link">Inschrijven</a></li>
+                <li><a href="leden.html" class="nav-link">Leden</a></li>
+                <li><a href="visvergunning.html" class="nav-link">Visvergunning</a></li>
+                <li><a href="weer.html" class="nav-link">Weer</a></li>
+                <li><a href="gallerij.html" class="nav-link">Gallerij</a></li>
+                <li><a href="route.html" class="nav-link">Route</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Calendar Section -->
+    <section class="calendar-section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Wedstrijdkalender 2026</h2>
+                <div class="section-line"></div>
+                <p>Bekijk alle wedstrijden en evenementen voor 2026</p>
+            </div>
+
+            <!-- Calendar Filters -->
+            <div class="calendar-filters">
+                <button class="filter-btn active" data-filter="all">Alle</button>
+                <button class="filter-btn" data-filter="vrije-gewone">Vrije Gewone</button>
+                <button class="filter-btn" data-filter="vrije-koppel">Vrije Koppel</button>
+                <button class="filter-btn" data-filter="clubwedstrijd">Clubwedstrijd</button>
+                <button class="filter-btn" data-filter="avondwedstrijd">Avondwedstrijd</button>
+                <button class="filter-btn" data-filter="criterium">Criterium</button>
+                <button class="filter-btn" data-filter="veteranen">Veteranen</button>
+            </div>
+
+            <!-- Calendar Stats -->
+            <div class="calendar-stats">
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>74</h3>
+                    <p>Evenementen</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-fish"></i>
+                    <h3>71</h3>
+                    <p>Wedstrijden</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-moon"></i>
+                    <h3>13</h3>
+                    <p>Avondwedstrijden</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-award"></i>
+                    <h3>5</h3>
+                    <p>Criterium Wedstrijden</p>
+                </div>
+            </div>
+
+            <!-- Calendar Table -->
+            <div class="calendar-table-container">
+                <table class="calendar-table" id="calendarTable">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Dag</th>
+                            <th>Wedstrijd</th>
+                            <th>Tijd</th>
+                            <th>Inschrijfgeld</th>
+                            <th>Actie</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendarBody">
+                        <!-- Calendar data will be loaded via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Visclub SiM</h3>
+                    <p>Gepassioneerd vissen in Merksplas sinds jaren. Lid worden of meedoen aan onze wedstrijden? Neem contact op!</p>
+                    <p><small>Nijverheidsstraat 6, 2330 Merksplas</small></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="kalender.html">Kalender</a></li>
+                        <li><a href="inschrijven.html">Inschrijven</a></li>
+                        <li><a href="inschrijvingen.html">Inschrijvingen</a></li>
+                        <li><a href="visvergunning.html">Visvergunning</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Volg ons</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/visclubsim" target="_blank" title="Volg ons op Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@visclubsim" target="_blank" title="Bekijk onze YouTube kanaal"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Blijf op de hoogte van al ons nieuws!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Vis Advies Bot Scripts -->
+    <script src="bot/weer-vangst-bot.js"></script>
+    <script src="bot/bot-chat-interface.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

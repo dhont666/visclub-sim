@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plaatsentrekking - Visclub SiM Admin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="../vijverkaart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for plaatsentrekking */
+        .draw-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .competition-selector {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .participants-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .participants-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .participant-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .fixed-positions-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #2c5f7d;
+            margin-bottom: 25px;
+        }
+
+        .fixed-position-input {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .fixed-positions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .fixed-position-badge {
+            background: white;
+            border: 2px solid #2c5f7d;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fixed-position-badge .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .draw-controls {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .draw-animation {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .draw-animation.active {
+            display: block;
+        }
+
+        .drawing-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #2c5f7d;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .results-section {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2c5f7d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-card.fixed {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+        }
+
+        .result-spot {
+            background: #2c5f7d;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .result-card.fixed .result-spot {
+            background: #ffc107;
+        }
+
+        .publish-section {
+            background: #e8f4f8;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px dashed #2c5f7d;
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .publish-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .publish-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .publish-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Vijver spot selection buttons */
+        .vijver-spot-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #999;
+        }
+
+        .vijver-spot-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .vijver-spot-btn.selected {
+            background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%);
+            border-color: #2c5f7d;
+            color: white;
+        }
+
+        .vijver-spot-btn.fixed {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            border-color: #ff5722;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .vijver-spot-btn:disabled {
+            opacity: 0.7;
+        }
+
+        /* Vijverkaart spot selection styling (interactive) */
+        #admin-vijverkaart .visplaats.vijver-selected {
+            background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%) !important;
+            border-color: #2c5f7d !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+
+        #admin-vijverkaart .visplaats.vijver-unselected {
+            background: #f0f0f0 !important;
+            border-color: #ddd !important;
+            color: #999 !important;
+            opacity: 0.6;
+        }
+
+        #admin-vijverkaart .visplaats.vijver-fixed {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%) !important;
+            border-color: #ff5722 !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+
+        #admin-vijverkaart .visplaats.vijver-selected:hover,
+        #admin-vijverkaart .visplaats.vijver-unselected:hover {
+            transform: scale(1.15) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+        }
+
+        #admin-vijverkaart .visplaats.vijver-fixed:hover {
+            transform: scale(1.05) !important;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header" style="background: #2c5f7d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="index.html" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-arrow-left"></i> Terug naar Dashboard
+            </a>
+            <h1 style="margin: 0; font-size: 24px;">
+                <i class="fas fa-random"></i> Plaatsentrekking
+            </h1>
+        </div>
+        <div id="adminInfo" style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-user-circle"></i>
+            <span id="adminName">Admin</span>
+        </div>
+    </header>
+
+    <div class="draw-container">
+        <!-- Terug naar overzicht knop -->
+        <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;">
+            <i class="fas fa-arrow-left"></i> Terug naar overzicht
+        </a>
+
+        <!-- Quick Setup Section (shown when no data) -->
+        <div id="quickSetupSection" class="competition-selector" style="display: none; background: #fff3cd; border-left: 4px solid #ffc107;">
+            <h3 style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Geen Data Gevonden</h3>
+            <p style="color: #856404; margin-bottom: 15px;">
+                Er zijn nog geen leden of wedstrijden. Klik hieronder om snel demo data toe te voegen voor testen.
+            </p>
+            <button class="btn btn-primary btn-large" onclick="quickSetupDemo()" style="margin-right: 10px;">
+                <i class="fas fa-magic"></i> Voeg Demo Data Toe (Test Modus)
+            </button>
+            <a href="index.html" class="btn btn-secondary">
+                <i class="fas fa-user-plus"></i> Leden Handmatig Toevoegen
+            </a>
+        </div>
+
+        <!-- Competition Selection -->
+        <div class="competition-selector">
+            <h3><i class="fas fa-calendar-alt"></i> Selecteer Wedstrijd</h3>
+            <select id="competitionSelect" class="form-control" style="width: 100%; padding: 12px; font-size: 16px;">
+                <option value="">Kies een wedstrijd...</option>
+            </select>
+            <div id="competitionInfo" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Datum:</strong> <span id="compDate">-</span>
+                    </div>
+                    <div>
+                        <strong>Type:</strong> <span id="compType">-</span>
+                    </div>
+                    <div>
+                        <strong>Deelnemers:</strong> <span id="compParticipants">0</span>
+                    </div>
+                    <div>
+                        <strong>Status:</strong> <span id="compStatus" class="badge">Nog niet getrokken</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participants -->
+        <div class="participants-section" id="participantsSection" style="display: none;">
+            <h3><i class="fas fa-users"></i> Ingeschreven Deelnemers</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px; font-weight: normal;">
+                    <input type="checkbox" id="selectAll">
+                    <span>Selecteer alle deelnemers voor loting</span>
+                </label>
+            </div>
+            <div class="participants-list" id="participantsList">
+                <!-- Participants will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Vijvernummer Selectie Info -->
+        <div class="vijver-selection-info" id="vijverSelectionInfo" style="display: none; background: #e7f3ff; padding: 20px; border-radius: 10px; border-left: 4px solid #0066cc; margin-bottom: 25px;">
+            <h4 style="margin: 0 0 10px 0; color: #0066cc;"><i class="fas fa-info-circle"></i> Selecteer Vijvernummers</h4>
+            <p style="margin: 0 0 15px 0; color: #333;">Klik op de nummers in de vijverkaart hieronder om plaatsen te selecteren/deselecteren voor de loting.</p>
+
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <button class="btn btn-success" onclick="selectAllSpots()">
+                    <i class="fas fa-check-double"></i> Selecteer Alle Plaatsen
+                </button>
+                <button class="btn btn-secondary" onclick="deselectAllSpots()">
+                    <i class="fas fa-times"></i> Deselecteer Alles
+                </button>
+                <div style="padding: 8px 15px; background: white; border-radius: 5px; border: 2px solid #2c5f7d;">
+                    <strong>Geselecteerd:</strong> <span id="selectedSpotsCount">43</span> van 43 plaatsen
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 14px;">
+                <div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Geselecteerd</div>
+                <div><span style="display: inline-block; width: 20px; height: 20px; background: #ddd; border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Niet geselecteerd</div>
+                <div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Vast toegewezen</div>
+            </div>
+        </div>
+
+        <!-- Fixed Positions -->
+        <div class="fixed-positions-section" id="fixedPositionsSection" style="display: none;">
+            <h3><i class="fas fa-thumbtack"></i> Vaste Plaatsen Toewijzen (Optioneel)</h3>
+            <p style="color: #666; margin-bottom: 20px;">Wijs specifieke plaatsen toe aan deelnemers voordat de loting start</p>
+
+            <div class="fixed-position-input">
+                <input type="text" id="fixedName" class="form-control" placeholder="Naam deelnemer" list="participantsDatalist">
+                <datalist id="participantsDatalist"></datalist>
+
+                <input type="number" id="fixedSpot" class="form-control" placeholder="Plaats (1-43)" min="1" max="43">
+
+                <button class="btn btn-primary" onclick="addFixedPosition()">
+                    <i class="fas fa-plus"></i> Toevoegen
+                </button>
+            </div>
+
+            <div>
+                <h4>Toegewezen vaste plaatsen:</h4>
+                <div class="fixed-positions-list" id="fixedPositionsList">
+                    <p style="color: #999;">Nog geen vaste plaatsen toegewezen</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Draw Controls -->
+        <div class="draw-controls" id="drawControls" style="display: none;">
+            <h2 style="margin-bottom: 10px;">Klaar voor de trekking?</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                <span id="selectedCount">0</span> deelnemers geselecteerd voor loting
+            </p>
+            <button class="btn btn-primary btn-large" id="startDrawBtn" onclick="startDraw()">
+                <i class="fas fa-random"></i> Start Automatische Trekking
+            </button>
+
+            <div class="draw-animation" id="drawAnimation">
+                <div class="drawing-number" id="drawingNumber">??</div>
+                <p>Plaatsen worden getrokken...</p>
+            </div>
+        </div>
+
+        <!-- Vijverkaart - Altijd Zichtbaar -->
+        <div class="vijverkaart-section" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px;">
+            <h3><i class="fas fa-map-marked-alt"></i> Visvijver Plattegrond</h3>
+            <p style="color: #666; margin-bottom: 20px;">Overzicht van alle visplaatsen (43 plaatsen)</p>
+            <div id="admin-vijverkaart"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection">
+            <h3><i class="fas fa-check-circle"></i> Trekking Resultaat</h3>
+
+            <!-- Results List -->
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be shown here -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                <button class="btn btn-secondary" onclick="exportResults()">
+                    <i class="fas fa-download"></i> Exporteer CSV
+                </button>
+                <button class="btn btn-secondary" onclick="printResults()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-secondary" onclick="resetDraw()">
+                    <i class="fas fa-redo"></i> Opnieuw Trekken
+                </button>
+            </div>
+
+            <!-- Publish Section -->
+            <div class="publish-section">
+                <h3 style="margin-bottom: 10px;">
+                    <i class="fas fa-globe"></i> Publiceer naar Website
+                </h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button class="publish-btn" id="publishBtn" onclick="publishResults()">
+                        <i class="fas fa-upload"></i> Publiceer Resultaten
+                    </button>
+                    <button class="publish-btn" style="background: #17a2b8;" onclick="generateDemoWeighings()">
+                        <i class="fas fa-flask"></i> Genereer Demo Wegingen
+                    </button>
+                </div>
+                <p style="margin-top: 15px; color: #28a745; display: none;" id="publishSuccess">
+                    <i class="fas fa-check-circle"></i> Succesvol gepubliceerd!
+                </p>
+                <p style="margin-top: 15px; color: #17a2b8; display: none;" id="demoSuccess">
+                    <i class="fas fa-check-circle"></i> Demo wegingen gegenereerd! <a href="../live-uitslag.html" target="_blank" style="color: #0056b3; text-decoration: underline;">Bekijk live scherm</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include admin auth and data API -->
+    <script src="admin-auth.js"></script>
+    <script src="data-api.js"></script>
+    <script src="../script.js"></script>
+
+    <script>
+        // State variables
+        let selectedCompetition = null;
+        let participants = [];
+        let selectedParticipants = [];
+        let fixedPositions = [];
+        let drawResults = [];
+        let validCompetitions = []; // Store competitions globally for change listener
+        let availableSpots = []; // Vijvernummers beschikbaar voor loting (1-43)
+
+        // Wait for all scripts to load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 DOMContentLoaded - Starting initialization...');
+
+            // Wait for admin-auth.js to complete its own auth check
+            // admin-auth.js sets authComplete flag after authentication
+            let retries = 0;
+            while (!window.adminAuth || !adminAuth.authComplete) {
+                if (retries > 30) {
+                    console.error('❌ Authentication timeout - admin-auth.js did not complete');
+                    console.log('Debug info:', {
+                        adminAuthExists: !!window.adminAuth,
+                        authComplete: window.adminAuth?.authComplete,
+                        currentUser: window.adminAuth?.currentUser
+                    });
+                    return;
+                }
+                if (retries % 5 === 0) {
+                    console.log(`⏳ Waiting for authentication... (attempt ${retries + 1}/30)`);
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            console.log('✅ User authenticated:', adminAuth.currentUser);
+            console.log('✅ Auth complete flag:', adminAuth.authComplete);
+
+            // Update admin display
+            adminAuth.updateUserDisplay();
+
+            // Initialize vijverkaart first
+            if (typeof Vijverkaart !== 'undefined') {
+                initVijverkaart();
+            } else {
+                console.error('❌ Vijverkaart class not found! Check if vijverkaart.js is loaded.');
+            }
+
+            // Load competitions
+            await loadCompetitions();
+        });
+
+        // Load competitions from calendar data
+        async function loadCompetitions() {
+            try {
+                console.log('🔄 Starting loadCompetitions...');
+
+                // Wait for dataAPI to be ready
+                if (!window.dataAPI) {
+                    console.error('❌ DataAPI not available');
+                    alert('Data systeem niet beschikbaar. Ververs de pagina.');
+                    return;
+                }
+                console.log('✅ DataAPI is available');
+
+                // Check if calendarData is available
+                if (!window.calendarData || !Array.isArray(window.calendarData)) {
+                    console.error('❌ Calendar data not available or invalid:', window.calendarData);
+                    console.log('📂 Available window properties:', Object.keys(window).filter(k => k.includes('calendar') || k.includes('Calendar')));
+                    alert('Kalender data niet beschikbaar. Ververs de pagina.');
+                    return;
+                }
+                console.log('✅ Calendar data is available, entries:', window.calendarData.length);
+
+                const competitionSelect = document.getElementById('competitionSelect');
+                if (!competitionSelect) {
+                    console.error('❌ Competition select element not found!');
+                    return;
+                }
+
+                const quickSetup = document.getElementById('quickSetupSection');
+
+                // Use getCurrentDate() if available (respects TEST_MODE), otherwise use current date
+                const today = window.getCurrentDate ? window.getCurrentDate() : new Date();
+                today.setHours(0, 0, 0, 0);
+
+                console.log('📅 Today:', today.toLocaleDateString('nl-BE'), '(TEST_MODE:', window.TEST_MODE || false, ')');
+
+                // Check if we have members
+                const members = await dataAPI.getMembers();
+                console.log('👥 Members found:', members.length);
+
+                // Show quick setup if no members
+                if (members.length === 0) {
+                    console.warn('⚠️ No members found, showing quick setup');
+                    quickSetup.style.display = 'block';
+                    competitionSelect.innerHTML = '<option value="">Geen leden - Voeg eerst leden toe</option>';
+                    competitionSelect.disabled = true;
+                    return;
+                } else {
+                    quickSetup.style.display = 'none';
+                }
+
+                // Load demo competitions from localStorage
+                const demoCompsStored = localStorage.getItem('demo_competitions');
+                let demoCompetitions = [];
+                if (demoCompsStored) {
+                    try {
+                        demoCompetitions = JSON.parse(demoCompsStored);
+                        console.log('✅ Found demo competitions in localStorage:', demoCompetitions.length);
+                    } catch (e) {
+                        console.error('Error parsing demo competitions:', e);
+                    }
+                }
+
+                // Combine calendar data with demo competitions
+                const allCompetitions = [...window.calendarData, ...demoCompetitions];
+
+                // Filter wedstrijden from calendar (exclude vergadering, bbq)
+                console.log('🔍 Filtering competitions from calendar data...');
+                validCompetitions = allCompetitions.filter(event => {
+                    // Parse datum (DD-MM-YYYY format)
+                    const [day, month, year] = event.datum.split('-').map(Number);
+                    const eventDate = new Date(year, month - 1, day);
+                    eventDate.setHours(0, 0, 0, 0);
+
+                    // Only include future competitions (not meetings or BBQ)
+                    const isFuture = eventDate >= today;
+                    const isCompetition = event.type !== 'vergadering' && event.type !== 'bbq';
+
+                    console.log(`  ${event.datum} (${event.wedstrijdtype}): future=${isFuture}, competition=${isCompetition}`);
+
+                    return isFuture && isCompetition;
+                });
+
+                console.log(`📊 Valid competitions after filtering: ${validCompetitions.length}`);
+
+                // Sort by date
+                validCompetitions.sort((a, b) => {
+                    const [dayA, monthA, yearA] = a.datum.split('-').map(Number);
+                    const [dayB, monthB, yearB] = b.datum.split('-').map(Number);
+                    const dateA = new Date(yearA, monthA - 1, dayA);
+                    const dateB = new Date(yearB, monthB - 1, dayB);
+                    return dateA - dateB;
+                });
+
+                // Clear existing options first
+                competitionSelect.innerHTML = '';
+                competitionSelect.disabled = false;
+
+                if (validCompetitions.length === 0) {
+                    console.warn('⚠️ No valid competitions found');
+                    competitionSelect.innerHTML = '<option value="">Geen aankomende wedstrijden</option>';
+                    competitionSelect.disabled = true;
+
+                    // Show helpful message
+                    const infoDiv = document.getElementById('competitionInfo');
+                    if (infoDiv) {
+                        infoDiv.style.display = 'block';
+                        infoDiv.innerHTML = '<p style="color: #666;">Er zijn momenteel geen aankomende wedstrijden in de kalender. Controleer de kalender data in script.js</p>';
+                    }
+                    return;
+                }
+
+                // Add placeholder option
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Kies een wedstrijd';
+                competitionSelect.appendChild(placeholderOption);
+
+                validCompetitions.forEach((competition, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${competition.datum} - ${competition.wedstrijdtype} (${competition.dag})`;
+                    competitionSelect.appendChild(option);
+                });
+
+                console.log('✅ Geladen wedstrijden:', validCompetitions.length);
+                console.log('📋 Wedstrijden details:', validCompetitions);
+
+                // Add change listener (only add once, so check if already added)
+                if (!competitionSelect.dataset.listenerAdded) {
+                    console.log('🔌 Adding change event listener to dropdown...');
+
+                    competitionSelect.addEventListener('change', async (e) => {
+                        console.log('🎯 Dropdown changed! Selected value:', e.target.value);
+                        const selectedValue = e.target.value;
+
+                        if (selectedValue === '') {
+                            // Placeholder selected - hide competition info
+                            console.log('ℹ️ Placeholder selected, hiding info');
+                            document.getElementById('competitionInfo').style.display = 'none';
+                            document.getElementById('participantsSection').style.display = 'none';
+                            return;
+                        }
+
+                        const selectedIndex = parseInt(selectedValue);
+                        console.log('🔍 Parsed index:', selectedIndex, 'Available competitions:', validCompetitions.length);
+
+                        if (!isNaN(selectedIndex) && validCompetitions[selectedIndex]) {
+                            console.log('✅ Loading competition:', validCompetitions[selectedIndex]);
+                            await loadCompetitionData(validCompetitions[selectedIndex]);
+                        } else {
+                            console.error('❌ Invalid selection! Index:', selectedIndex, 'Competition:', validCompetitions[selectedIndex]);
+                        }
+                    });
+
+                    competitionSelect.dataset.listenerAdded = 'true';
+                    console.log('✅ Event listener attached successfully');
+                } else {
+                    console.log('ℹ️ Event listener already attached, skipping');
+                }
+
+                // Auto-select first competition
+                if (validCompetitions.length > 0) {
+                    console.log('🎯 Auto-selecting first competition...');
+                    competitionSelect.value = '0';
+                    await loadCompetitionData(validCompetitions[0]);
+                    console.log('✅ First competition loaded');
+                }
+            } catch (error) {
+                console.error('Error loading competitions:', error);
+                alert('Fout bij laden wedstrijden: ' + error.message);
+            }
+        }
+
+        // Load competition data
+        async function loadCompetitionData(competition) {
+            try {
+                console.log('📊 loadCompetitionData called with:', competition);
+                selectedCompetition = competition;
+
+                // Update competition info
+                document.getElementById('competitionInfo').style.display = 'block';
+                document.getElementById('compDate').textContent = competition.datum;
+                document.getElementById('compType').textContent = competition.wedstrijdtype;
+                console.log('✅ Competition info updated in UI');
+
+                // Load registrations from backend
+                const allRegistrations = await dataAPI.getRegistrations();
+
+                // Filter registrations for this competition
+                participants = allRegistrations.filter(reg => {
+                    // Match by competition date or name
+                    return reg.competition === `${competition.datum} - ${competition.wedstrijdtype}` ||
+                           reg.competitionDate === competition.datum ||
+                           reg.competition.includes(competition.datum);
+                }).map(reg => ({
+                    id: reg.id,
+                    name: reg.partner ? `${reg.name} & ${reg.partner}` : reg.name,
+                    type: reg.partner ? 'Koppel' : 'Individueel'
+                }));
+
+                document.getElementById('compParticipants').textContent = participants.length;
+
+                // Check if already drawn (use datum as unique ID)
+                const drawKey = `draw_${competition.datum.replace(/-/g, '_')}`;
+                const savedDraw = localStorage.getItem(drawKey);
+                if (savedDraw) {
+                    const savedData = JSON.parse(savedDraw);
+                    drawResults = savedData.results;
+                    document.getElementById('compStatus').innerHTML = '<span class="badge" style="background: #28a745;">Getrokken</span>';
+                    showResults();
+                } else {
+                    document.getElementById('compStatus').innerHTML = '<span class="badge" style="background: #ffc107;">Nog niet getrokken</span>';
+                    showParticipants();
+                }
+
+                // Reset selections
+                fixedPositions = [];
+                selectedParticipants = [];
+                updateFixedPositionsUI();
+            } catch (error) {
+                console.error('Error loading competition data:', error);
+                alert('Fout bij laden wedstrijd data: ' + error.message);
+            }
+        }
+
+        // Show participants list
+        function showParticipants() {
+            document.getElementById('participantsSection').style.display = 'block';
+            document.getElementById('vijverSelectionInfo').style.display = 'block';
+            document.getElementById('fixedPositionsSection').style.display = 'block';
+            document.getElementById('drawControls').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            // Initialize available spots (all 43 by default)
+            initializeAvailableSpots();
+
+            // Ensure vijverkaart is visible and initialized
+            if (!adminVijverkaart) {
+                initVijverkaart();
+            }
+            // Render vijverkaart with selection UI
+            renderVijverkaartWithSelection();
+
+            const listEl = document.getElementById('participantsList');
+            listEl.innerHTML = '';
+
+            participants.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                item.innerHTML = `
+                    <input type="checkbox" id="participant_${p.id}" value="${p.id}" onchange="updateSelectedParticipants()">
+                    <label for="participant_${p.id}" style="cursor: pointer; flex: 1;">
+                        ${p.name} <small style="color: #666;">(${p.type})</small>
+                    </label>
+                `;
+                listEl.appendChild(item);
+            });
+
+            // Update datalist for autocomplete
+            const datalist = document.getElementById('participantsDatalist');
+            datalist.innerHTML = '';
+            participants.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.name;
+                datalist.appendChild(option);
+            });
+
+            // Select all by default
+            document.getElementById('selectAll').checked = true;
+            selectAllParticipants();
+        }
+
+        // Select all participants
+        function selectAllParticipants() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('#participantsList input[type="checkbox"]');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+            
+            updateSelectedParticipants();
+        }
+
+        document.getElementById('selectAll').addEventListener('change', selectAllParticipants);
+
+        // Update selected participants count
+        function updateSelectedParticipants() {
+            const checkboxes = document.querySelectorAll('#participantsList input[type="checkbox"]:checked');
+            selectedParticipants = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+            const fixedNames = fixedPositions.map(fp => fp.name.toLowerCase());
+            const availableForDraw = selectedParticipants.filter(id => {
+                const participant = participants.find(p => p.id === id);
+                return participant && !fixedNames.includes(participant.name.toLowerCase());
+            });
+
+            // Update counter text to be more clear
+            const totalSelected = selectedParticipants.length;
+            const withFixedPositions = totalSelected - availableForDraw.length;
+
+            if (withFixedPositions > 0) {
+                document.getElementById('selectedCount').textContent =
+                    `${availableForDraw.length} (${totalSelected} totaal, waarvan ${withFixedPositions} met vaste plaats)`;
+            } else {
+                document.getElementById('selectedCount').textContent = availableForDraw.length;
+            }
+        }
+
+        // =====================================
+        // VIJVERNUMMER SELECTIE FUNCTIES
+        // =====================================
+
+        function initializeAvailableSpots() {
+            // Start met alle 43 plaatsen geselecteerd
+            availableSpots = Array.from({length: 43}, (_, i) => i + 1);
+            updateSelectedSpotsCount();
+        }
+
+        function renderVijverkaartWithSelection() {
+            if (!adminVijverkaart) return;
+
+            // Render empty vijverkaart (no toewijzingen yet)
+            adminVijverkaart.render({});
+
+            // Apply selection styling and click handlers to spots
+            const spots = document.querySelectorAll('#admin-vijverkaart .visplaats');
+            spots.forEach(spot => {
+                const plaatsNr = parseInt(spot.dataset.plaats);
+                const isSelected = availableSpots.includes(plaatsNr);
+                const isFixed = fixedPositions.some(fp => fp.spot === plaatsNr);
+
+                // Remove existing classes
+                spot.classList.remove('vijver-selected', 'vijver-unselected', 'vijver-fixed');
+
+                // Add appropriate class
+                if (isFixed) {
+                    spot.classList.add('vijver-fixed');
+                    spot.style.pointerEvents = 'auto';
+                    spot.style.cursor = 'not-allowed';
+                } else if (isSelected) {
+                    spot.classList.add('vijver-selected');
+                    spot.style.pointerEvents = 'auto';
+                    spot.style.cursor = 'pointer';
+                } else {
+                    spot.classList.add('vijver-unselected');
+                    spot.style.pointerEvents = 'auto';
+                    spot.style.cursor = 'pointer';
+                }
+
+                // Add click handler
+                if (!isFixed) {
+                    spot.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleSpot(plaatsNr);
+                    };
+                } else {
+                    spot.onclick = null;
+                }
+            });
+
+            updateSelectedSpotsCount();
+        }
+
+        function toggleSpot(spotNumber) {
+            const index = availableSpots.indexOf(spotNumber);
+            if (index > -1) {
+                availableSpots.splice(index, 1);
+            } else {
+                availableSpots.push(spotNumber);
+                availableSpots.sort((a, b) => a - b);
+            }
+            renderVijverkaartWithSelection();
+        }
+
+        function selectAllSpots() {
+            availableSpots = Array.from({length: 43}, (_, i) => i + 1);
+            // Remove fixed positions from available spots
+            fixedPositions.forEach(fp => {
+                const index = availableSpots.indexOf(fp.spot);
+                if (index > -1) availableSpots.splice(index, 1);
+            });
+            renderVijverkaartWithSelection();
+        }
+
+        function deselectAllSpots() {
+            availableSpots = [];
+            renderVijverkaartWithSelection();
+        }
+
+        function updateSelectedSpotsCount() {
+            document.getElementById('selectedSpotsCount').textContent = availableSpots.length;
+        }
+
+        // Add fixed position
+        function addFixedPosition() {
+            const name = document.getElementById('fixedName').value.trim();
+            const spot = parseInt(document.getElementById('fixedSpot').value);
+
+            if (!name || !spot || spot < 1 || spot > 43) {
+                alert('Vul een geldige naam en plaats (1-43) in');
+                return;
+            }
+
+            // Check if spot already taken
+            if (fixedPositions.find(fp => fp.spot === spot)) {
+                alert(`Plaats ${spot} is al toegewezen`);
+                return;
+            }
+
+            // Check if person already has fixed position
+            if (fixedPositions.find(fp => fp.name.toLowerCase() === name.toLowerCase())) {
+                alert(`${name} heeft al een vaste plaats`);
+                return;
+            }
+
+            fixedPositions.push({ name, spot });
+
+            // Remove from available spots
+            const index = availableSpots.indexOf(spot);
+            if (index > -1) {
+                availableSpots.splice(index, 1);
+            }
+
+            updateFixedPositionsUI();
+            renderVijverkaartWithSelection(); // Update vijverkaart selection
+
+            // Clear inputs
+            document.getElementById('fixedName').value = '';
+            document.getElementById('fixedSpot').value = '';
+
+            updateSelectedParticipants();
+        }
+
+        // Update fixed positions UI
+        function updateFixedPositionsUI() {
+            const container = document.getElementById('fixedPositionsList');
+            
+            if (fixedPositions.length === 0) {
+                container.innerHTML = '<p style="color: #999;">Nog geen vaste plaatsen toegewezen</p>';
+                return;
+            }
+
+            container.innerHTML = fixedPositions
+                .sort((a, b) => a.spot - b.spot)
+                .map(fp => `
+                    <div class="fixed-position-badge">
+                        <strong>Plaats ${fp.spot}:</strong> ${fp.name}
+                        <button class="remove-btn" onclick="removeFixedPosition(${fp.spot})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+        }
+
+        // Remove fixed position
+        function removeFixedPosition(spot) {
+            fixedPositions = fixedPositions.filter(fp => fp.spot !== spot);
+
+            // Add back to available spots
+            if (!availableSpots.includes(spot)) {
+                availableSpots.push(spot);
+                availableSpots.sort((a, b) => a - b);
+            }
+
+            updateFixedPositionsUI();
+            renderVijverkaartWithSelection(); // Update vijverkaart selection
+            updateSelectedParticipants();
+        }
+
+        // Start draw
+        async function startDraw() {
+            // Filter out participants who already have fixed positions
+            const fixedNames = fixedPositions.map(fp => fp.name.toLowerCase().trim());
+            const availableParticipants = selectedParticipants
+                .map(id => participants.find(p => p.id === id))
+                .filter(p => {
+                    if (!p) return false;
+                    const participantName = p.name.toLowerCase().trim();
+                    const hasFixedPosition = fixedNames.some(fixedName => fixedName === participantName);
+                    if (hasFixedPosition) {
+                        console.log(`ℹ️ ${p.name} heeft al een vaste plaats, wordt overgeslagen in loting`);
+                    }
+                    return !hasFixedPosition;
+                });
+
+            if (availableParticipants.length === 0) {
+                if (fixedPositions.length > 0) {
+                    alert('Alle geselecteerde deelnemers hebben al een vaste plaats toegewezen. Er is niemand meer om te loten.');
+                } else {
+                    alert('Geen deelnemers geselecteerd voor loting');
+                }
+                return;
+            }
+
+            // Check if enough spots available (only count spots needed for lottery participants)
+            if (availableSpots.length < availableParticipants.length) {
+                const shortage = availableParticipants.length - availableSpots.length;
+                alert(`❌ Niet genoeg plaatsen beschikbaar!\n\n` +
+                      `📊 Situatie:\n` +
+                      `• Totaal deelnemers geselecteerd: ${selectedParticipants.length}\n` +
+                      `• Vaste plaatsen toegewezen: ${fixedPositions.length}\n` +
+                      `• Deelnemers die nog geloot moeten worden: ${availableParticipants.length}\n` +
+                      `• Plaatsen geselecteerd voor loting: ${availableSpots.length}\n\n` +
+                      `⚠️ Je hebt ${shortage} plaats${shortage > 1 ? 'en' : ''} te weinig!\n\n` +
+                      `💡 Oplossing: Selecteer minimaal ${availableParticipants.length} plaatsen op de vijverkaart voor de loting.`);
+                return;
+            }
+
+            // Hide controls, show animation
+            document.getElementById('drawControls').style.display = 'none';
+            document.getElementById('drawAnimation').classList.add('active');
+
+            drawResults = [];
+
+            // Add fixed positions first
+            fixedPositions.forEach(fp => {
+                drawResults.push({
+                    name: fp.name,
+                    spot: fp.spot,
+                    isFixed: true
+                });
+            });
+
+            // Shuffle available spots (use global availableSpots variable)
+            const shuffledSpots = [...availableSpots].sort(() => Math.random() - 0.5);
+
+            // Animate drawing
+            const drawingNumber = document.getElementById('drawingNumber');
+            
+            for (let i = 0; i < availableParticipants.length; i++) {
+                // Animate number
+                let counter = 0;
+                const interval = setInterval(() => {
+                    drawingNumber.textContent = Math.floor(Math.random() * 43) + 1;
+                    counter++;
+                    if (counter > 10) {
+                        clearInterval(interval);
+                        drawingNumber.textContent = shuffledSpots[i];
+                    }
+                }, 100);
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                drawResults.push({
+                    name: availableParticipants[i].name,
+                    spot: shuffledSpots[i],
+                    isFixed: false
+                });
+            }
+
+            // Save results (using datum as unique ID)
+            const drawKey = `draw_${selectedCompetition.datum.replace(/-/g, '_')}`;
+            localStorage.setItem(drawKey, JSON.stringify({
+                competition: selectedCompetition,
+                results: drawResults,
+                timestamp: new Date().toISOString()
+            }));
+
+            // Show results
+            setTimeout(() => {
+                document.getElementById('drawAnimation').classList.remove('active');
+                showResults();
+            }, 500);
+        }
+
+        // Show results
+        function showResults() {
+            document.getElementById('participantsSection').style.display = 'none';
+            document.getElementById('fixedPositionsSection').style.display = 'none';
+            document.getElementById('drawControls').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Update vijverkaart
+            if (!adminVijverkaart) initVijverkaart();
+            updateVijverkaartNaTrekking();
+
+            // Show results grid
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = '';
+
+            drawResults
+                .sort((a, b) => a.spot - b.spot)
+                .forEach(result => {
+                    const card = document.createElement('div');
+                    card.className = `result-card ${result.isFixed ? 'fixed' : ''}`;
+                    card.innerHTML = `
+                        <div>
+                            <strong>${result.name}</strong>
+                        </div>
+                        <div class="result-spot">${result.spot}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+        }
+
+
+        // Reset draw
+        function resetDraw() {
+            if (confirm('Weet je zeker dat je de trekking opnieuw wilt doen?')) {
+                const drawKey = `draw_${selectedCompetition.datum.replace(/-/g, '_')}`;
+                localStorage.removeItem(drawKey);
+                drawResults = [];
+                showParticipants();
+                document.getElementById('compStatus').innerHTML = '<span class="badge" style="background: #ffc107;">Nog niet getrokken</span>';
+            }
+        }
+
+        // Export results
+        function exportResults() {
+            let csv = 'Plaats,Naam,Type,Status\n';
+            drawResults
+                .sort((a, b) => a.spot - b.spot)
+                .forEach(result => {
+                    const status = result.isFixed ? 'Vaste Plaats' : 'Geloot';
+                    csv += `${result.spot},"${result.name}","${selectedCompetition.wedstrijdtype}","${status}"\n`;
+                });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `plaatsentrekking_${selectedCompetition.datum}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Print results
+        function printResults() {
+            window.print();
+        }
+
+        // Publish results to home page
+        function publishResults() {
+            if (!drawResults || drawResults.length === 0) {
+                alert('Geen resultaten om te publiceren');
+                return;
+            }
+
+            // Get start numbers for participants
+            const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
+
+            // Add start numbers to results
+            const resultsWithStartNumbers = drawResults.map(result => ({
+                ...result,
+                startNumber: startNumbers[result.name] || null
+            }));
+
+            // Save to localStorage with publish flag
+            const publishData = {
+                competition: selectedCompetition,
+                results: resultsWithStartNumbers,
+                publishedAt: new Date().toISOString(),
+                publishedBy: adminAuth.currentUser.username
+            };
+
+            localStorage.setItem('published_draw', JSON.stringify(publishData));
+
+            // Publiceren via vijverkaart systeem
+            if (window.adminVijverkaart && selectedCompetition) {
+                window.adminVijverkaart.publiceerNaarHomepage({
+                    naam: selectedCompetition.wedstrijdtype || 'Wedstrijd',
+                    datum: selectedCompetition.datum,
+                    type: selectedCompetition.type || 'Algemeen'
+                });
+            }
+
+            // Show success message
+            document.getElementById('publishSuccess').style.display = 'block';
+            document.getElementById('publishBtn').disabled = true;
+            document.getElementById('publishBtn').innerHTML = '<i class="fas fa-check"></i> Gepubliceerd';
+
+            // Reset after 3 seconds
+            setTimeout(() => {
+                document.getElementById('publishSuccess').style.display = 'none';
+                document.getElementById('publishBtn').disabled = false;
+                document.getElementById('publishBtn').innerHTML = '<i class="fas fa-upload"></i> Publiceer Resultaten';
+            }, 3000);
+
+            alert('Resultaten succesvol gepubliceerd! Ze zijn nu zichtbaar op de homepage.');
+        }
+
+        // =====================================
+        // STARTNUMMER BEHEER FUNCTIES
+        // =====================================
+
+        function toggleStartNumberSection() {
+            const section = document.getElementById('startNumberSection');
+            const btn = document.getElementById('toggleStartNumberText');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                btn.textContent = 'Verberg Startnummers';
+                loadStartNumbers();
+            } else {
+                section.style.display = 'none';
+                btn.textContent = 'Toon Startnummers';
+            }
+        }
+
+        async function loadStartNumbers() {
+            const members = await window.dataAPI.getMembers();
+            const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
+
+            const list = document.getElementById('startNumbersList');
+
+            if (members.length === 0) {
+                list.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Geen leden gevonden. Voeg eerst leden toe.</p>';
+                return;
+            }
+
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">';
+            html += '<th style="padding: 12px; text-align: left;">Lid</th>';
+            html += '<th style="padding: 12px; text-align: center; width: 150px;">Startnummer</th>';
+            html += '<th style="padding: 12px; text-align: center; width: 100px;">Acties</th>';
+            html += '</tr></thead><tbody>';
+
+            members.forEach(member => {
+                const fullName = `${member.firstName} ${member.lastName}`;
+                const startNum = startNumbers[fullName] || '';
+
+                html += `<tr style="border-bottom: 1px solid #dee2e6;">`;
+                html += `<td style="padding: 12px;"><strong>${fullName}</strong></td>`;
+                html += `<td style="padding: 12px; text-align: center;">`;
+                html += `<input type="number" value="${startNum}" min="1" max="999" `;
+                html += `style="width: 80px; padding: 5px; text-align: center;" `;
+                html += `onchange="updateStartNumber('${fullName}', this.value)">`;
+                html += `</td>`;
+                html += `<td style="padding: 12px; text-align: center;">`;
+                html += `<button class="btn-small" onclick="clearStartNumber('${fullName}')" title="Wis nummer">`;
+                html += `<i class="fas fa-times"></i>`;
+                html += `</button>`;
+                html += `</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table>';
+            list.innerHTML = html;
+        }
+
+        function updateStartNumber(memberName, number) {
+            const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
+
+            if (number && parseInt(number) > 0) {
+                // Check for duplicates
+                const existingMember = Object.keys(startNumbers).find(name =>
+                    startNumbers[name] === parseInt(number) && name !== memberName
+                );
+
+                if (existingMember) {
+                    alert(`Startnummer ${number} is al toegewezen aan ${existingMember}!`);
+                    loadStartNumbers(); // Reload to reset the input
+                    return;
+                }
+
+                startNumbers[memberName] = parseInt(number);
+            } else {
+                delete startNumbers[memberName];
+            }
+
+            localStorage.setItem('member_start_numbers', JSON.stringify(startNumbers));
+            console.log(`✅ Startnummer ${number} toegewezen aan ${memberName}`);
+        }
+
+        function clearStartNumber(memberName) {
+            if (confirm(`Startnummer verwijderen voor ${memberName}?`)) {
+                const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
+                delete startNumbers[memberName];
+                localStorage.setItem('member_start_numbers', JSON.stringify(startNumbers));
+                loadStartNumbers();
+            }
+        }
+
+        async function autoAssignStartNumbers() {
+            if (!confirm('Automatisch startnummers toewijzen aan alle leden?\n\nBestaande nummers worden overschreven!')) {
+                return;
+            }
+
+            const members = await window.dataAPI.getMembers();
+            const startNumbers = {};
+
+            // Sort members by name for consistent numbering
+            members.sort((a, b) => {
+                const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+                const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            // Assign sequential numbers
+            members.forEach((member, index) => {
+                const fullName = `${member.firstName} ${member.lastName}`;
+                startNumbers[fullName] = index + 1;
+            });
+
+            localStorage.setItem('member_start_numbers', JSON.stringify(startNumbers));
+            loadStartNumbers();
+            alert(`✅ Automatisch ${members.length} startnummers toegewezen!`);
+        }
+
+        function exportStartNumbers() {
+            const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
+
+            if (Object.keys(startNumbers).length === 0) {
+                alert('Geen startnummers om te exporteren');
+                return;
+            }
+
+            // Create CSV
+            let csv = 'Naam,Startnummer\n';
+            Object.entries(startNumbers)
+                .sort((a, b) => a[1] - b[1])
+                .forEach(([name, number]) => {
+                    csv += `"${name}",${number}\n`;
+                });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `startnummers_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function openStartNumberManager() {
+            // This could open a modal for bulk editing
+            alert('Gebruik de tabel hieronder om startnummers aan te passen.\n\nOf klik op "Automatisch Toewijzen" voor snelle toewijzing.');
+        }
+
+        // =====================================
+        // QUICK SETUP DEMO DATA
+        // =====================================
+
+        // =====================================
+        // DEMO WEGING FUNCTIES
+        // =====================================
+
+        function generateDemoWeighings() {
+            if (!drawResults || drawResults.length === 0) {
+                alert('❌ Eerst een trekking uitvoeren voordat je demo wegingen kunt genereren!');
+                return;
+            }
+
+            if (!selectedCompetition) {
+                alert('❌ Geen wedstrijd geselecteerd!');
+                return;
+            }
+
+            if (!confirm('Demo wegingen genereren voor deze trekking?\n\nDit zal realistische wegingen toevoegen voor alle deelnemers.\n\nBestaande wegingen voor deze datum worden verwijderd.')) {
+                return;
+            }
+
+            try {
+                // Load existing weighings
+                const allWeighings = JSON.parse(localStorage.getItem('weighings') || '[]');
+
+                // Remove existing weighings for this competition date
+                const filteredWeighings = allWeighings.filter(w => w.competitionDate !== selectedCompetition.datum);
+
+                // Generate realistic weights (between 0.5 kg and 15 kg)
+                const demoWeighings = drawResults.map(result => {
+                    // Random weight with realistic distribution
+                    // Most fish between 2-8 kg, some lighter, some heavier
+                    const randomBase = Math.random();
+                    let weight;
+
+                    if (randomBase < 0.1) {
+                        // 10% chance: Small catch (0.5 - 2 kg)
+                        weight = 0.5 + Math.random() * 1.5;
+                    } else if (randomBase < 0.7) {
+                        // 60% chance: Medium catch (2 - 8 kg)
+                        weight = 2 + Math.random() * 6;
+                    } else if (randomBase < 0.95) {
+                        // 25% chance: Large catch (8 - 12 kg)
+                        weight = 8 + Math.random() * 4;
+                    } else {
+                        // 5% chance: Very large catch (12 - 15 kg)
+                        weight = 12 + Math.random() * 3;
+                    }
+
+                    return {
+                        id: `demo_${result.spot}_${Date.now()}`,
+                        name: result.name,
+                        spot: result.spot,
+                        weight: parseFloat(weight.toFixed(3)),
+                        competitionDate: selectedCompetition.datum,
+                        competitionType: selectedCompetition.wedstrijdtype || 'Demo Wedstrijd',
+                        timestamp: new Date().toISOString(),
+                        isDemo: true
+                    };
+                });
+
+                // Add new demo weighings
+                const newWeighings = [...filteredWeighings, ...demoWeighings];
+
+                // Save to localStorage
+                localStorage.setItem('weighings', JSON.stringify(newWeighings));
+
+                console.log(`✅ ${demoWeighings.length} demo wegingen gegenereerd`);
+
+                // Show success message
+                const successMsg = document.getElementById('demoSuccess');
+                successMsg.style.display = 'block';
+
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 10000);
+
+                alert(`✅ ${demoWeighings.length} demo wegingen gegenereerd!\n\nGa naar het live scherm om de resultaten te bekijken.\n\n💡 Tip: Open live-uitslag.html in een nieuw venster.`);
+
+            } catch (error) {
+                console.error('Fout bij genereren demo wegingen:', error);
+                alert('❌ Fout bij genereren demo wegingen: ' + error.message);
+            }
+        }
+
+        async function quickSetupDemo() {
+            if (!confirm('Dit voegt demo leden en wedstrijden toe voor testen.\n\nDoorgaan?')) {
+                return;
+            }
+
+            try {
+                console.log('🚀 Quick Setup gestart...');
+
+                // Demo leden
+                const demoMembers = [
+                    { firstName: 'Jan', lastName: 'Janssens', email: 'jan@example.com', phone: '0471234567', membershipType: 'Jaarlid' },
+                    { firstName: 'Piet', lastName: 'Pieters', email: 'piet@example.com', phone: '0472345678', membershipType: 'Jaarlid' },
+                    { firstName: 'Karel', lastName: 'Klaassen', email: 'karel@example.com', phone: '0473456789', membershipType: 'Jaarlid' },
+                    { firstName: 'Marie', lastName: 'De Vries', email: 'marie@example.com', phone: '0474567890', membershipType: 'Jaarlid' },
+                    { firstName: 'Dirk', lastName: 'Dirksen', email: 'dirk@example.com', phone: '0475678901', membershipType: 'Senior' },
+                    { firstName: 'Eva', lastName: 'Evers', email: 'eva@example.com', phone: '0476789012', membershipType: 'Jeugd' },
+                    { firstName: 'Frank', lastName: 'Franssen', email: 'frank@example.com', phone: '0477890123', membershipType: 'Jaarlid' },
+                    { firstName: 'Greet', lastName: 'Goossens', email: 'greet@example.com', phone: '0478901234', membershipType: 'Jaarlid' },
+                    { firstName: 'Hans', lastName: 'Hermans', email: 'hans@example.com', phone: '0479012345', membershipType: 'Jaarlid' },
+                    { firstName: 'Inge', lastName: 'Ivens', email: 'inge@example.com', phone: '0480123456', membershipType: 'Jaarlid' }
+                ];
+
+                // Voeg leden toe
+                for (const member of demoMembers) {
+                    await window.dataAPI.addMember(member);
+                }
+                console.log(`✅ ${demoMembers.length} demo leden toegevoegd`);
+
+                // Demo wedstrijden (toekomstige data)
+                const today = new Date();
+                const demoCompetitions = [
+                    {
+                        name: 'Vrije Gewone',
+                        date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +7 dagen
+                        status: 'upcoming',
+                        competition_type: 'Gewone'
+                    },
+                    {
+                        name: 'Vrije Koppel',
+                        date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +14 dagen
+                        status: 'upcoming',
+                        competition_type: 'Koppel'
+                    },
+                    {
+                        name: 'Algemene Kampioenschap',
+                        date: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +21 dagen
+                        status: 'upcoming',
+                        competition_type: 'Kampioenschap'
+                    }
+                ];
+
+                // Voeg wedstrijden toe
+                const competitions = await window.dataAPI.getCompetitions();
+                competitions.push(...demoCompetitions.map((comp, idx) => ({
+                    ...comp,
+                    competition_id: competitions.length + idx + 1
+                })));
+
+                localStorage.setItem('mock_competitions', JSON.stringify(competitions));
+                console.log(`✅ ${demoCompetitions.length} demo wedstrijden toegevoegd`);
+
+                // Demo inschrijvingen
+                const newCompetitions = await window.dataAPI.getCompetitions();
+                const firstComp = newCompetitions[newCompetitions.length - 3];
+
+                if (firstComp) {
+                    for (let i = 0; i < 5; i++) {
+                        const member = demoMembers[i];
+                        await window.dataAPI.addRegistration({
+                            name: `${member.firstName} ${member.lastName}`,
+                            email: member.email,
+                            competition: `${firstComp.date} - ${firstComp.name}`,
+                            type: 'solo',
+                            paid: Math.random() > 0.5
+                        });
+                    }
+                    console.log('✅ 5 demo inschrijvingen toegevoegd');
+                }
+
+                alert(`✅ Demo data succesvol toegevoegd!\n\n${demoMembers.length} leden\n${demoCompetitions.length} wedstrijden\n5 inschrijvingen\n\nDe pagina wordt nu herladen.`);
+
+                // Reload page
+                window.location.reload();
+
+            } catch (error) {
+                console.error('❌ Fout bij quick setup:', error);
+                alert('Fout bij toevoegen demo data: ' + error.message);
+            }
+        }
+    </script>
+
+    <!-- Vijverkaart functionaliteit -->
+    <script src="../vijverkaart.js"></script>
+    <script>
+        // Initialiseer vijverkaart voor admin
+        let adminVijverkaart = null;
+
+        function initVijverkaart() {
+            console.log('🗺️ Initializing vijverkaart...');
+            const container = document.getElementById('admin-vijverkaart');
+            if (!container) {
+                console.error('❌ Container admin-vijverkaart not found!');
+                return;
+            }
+
+            adminVijverkaart = new Vijverkaart('admin-vijverkaart', {
+                interactive: true,
+                showHeader: false, // We have our own header
+                showLegend: true
+            });
+            window.adminVijverkaart = adminVijverkaart;
+
+            // Render empty vijverkaart
+            adminVijverkaart.render({});
+            console.log('✅ Vijverkaart rendered (empty)');
+        }
+
+        // Update vijverkaart na trekking
+        function updateVijverkaartNaTrekking() {
+            if (!adminVijverkaart || !drawResults || drawResults.length === 0) {
+                return;
+            }
+
+            // Converteer drawResults naar vijverkaart toewijzingen
+            const toewijzingen = {};
+            drawResults.forEach(result => {
+                toewijzingen[result.spot] = {
+                    naam: result.name,
+                    email: result.participant || ''
+                };
+            });
+
+            adminVijverkaart.updateToewijzingen(toewijzingen);
+        }
+
+        // Voeg toe aan bestaande startDraw functie
+        const originalStartDraw = startDraw;
+        startDraw = async function() {
+            await originalStartDraw();
+
+            // Update vijverkaart na trekking
+            setTimeout(() => {
+                if (!adminVijverkaart) initVijverkaart();
+                updateVijverkaartNaTrekking();
+            }, 500);
+        };
+
+        // Note: Vijverkaart initialization is now handled in the main DOMContentLoaded listener above
+    </script>
+</body>
+</html>

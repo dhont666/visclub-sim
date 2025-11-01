@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Berichten - Visclub SiM Admin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .messages-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #2c5f7d;
+            color: white;
+            border-color: #2c5f7d;
+        }
+
+        .messages-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .message-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #2c5f7d;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .message-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .message-card.unread {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .message-card.archived {
+            opacity: 0.6;
+            border-left-color: #6c757d;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .message-sender {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2c5f7d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .sender-info h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .sender-info p {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .message-meta {
+            text-align: right;
+        }
+
+        .message-date {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .message-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-unread {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-read {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-replied {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-archived {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .message-subject {
+            font-weight: 600;
+            color: #2c5f7d;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .message-preview {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn.reply {
+            background: #28a745;
+            color: white;
+        }
+
+        .action-btn.mark-read {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .action-btn.archive {
+            background: #6c757d;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Modal for viewing full message */
+        .message-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .reply-form {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h3 {
+            font-size: 28px;
+            margin: 0 0 5px 0;
+            color: #2c5f7d;
+        }
+
+        .stat-box p {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="messages-container">
+        <!-- Terug naar overzicht knop -->
+        <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;">
+            <i class="fas fa-arrow-left"></i> Terug naar overzicht
+        </a>
+
+        <div class="messages-header">
+            <div>
+                <h1 style="margin: 0 0 5px 0; color: #2c5f7d;">
+                    <i class="fas fa-envelope"></i> Contact Berichten
+                </h1>
+                <p style="margin: 0; color: #666;">Beheer alle inkomende contactformulier berichten</p>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-inbox"></i> Alle
+                </button>
+                <button class="filter-btn" data-filter="unread">
+                    <i class="fas fa-envelope"></i> Ongelezen
+                </button>
+                <button class="filter-btn" data-filter="read">
+                    <i class="fas fa-envelope-open"></i> Gelezen
+                </button>
+                <button class="filter-btn" data-filter="archived">
+                    <i class="fas fa-archive"></i> Gearchiveerd
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-box">
+                <h3 id="totalMessages">0</h3>
+                <p>Totaal Berichten</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="unreadMessages" style="color: #28a745;">0</h3>
+                <p>Ongelezen</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="repliedMessages" style="color: #ffc107;">0</h3>
+                <p>Beantwoord</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="archivedMessages" style="color: #6c757d;">0</h3>
+                <p>Gearchiveerd</p>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="messages-grid" id="messagesGrid">
+            <!-- Messages will be loaded here -->
+            <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+                <i class="fas fa-inbox" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
+                <h3 style="color: #999;">Geen berichten gevonden</h3>
+                <p style="color: #999;">Er zijn nog geen contactformulier berichten ontvangen.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Detail Modal -->
+    <div class="message-modal" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalSubject" style="margin: 0; color: #2c5f7d;">Bericht</h2>
+                    <p id="modalMeta" style="margin: 5px 0 0 0; color: #666; font-size: 14px;"></p>
+                </div>
+                <button class="close-modal" onclick="closeMessageModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <strong style="color: #666; font-size: 13px;">Van:</strong>
+                            <p id="modalSender" style="margin: 5px 0 0 0; color: #333;"></p>
+                        </div>
+                        <div>
+                            <strong style="color: #666; font-size: 13px;">Email:</strong>
+                            <p id="modalEmail" style="margin: 5px 0 0 0; color: #333;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <strong style="color: #666; font-size: 13px;">Bericht:</strong>
+                    <div id="modalMessage" style="margin-top: 10px; line-height: 1.8; color: #333; white-space: pre-wrap;"></div>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="reply-form" id="replyForm" style="display: none;">
+                    <h4 style="margin-top: 0; color: #2c5f7d;">
+                        <i class="fas fa-reply"></i> Antwoord versturen
+                    </h4>
+                    <textarea id="replyMessage" placeholder="Type je antwoord hier..."></textarea>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="action-btn reply" onclick="sendReply()">
+                            <i class="fas fa-paper-plane"></i> Versturen
+                        </button>
+                        <button class="action-btn" style="background: #6c757d; color: white;" onclick="hideReplyForm()">
+                            <i class="fas fa-times"></i> Annuleren
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn reply" onclick="showReplyForm()">
+                    <i class="fas fa-reply"></i> Beantwoorden
+                </button>
+                <button class="action-btn mark-read" onclick="markAsRead()">
+                    <i class="fas fa-check"></i> Markeer als gelezen
+                </button>
+                <button class="action-btn archive" onclick="archiveMessage()">
+                    <i class="fas fa-archive"></i> Archiveren
+                </button>
+                <button class="action-btn delete" onclick="deleteMessage()">
+                    <i class="fas fa-trash"></i> Verwijderen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-auth.js"></script>
+    <script>
+        // Store messages in localStorage (in production, this would be a database)
+        let messages = JSON.parse(localStorage.getItem('contact_messages') || '[]');
+        let currentMessageId = null;
+
+        // Load messages on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+            setupFilters();
+        });
+
+        function loadMessages(filter = 'all') {
+            const grid = document.getElementById('messagesGrid');
+
+            let filteredMessages = messages;
+            if (filter !== 'all') {
+                filteredMessages = messages.filter(m => m.status === filter);
+            }
+
+            // Update stats
+            document.getElementById('totalMessages').textContent = messages.length;
+            document.getElementById('unreadMessages').textContent = messages.filter(m => m.status === 'unread').length;
+            document.getElementById('repliedMessages').textContent = messages.filter(m => m.status === 'replied').length;
+            document.getElementById('archivedMessages').textContent = messages.filter(m => m.status === 'archived').length;
+
+            if (filteredMessages.length === 0) {
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+                        <i class="fas fa-inbox" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
+                        <h3 style="color: #999;">Geen berichten gevonden</h3>
+                        <p style="color: #999;">Er zijn geen berichten met dit filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by date (newest first)
+            filteredMessages.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            grid.innerHTML = filteredMessages.map(msg => `
+                <div class="message-card ${msg.status}" onclick="viewMessage('${msg.id}')">
+                    <div class="message-header">
+                        <div class="message-sender">
+                            <div class="sender-avatar">${msg.name.charAt(0).toUpperCase()}</div>
+                            <div class="sender-info">
+                                <h4>${msg.name}</h4>
+                                <p>${msg.email}</p>
+                            </div>
+                        </div>
+                        <div class="message-meta">
+                            <div class="message-date">
+                                <i class="fas fa-clock"></i> ${formatDate(msg.date)}
+                            </div>
+                            <span class="message-status status-${msg.status}">
+                                ${getStatusLabel(msg.status)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="message-subject">${msg.subject}</div>
+                    <div class="message-preview">${msg.message}</div>
+                    <div class="message-actions" onclick="event.stopPropagation()">
+                        <button class="action-btn reply" onclick="viewAndReply('${msg.id}')">
+                            <i class="fas fa-reply"></i> Beantwoorden
+                        </button>
+                        <button class="action-btn mark-read" onclick="toggleRead('${msg.id}')">
+                            <i class="fas fa-check"></i> ${msg.status === 'unread' ? 'Markeer gelezen' : 'Markeer ongelezen'}
+                        </button>
+                        <button class="action-btn archive" onclick="toggleArchive('${msg.id}')">
+                            <i class="fas fa-archive"></i> ${msg.status === 'archived' ? 'Dearchiveren' : 'Archiveren'}
+                        </button>
+                        <button class="action-btn delete" onclick="confirmDelete('${msg.id}')">
+                            <i class="fas fa-trash"></i> Verwijderen
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadMessages(this.dataset.filter);
+                });
+            });
+        }
+
+        function viewMessage(id) {
+            const message = messages.find(m => m.id === id);
+            if (!message) return;
+
+            currentMessageId = id;
+
+            document.getElementById('modalSubject').textContent = message.subject;
+            document.getElementById('modalMeta').textContent = `Ontvangen op ${formatDate(message.date)}`;
+            document.getElementById('modalSender').textContent = message.name;
+            document.getElementById('modalEmail').innerHTML = `<a href="mailto:${message.email}" style="color: #2c5f7d;">${message.email}</a>`;
+            document.getElementById('modalMessage').textContent = message.message;
+
+            document.getElementById('messageModal').classList.add('active');
+
+            // Mark as read
+            if (message.status === 'unread') {
+                message.status = 'read';
+                saveMessages();
+                loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+            }
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageModal').classList.remove('active');
+            document.getElementById('replyForm').style.display = 'none';
+            currentMessageId = null;
+        }
+
+        function showReplyForm() {
+            document.getElementById('replyForm').style.display = 'block';
+        }
+
+        function hideReplyForm() {
+            document.getElementById('replyForm').style.display = 'none';
+        }
+
+        function viewAndReply(id) {
+            viewMessage(id);
+            showReplyForm();
+        }
+
+        function sendReply() {
+            const replyText = document.getElementById('replyMessage').value.trim();
+            if (!replyText) {
+                alert('Typ een bericht om te versturen.');
+                return;
+            }
+
+            const message = messages.find(m => m.id === currentMessageId);
+            if (!message) return;
+
+            // In production, send email via backend
+            console.log('Sending reply to:', message.email);
+            console.log('Reply:', replyText);
+
+            // Update message status
+            message.status = 'replied';
+            message.reply = {
+                text: replyText,
+                date: new Date().toISOString()
+            };
+
+            saveMessages();
+            loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+
+            alert('✅ Antwoord verstuurd naar ' + message.email);
+            closeMessageModal();
+        }
+
+        function markAsRead() {
+            const message = messages.find(m => m.id === currentMessageId);
+            if (!message) return;
+
+            message.status = 'read';
+            saveMessages();
+            loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+            closeMessageModal();
+        }
+
+        function toggleRead(id) {
+            const message = messages.find(m => m.id === id);
+            if (!message) return;
+
+            message.status = message.status === 'unread' ? 'read' : 'unread';
+            saveMessages();
+            loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+        }
+
+        function archiveMessage() {
+            const message = messages.find(m => m.id === currentMessageId);
+            if (!message) return;
+
+            message.status = 'archived';
+            saveMessages();
+            loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+            closeMessageModal();
+        }
+
+        function toggleArchive(id) {
+            const message = messages.find(m => m.id === id);
+            if (!message) return;
+
+            message.status = message.status === 'archived' ? 'read' : 'archived';
+            saveMessages();
+            loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+        }
+
+        function deleteMessage() {
+            if (!currentMessageId) return;
+
+            if (confirm('Weet je zeker dat je dit bericht wilt verwijderen?')) {
+                messages = messages.filter(m => m.id !== currentMessageId);
+                saveMessages();
+                loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+                closeMessageModal();
+            }
+        }
+
+        function confirmDelete(id) {
+            if (confirm('Weet je zeker dat je dit bericht wilt verwijderen?')) {
+                messages = messages.filter(m => m.id !== id);
+                saveMessages();
+                loadMessages(document.querySelector('.filter-btn.active').dataset.filter);
+            }
+        }
+
+        function saveMessages() {
+            localStorage.setItem('contact_messages', JSON.stringify(messages));
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                if (hours === 0) {
+                    const minutes = Math.floor(diff / (1000 * 60));
+                    return minutes === 0 ? 'Zojuist' : `${minutes} min geleden`;
+                }
+                return `${hours} uur geleden`;
+            } else if (days === 1) {
+                return 'Gisteren';
+            } else if (days < 7) {
+                return `${days} dagen geleden`;
+            } else {
+                return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'unread': 'Nieuw',
+                'read': 'Gelezen',
+                'replied': 'Beantwoord',
+                'archived': 'Gearchiveerd'
+            };
+            return labels[status] || status;
+        }
+
+        // Click outside modal to close
+        document.getElementById('messageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessageModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klassement Beheer - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2c5f7d;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #2c5f7d;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a3a4d;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .result-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .result-row input {
+            margin-bottom: 0;
+        }
+
+        .points-display {
+            padding: 12px;
+            background: #e8f4f8;
+            color: #2c5f7d;
+            font-weight: bold;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .remove-btn {
+            padding: 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-member-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .action-card i {
+            font-size: 32px;
+            color: #2c5f7d;
+            margin-bottom: 10px;
+        }
+
+        .success-msg, .error-msg {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM - Admin</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../klassement.html" class="nav-link">
+                    <i class="fas fa-arrow-left"></i> Terug naar Klassement
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Admin Section -->
+    <section class="admin-container">
+        <div class="container">
+            <!-- Terug naar overzicht knop -->
+            <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Terug naar overzicht
+            </a>
+
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Resultaten Beheren</h2>
+                <div class="section-line"></div>
+                <p>Voer wedstrijdresultaten in voor automatische klassement updates</p>
+            </div>
+
+            <div class="success-msg" id="successMsg">
+                <i class="fas fa-check-circle"></i> <span id="successText"></span>
+            </div>
+            <div class="error-msg" id="errorMsg">
+                <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card" onclick="showSection('add-results')">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>Resultaten Toevoegen</h4>
+                    <p>Voer nieuwe wedstrijdresultaten in</p>
+                </div>
+                <div class="action-card" onclick="showSection('manage-members')">
+                    <i class="fas fa-users"></i>
+                    <h4>Leden Beheren</h4>
+                    <p>Voeg leden toe of pas aan</p>
+                </div>
+                <div class="action-card" onclick="showSection('view-data')">
+                    <i class="fas fa-table"></i>
+                    <h4>Data Bekijken</h4>
+                    <p>Bekijk alle opgeslagen resultaten</p>
+                </div>
+            </div>
+
+            <!-- Add Results Section -->
+            <div class="admin-card" id="add-results-section">
+                <h3><i class="fas fa-clipboard-list"></i> Wedstrijdresultaten Invoeren</h3>
+
+                <form id="resultsForm">
+                    <div class="form-group">
+                        <label for="competitionSelect">Selecteer Wedstrijd uit Kalender *</label>
+                        <select id="competitionSelect" required onchange="updateCompetitionInfo()">
+                            <option value="">-- Selecteer wedstrijd --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="display: none;">
+                        <label for="competitionDate">Wedstrijddatum</label>
+                        <input type="text" id="competitionDate" readonly>
+                    </div>
+
+                    <div class="form-group" style="display: none;">
+                        <label for="competitionType">Wedstrijdtype</label>
+                        <input type="text" id="competitionType" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deelnemers en Resultaten</label>
+                        <div id="resultsGrid" class="results-grid">
+                            <!-- Resultaat rijen worden hier toegevoegd -->
+                        </div>
+                        <button type="button" class="add-member-btn" onclick="addResultRow()">
+                            <i class="fas fa-plus"></i> Deelnemer Toevoegen
+                        </button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary" onclick="autoAssignPositions()" style="background: #17a2b8;">
+                            <i class="fas fa-sort-amount-down"></i> Auto Posities (op gewicht)
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Resultaten Opslaan
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Manage Members Section -->
+            <div class="admin-card" id="manage-members-section" style="display: none;">
+                <h3><i class="fas fa-users"></i> Leden Beheren</h3>
+
+                <form id="memberForm">
+                    <div class="form-group">
+                        <label for="memberName">Naam *</label>
+                        <input type="text" id="memberName" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="isVeteran">
+                            Veteraan
+                        </label>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Lid Toevoegen
+                        </button>
+                    </div>
+                </form>
+
+                <hr style="margin: 30px 0;">
+
+                <h4>Huidige Leden</h4>
+                <div id="membersList"></div>
+            </div>
+
+            <!-- View Data Section -->
+            <div class="admin-card" id="view-data-section" style="display: none;">
+                <h3><i class="fas fa-table"></i> Alle Resultaten</h3>
+                <div id="allResultsTable"></div>
+            </div>
+        </div>
+    </section>
+
+    <script src="../script.js"></script>
+    <script src="../klassement-data.js"></script>
+
+    <!-- Admin Authentication -->
+    <script src="admin-auth.js"></script>
+
+    <script>
+        // Global state
+        let resultCounter = 0;
+
+        // Show/hide sections
+        function showSection(section) {
+            document.querySelectorAll('.admin-card').forEach(card => {
+                card.style.display = 'none';
+            });
+
+            const sectionMap = {
+                'add-results': 'add-results-section',
+                'manage-members': 'manage-members-section',
+                'view-data': 'view-data-section'
+            };
+
+            const targetSection = document.getElementById(sectionMap[section]);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+
+                if (section === 'manage-members') {
+                    loadMembersList();
+                } else if (section === 'view-data') {
+                    loadAllResults();
+                }
+            }
+        }
+
+        // Calculate points
+        function calculatePoints(position, isAbsent, caughtNothing) {
+            if (isAbsent) return 50;
+            if (caughtNothing) return 43;
+            if (position && position > 0) return parseInt(position);
+            return 50;
+        }
+
+        // Add result row
+        function addResultRow() {
+            const members = getData(STORAGE_KEYS.MEMBERS);
+            const grid = document.getElementById('resultsGrid');
+            const rowId = `row-${resultCounter++}`;
+
+            const row = document.createElement('div');
+            row.className = 'result-row';
+            row.id = rowId;
+
+            // Format member name - handle both old format (name) and new format (firstName + lastName)
+            const memberOptions = members.map(m => {
+                const displayName = m.name || `${m.firstName} ${m.lastName}`;
+                return `<option value="${m.id}">${displayName}</option>`;
+            }).join('');
+
+            row.innerHTML = `
+                <div>
+                    <select class="member-select" onchange="updatePoints('${rowId}')">
+                        <option value="">-- Selecteer lid --</option>
+                        ${memberOptions}
+                    </select>
+                </div>
+                <div>
+                    <input type="number" class="position-input" placeholder="Positie" min="1" onchange="updatePoints('${rowId}')">
+                </div>
+                <div>
+                    <input type="number" class="weight-input" placeholder="Gewicht (kg)" min="0" step="0.001">
+                </div>
+                <div>
+                    <label style="font-size: 12px; margin-bottom: 5px; display: block;">
+                        <input type="checkbox" class="absent-check" onchange="updatePoints('${rowId}')"> Afwezig
+                    </label>
+                    <label style="font-size: 12px;">
+                        <input type="checkbox" class="nothing-check" onchange="updatePoints('${rowId}')"> Niks
+                    </label>
+                </div>
+                <div class="points-display">? ptn</div>
+                <button type="button" class="remove-btn" onclick="removeRow('${rowId}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            grid.appendChild(row);
+        }
+
+        // Remove result row
+        function removeRow(rowId) {
+            document.getElementById(rowId).remove();
+        }
+
+        // Update points for a row
+        function updatePoints(rowId) {
+            const row = document.getElementById(rowId);
+            const position = row.querySelector('.position-input').value;
+            const isAbsent = row.querySelector('.absent-check').checked;
+            const caughtNothing = row.querySelector('.nothing-check').checked;
+
+            // Disable/enable inputs based on checkboxes
+            row.querySelector('.position-input').disabled = isAbsent || caughtNothing;
+
+            const points = calculatePoints(position, isAbsent, caughtNothing);
+            row.querySelector('.points-display').textContent = `${points} ptn`;
+        }
+
+        // Auto assign positions based on weight (highest weight = position 1)
+        function autoAssignPositions() {
+            const rows = Array.from(document.querySelectorAll('.result-row'));
+
+            if (rows.length === 0) {
+                alert('⚠️ Voeg eerst deelnemers toe');
+                return;
+            }
+
+            // Collect rows with weights
+            const rowsWithWeights = rows.map((row, index) => {
+                const weight = parseFloat(row.querySelector('.weight-input').value) || 0;
+                const isAbsent = row.querySelector('.absent-check').checked;
+                const caughtNothing = row.querySelector('.nothing-check').checked;
+
+                return {
+                    row: row,
+                    weight: weight,
+                    isAbsent: isAbsent,
+                    caughtNothing: caughtNothing,
+                    rowId: row.id
+                };
+            });
+
+            // Sort by weight (highest first)
+            rowsWithWeights.sort((a, b) => {
+                // Absent or caught nothing goes to bottom
+                if (a.isAbsent || a.caughtNothing) return 1;
+                if (b.isAbsent || b.caughtNothing) return -1;
+
+                // Otherwise sort by weight descending (highest first)
+                return b.weight - a.weight;
+            });
+
+            // Assign positions
+            let position = 1;
+            rowsWithWeights.forEach(item => {
+                if (!item.isAbsent && !item.caughtNothing) {
+                    item.row.querySelector('.position-input').value = position;
+                    position++;
+                    updatePoints(item.rowId);
+                } else {
+                    // Clear position for absent/nothing caught
+                    item.row.querySelector('.position-input').value = '';
+                    updatePoints(item.rowId);
+                }
+            });
+
+            showSuccess(`✅ Posities automatisch toegewezen op basis van gewicht!`);
+        }
+
+        // Submit results form
+        document.getElementById('resultsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const date = document.getElementById('competitionDate').value;
+            const type = document.getElementById('competitionType').value;
+            const rows = document.querySelectorAll('.result-row');
+
+            if (rows.length === 0) {
+                showError('Voeg minimaal 1 deelnemer toe');
+                return;
+            }
+
+            const results = getData(STORAGE_KEYS.RESULTS);
+            const members = getData(STORAGE_KEYS.MEMBERS);
+            let newResults = [];
+
+            rows.forEach(row => {
+                const memberId = parseInt(row.querySelector('.member-select').value);
+                const position = row.querySelector('.position-input').value;
+                const weight = row.querySelector('.weight-input').value || 0;
+                const isAbsent = row.querySelector('.absent-check').checked;
+                const caughtNothing = row.querySelector('.nothing-check').checked;
+
+                if (!memberId) return;
+
+                const member = members.find(m => m.id === memberId);
+                const points = calculatePoints(position, isAbsent, caughtNothing);
+
+                // Handle both old format (name) and new format (firstName + lastName)
+                const memberName = member.name || `${member.firstName} ${member.lastName}`;
+
+                newResults.push({
+                    id: Date.now() + Math.random(),
+                    competitionId: Date.now(),
+                    competitionType: type,
+                    competitionDate: date,
+                    memberId,
+                    memberName: memberName,
+                    points,
+                    position: position ? parseInt(position) : null,
+                    weight: parseFloat(weight) || 0, // Weight in kg (decimal allowed)
+                    isAbsent,
+                    caughtNothing
+                });
+            });
+
+            saveData(STORAGE_KEYS.RESULTS, [...results, ...newResults]);
+            showSuccess(`${newResults.length} resultaten opgeslagen!`);
+            resetForm();
+        });
+
+        // Submit member form
+        document.getElementById('memberForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('memberName').value;
+            const isVeteran = document.getElementById('isVeteran').checked;
+
+            const members = getData(STORAGE_KEYS.MEMBERS);
+            const newMember = {
+                id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1,
+                name,
+                isVeteran
+            };
+
+            saveData(STORAGE_KEYS.MEMBERS, [...members, newMember]);
+            showSuccess(`Lid "${name}" toegevoegd!`);
+
+            document.getElementById('memberForm').reset();
+            loadMembersList();
+        });
+
+        // Load members list
+        function loadMembersList() {
+            const members = getData(STORAGE_KEYS.MEMBERS);
+            const list = document.getElementById('membersList');
+
+            if (members.length === 0) {
+                list.innerHTML = '<p style="color: #666;">Geen leden gevonden</p>';
+                return;
+            }
+
+            list.innerHTML = members.map(m => {
+                // Handle both old format (name) and new format (firstName + lastName)
+                const displayName = m.name || `${m.firstName} ${m.lastName}`;
+                const isVeteran = m.isVeteran || (m.membershipType && m.membershipType.includes('Senior'));
+
+                return `
+                    <div style="padding: 10px; background: #f8f9fa; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${displayName} ${isVeteran ? '<span style="color: #2c5f7d; font-size: 12px;">(Veteraan)</span>' : ''}</span>
+                        <button class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteMember(${m.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Delete member
+        function deleteMember(id) {
+            if (!confirm('Weet je zeker dat je dit lid wilt verwijderen?')) return;
+
+            const members = getData(STORAGE_KEYS.MEMBERS).filter(m => m.id !== id);
+            saveData(STORAGE_KEYS.MEMBERS, members);
+            showSuccess('Lid verwijderd');
+            loadMembersList();
+        }
+
+        // Load all results
+        function loadAllResults() {
+            const results = getData(STORAGE_KEYS.RESULTS);
+            const table = document.getElementById('allResultsTable');
+
+            if (results.length === 0) {
+                table.innerHTML = '<p style="color: #666;">Geen resultaten gevonden</p>';
+                return;
+            }
+
+            table.innerHTML = `
+                <div style="margin-bottom: 15px; text-align: right;">
+                    <button class="btn-danger" onclick="clearAllResults()" style="padding: 8px 16px;">
+                        <i class="fas fa-trash"></i> Alle Resultaten Verwijderen
+                    </button>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #2c5f7d; color: white;">
+                        <tr>
+                            <th style="padding: 10px;">Datum</th>
+                            <th>Type</th>
+                            <th>Naam</th>
+                            <th>Positie</th>
+                            <th>Punten</th>
+                            <th style="width: 100px;">Actie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${results.map(r => `
+                            <tr style="border-bottom: 1px solid #e0e0e0;">
+                                <td style="padding: 8px;">${r.competitionDate}</td>
+                                <td>${r.competitionType}</td>
+                                <td>${r.memberName}</td>
+                                <td>${r.isAbsent ? 'Afwezig' : r.caughtNothing ? 'Niks' : r.position || '-'}</td>
+                                <td><strong>${r.points}</strong></td>
+                                <td>
+                                    <button class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteResult('${r.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Delete single result
+        function deleteResult(id) {
+            if (!confirm('Weet je zeker dat je dit resultaat wilt verwijderen?')) return;
+
+            const results = getData(STORAGE_KEYS.RESULTS).filter(r => String(r.id) !== String(id));
+            saveData(STORAGE_KEYS.RESULTS, results);
+            showSuccess('Resultaat verwijderd');
+            loadAllResults();
+        }
+
+        // Clear all results
+        function clearAllResults() {
+            if (!confirm('WAARSCHUWING: Dit verwijdert ALLE resultaten. Doorgaan?')) return;
+
+            saveData(STORAGE_KEYS.RESULTS, []);
+            showSuccess('Alle resultaten verwijderd');
+            loadAllResults();
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('resultsForm').reset();
+            document.getElementById('resultsGrid').innerHTML = '';
+            resultCounter = 0;
+        }
+
+        // Show success message
+        function showSuccess(text) {
+            const msg = document.getElementById('successMsg');
+            document.getElementById('successText').textContent = text;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 5000);
+        }
+
+        // Show error message
+        function showError(text) {
+            const msg = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = text;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 5000);
+        }
+
+        // Populate competition dropdown from calendar
+        function populateCompetitionDropdown() {
+            const select = document.getElementById('competitionSelect');
+
+            if (typeof calendarData === 'undefined') {
+                console.error('❌ calendarData not loaded!');
+                return;
+            }
+
+            // Filter only competition events (not meetings or BBQ)
+            const competitions = calendarData.filter(event =>
+                event.type !== 'vergadering' && event.type !== 'bbq'
+            );
+
+            // Add options
+            competitions.forEach((event, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${event.datum} - ${event.wedstrijdtype} (${event.dag})`;
+                option.dataset.date = event.datum;
+                option.dataset.type = event.type;
+                option.dataset.name = event.wedstrijdtype;
+                select.appendChild(option);
+            });
+
+            console.log(`✅ Loaded ${competitions.length} competitions from calendar`);
+        }
+
+        // Update competition info when selection changes
+        function updateCompetitionInfo() {
+            const select = document.getElementById('competitionSelect');
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (!selectedOption.value) {
+                document.getElementById('competitionDate').value = '';
+                document.getElementById('competitionType').value = '';
+                return;
+            }
+
+            const date = selectedOption.dataset.date;
+            const type = selectedOption.dataset.type;
+
+            document.getElementById('competitionDate').value = date;
+            document.getElementById('competitionType').value = type;
+
+            console.log(`📅 Selected: ${date} - ${type}`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate competition dropdown
+            populateCompetitionDropdown();
+
+            // Add 3 initial rows
+            for (let i = 0; i < 3; i++) {
+                addResultRow();
+            }
+        });
+    </script>
+</body>
+</html>

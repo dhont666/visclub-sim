@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inschrijvingen Overzicht - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .registrations-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .registrations-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .registrations-content {
+            padding: 3rem 0;
+            min-height: 60vh;
+        }
+
+        .competition-selector {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .competition-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .registrations-list {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .registration-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-box p {
+            color: var(--text-light);
+        }
+
+        .participants-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .participants-table th,
+        .participants-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .participants-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .participants-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.solo {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge.koppel {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="registrations-header">
+        <div class="container">
+            <h1><i class="fas fa-users"></i> Inschrijvingen Overzicht</h1>
+            <p>Bekijk alle ingeschreven deelnemers per wedstrijd</p>
+        </div>
+    </div>
+
+    <section class="registrations-content">
+        <div class="container">
+            <a href="home.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Terug naar home
+            </a>
+
+            <div class="competition-selector">
+                <label for="competitionSelect"><strong>Selecteer een wedstrijd:</strong></label>
+                <select id="competitionSelect">
+                    <option value="">Kies een wedstrijd...</option>
+                </select>
+            </div>
+
+            <div id="registrationsContent" class="registrations-list" style="display: none;">
+                <h2 id="competitionTitle"></h2>
+
+                <div class="registration-stats">
+                    <div class="stat-box">
+                        <i class="fas fa-users"></i>
+                        <h3 id="totalParticipants">0</h3>
+                        <p>Totaal Ingeschreven</p>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-user"></i>
+                        <h3 id="soloParticipants">0</h3>
+                        <p>Individueel</p>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-user-friends"></i>
+                        <h3 id="koppelParticipants">0</h3>
+                        <p>Koppels</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="participants-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Naam</th>
+                                <th>Type</th>
+                                <th>Koppelgenoot</th>
+                                <th>Inschrijftijd</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="emptyState" class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Selecteer een wedstrijd</h3>
+                <p>Kies een wedstrijd uit de lijst om de ingeschreven deelnemers te bekijken</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Demo data - will be replaced with API calls
+        const registrationsData = {
+            '2026-03-07': [
+                { id: 1, name: 'Jan Janssens', type: 'solo', partner: '', timestamp: '2026-02-20 14:30' },
+                { id: 2, name: 'Piet Peters', type: 'solo', partner: '', timestamp: '2026-02-21 09:15' },
+                { id: 3, name: 'Koen Kools', type: 'solo', partner: '', timestamp: '2026-02-22 16:45' }
+            ],
+            '2026-03-14': [
+                { id: 1, name: 'Tom Timmers', type: 'koppel', partner: 'Tim Timmers', timestamp: '2026-02-25 10:00' },
+                { id: 2, name: 'Bob Bakker', type: 'koppel', partner: 'Bert Bakker', timestamp: '2026-02-26 14:20' }
+            ]
+        };
+
+        // Populate competition selector and auto-select next upcoming competition
+        const competitionSelect = document.getElementById('competitionSelect');
+        const now = getCurrentDate();
+        let nextCompetitionValue = null;
+        let firstUpcomingFound = false;
+
+        calendarData.forEach(event => {
+            if (event.type !== 'vergadering' && event.type !== 'bbq') {
+                const option = document.createElement('option');
+                const dateKey = event.datum.split('-').reverse().join('-');
+                option.value = dateKey;
+                option.textContent = `${event.datum} - ${event.wedstrijdtype}`;
+                competitionSelect.appendChild(option);
+
+                // Find first upcoming competition
+                if (!firstUpcomingFound) {
+                    const [day, month, year] = event.datum.split('-').map(Number);
+                    const eventDate = new Date(year, month - 1, day);
+
+                    if (eventDate >= now) {
+                        nextCompetitionValue = dateKey;
+                        firstUpcomingFound = true;
+                    }
+                }
+            }
+        });
+
+        // Auto-select the next upcoming competition
+        if (nextCompetitionValue) {
+            competitionSelect.value = nextCompetitionValue;
+            // Trigger change event to load the registrations
+            competitionSelect.dispatchEvent(new Event('change'));
+        }
+
+        // Handle competition selection
+        competitionSelect.addEventListener('change', function() {
+            const selectedDate = this.value;
+            const registrationsContent = document.getElementById('registrationsContent');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!selectedDate) {
+                registrationsContent.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            const registrations = registrationsData[selectedDate] || [];
+
+            // Update title
+            const selectedText = this.options[this.selectedIndex].text;
+            document.getElementById('competitionTitle').textContent = selectedText;
+
+            // Calculate stats
+            const soloCount = registrations.filter(r => r.type === 'solo').length;
+            const koppelCount = registrations.filter(r => r.type === 'koppel').length;
+
+            document.getElementById('totalParticipants').textContent = registrations.length;
+            document.getElementById('soloParticipants').textContent = soloCount;
+            document.getElementById('koppelParticipants').textContent = koppelCount;
+
+            // Populate table
+            const tbody = document.getElementById('participantsBody');
+            tbody.innerHTML = '';
+
+            if (registrations.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-inbox"></i><br>
+                            Nog geen inschrijvingen voor deze wedstrijd
+                        </td>
+                    </tr>
+                `;
+            } else {
+                registrations.forEach((reg, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${reg.name}</strong></td>
+                        <td><span class="badge ${reg.type}">${reg.type === 'solo' ? 'Individueel' : 'Koppel'}</span></td>
+                        <td>${reg.partner || '-'}</td>
+                        <td>${reg.timestamp}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            registrationsContent.style.display = 'block';
+            emptyState.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

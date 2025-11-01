@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weging - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c5f7d;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .header .competition-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #2c5f7d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .weigh-group-selector {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .weigh-group-selector h2 {
+            color: #2c5f7d;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .group-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .group-btn {
+            padding: 30px 20px;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .group-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .group-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .group-btn i {
+            display: block;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .competition-selector {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .competition-selector select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .weigh-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .spot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .spot-btn {
+            padding: 20px;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            position: relative;
+        }
+
+        .spot-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .spot-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .spot-btn.weighed {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .spot-btn.weighed::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 12px;
+            color: #28a745;
+        }
+
+        .weight-input-section {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .weight-input-section.active {
+            display: block;
+        }
+
+        .weight-input-section h3 {
+            color: #2c5f7d;
+            margin-bottom: 15px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .participant-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .participant-info div {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .participant-info strong {
+            color: #2c5f7d;
+        }
+
+        .weight-input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .weight-input {
+            width: 100%;
+            padding: 20px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 32px;
+            text-align: center;
+            font-weight: bold;
+            color: #2c5f7d;
+        }
+
+        .weight-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .weight-unit {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #999;
+            pointer-events: none;
+        }
+
+        .quick-weights {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-weight-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-weight-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .save-weight-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .save-weight-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .save-weight-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            padding: 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .progress-bar h3 {
+            color: #2c5f7d;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .progress-track {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            height: 100%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .weighed-list {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .weighed-list h3 {
+            color: #2c5f7d;
+            margin-bottom: 15px;
+            font-size: 18px;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding-bottom: 10px;
+        }
+
+        .weighed-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .weighed-item .spot {
+            font-weight: bold;
+            color: #2c5f7d;
+            font-size: 18px;
+        }
+
+        .weighed-item .name {
+            flex: 1;
+            margin: 0 15px;
+            color: #333;
+        }
+
+        .weighed-item .weight {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 18px;
+        }
+
+        .weighed-item .edit-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Terug naar Dashboard
+        </a>
+
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-weight"></i> Weging Invoeren</h1>
+            <div class="competition-info" id="competitionInfo">Selecteer eerst een wedstrijd</div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alertSuccess" class="alert success">
+            <i class="fas fa-check-circle"></i> <span id="alertMessage"></span>
+        </div>
+
+        <!-- Competition Selector -->
+        <div class="competition-selector">
+            <h2><i class="fas fa-calendar"></i> Selecteer Wedstrijd</h2>
+            <select id="competitionSelect">
+                <option value="">-- Kies wedstrijd --</option>
+            </select>
+        </div>
+
+        <!-- Weigh Group Selector -->
+        <div class="weigh-group-selector" id="groupSelector" style="display: none;">
+            <h2><i class="fas fa-users"></i> Kies Weeggroep</h2>
+            <div class="group-buttons">
+                <button class="group-btn" onclick="selectGroup(1)">
+                    <i class="fas fa-weight-hanging"></i>
+                    <div>Groep 1</div>
+                    <small>Plaats 1-21</small>
+                </button>
+                <button class="group-btn" onclick="selectGroup(2)">
+                    <i class="fas fa-weight-hanging"></i>
+                    <div>Groep 2</div>
+                    <small>Plaats 22-43</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <h3><i class="fas fa-tasks"></i> Voortgang</h3>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill">0 / 0</div>
+            </div>
+        </div>
+
+        <!-- Spot Selection -->
+        <div class="weigh-card" id="spotSelection" style="display: none;">
+            <h2><i class="fas fa-map-marker-alt"></i> Selecteer Visplaats</h2>
+            <div class="spot-grid" id="spotGrid">
+                <!-- Spots will be generated here -->
+            </div>
+        </div>
+
+        <!-- Weight Input -->
+        <div class="weight-input-section" id="weightInput">
+            <h3><i class="fas fa-weight"></i> Voer Gewicht In</h3>
+
+            <div class="participant-info" id="participantInfo">
+                <!-- Participant info will be loaded here -->
+            </div>
+
+            <div class="weight-input-wrapper">
+                <input type="number" class="weight-input" id="weightValue"
+                       placeholder="0.000" step="0.001" min="0" max="100">
+                <span class="weight-unit">kg</span>
+            </div>
+
+            <div class="quick-weights">
+                <button class="quick-weight-btn" onclick="setQuickWeight(0)">Niks</button>
+                <button class="quick-weight-btn" onclick="setQuickWeight(0.500)">0.5 kg</button>
+                <button class="quick-weight-btn" onclick="setQuickWeight(1.000)">1.0 kg</button>
+                <button class="quick-weight-btn" onclick="setQuickWeight(2.000)">2.0 kg</button>
+            </div>
+
+            <button class="save-weight-btn" onclick="saveWeight()">
+                <i class="fas fa-save"></i> Opslaan
+            </button>
+            <button class="cancel-btn" onclick="cancelWeight()">
+                <i class="fas fa-times"></i> Annuleren
+            </button>
+        </div>
+
+        <!-- Weighed List -->
+        <div class="weighed-list" id="weighedList" style="display: none;">
+            <h3><i class="fas fa-check-circle"></i> Gewogen Plaatsen</h3>
+            <div id="weighedListContent">
+                <div class="no-data">Nog geen plaatsen gewogen</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-auth.js"></script>
+    <script src="data-api.js"></script>
+    <script src="../script.js"></script>
+
+    <script>
+        let selectedCompetition = null;
+        let selectedGroup = null;
+        let selectedSpot = null;
+        let weighings = [];
+        let drawResults = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check auth
+            if (!adminAuth || !adminAuth.checkAuth()) {
+                alert('Je moet ingelogd zijn om deze pagina te gebruiken');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            await loadCompetitions();
+            loadWeighings();
+        });
+
+        // Load competitions
+        async function loadCompetitions() {
+            const select = document.getElementById('competitionSelect');
+
+            // Check if we have stored draws (trekkingen)
+            const allDrawKeys = Object.keys(localStorage).filter(key => key.startsWith('draw_'));
+
+            if (allDrawKeys.length === 0) {
+                select.innerHTML = '<option value="">Geen trekkingen gevonden - Doe eerst een trekking</option>';
+                console.log('No draws found in localStorage');
+                return;
+            }
+
+            // Load all draws and extract competition info
+            const competitions = [];
+            allDrawKeys.forEach(key => {
+                const drawData = JSON.parse(localStorage.getItem(key));
+                if (drawData && drawData.competition) {
+                    competitions.push({
+                        key: key,
+                        datum: drawData.competition.datum,
+                        wedstrijdtype: drawData.competition.wedstrijdtype || drawData.competition.type,
+                        timestamp: drawData.timestamp
+                    });
+                }
+            });
+
+            if (competitions.length === 0) {
+                select.innerHTML = '<option value="">Geen geldige trekkingen gevonden</option>';
+                return;
+            }
+
+            // Sort by timestamp (most recent first)
+            competitions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            console.log('Found competitions:', competitions);
+
+            // Add options
+            competitions.forEach((comp, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${comp.datum} - ${comp.wedstrijdtype}`;
+                option.dataset.datum = comp.datum;
+                option.dataset.type = comp.wedstrijdtype;
+                select.appendChild(option);
+            });
+
+            // Listen for selection
+            select.addEventListener('change', function() {
+                if (this.value === '') {
+                    selectedCompetition = null;
+                    document.getElementById('groupSelector').style.display = 'none';
+                    document.getElementById('spotSelection').style.display = 'none';
+                    return;
+                }
+
+                const selectedIndex = parseInt(this.value);
+                selectedCompetition = competitions[selectedIndex];
+
+                document.getElementById('competitionInfo').textContent =
+                    `${selectedCompetition.datum} - ${selectedCompetition.wedstrijdtype}`;
+
+                document.getElementById('groupSelector').style.display = 'block';
+                loadWeighings();
+            });
+
+            // Auto-select first competition
+            if (competitions.length > 0) {
+                select.value = '0';
+                selectedCompetition = competitions[0];
+                document.getElementById('competitionInfo').textContent =
+                    `${selectedCompetition.datum} - ${selectedCompetition.wedstrijdtype}`;
+                document.getElementById('groupSelector').style.display = 'block';
+            }
+        }
+
+        // Select weigh group
+        function selectGroup(groupNumber) {
+            selectedGroup = groupNumber;
+
+            // Update UI
+            document.querySelectorAll('.group-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.group-btn').classList.add('active');
+
+            // Load draw results for this competition
+            loadDrawResults();
+
+            // Show spot selection
+            generateSpotGrid();
+            document.getElementById('spotSelection').style.display = 'block';
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('weighedList').style.display = 'block';
+
+            updateProgress();
+            displayWeighedList();
+        }
+
+        // Load draw results
+        function loadDrawResults() {
+            if (!selectedCompetition) return;
+
+            const drawKey = `draw_${selectedCompetition.datum.replace(/-/g, '_')}`;
+            const savedDraw = localStorage.getItem(drawKey);
+
+            if (savedDraw) {
+                const drawData = JSON.parse(savedDraw);
+                drawResults = drawData.results || [];
+                console.log('Loaded draw results:', drawResults.length, 'participants');
+            } else {
+                drawResults = [];
+                console.log('No draw results found for this competition');
+            }
+        }
+
+        // Generate spot grid based on selected group
+        function generateSpotGrid() {
+            const grid = document.getElementById('spotGrid');
+            grid.innerHTML = '';
+
+            const startSpot = selectedGroup === 1 ? 1 : 22;
+            const endSpot = selectedGroup === 1 ? 21 : 43;
+
+            for (let i = startSpot; i <= endSpot; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'spot-btn';
+                btn.textContent = i;
+                btn.onclick = () => selectSpot(i);
+
+                // Check if already weighed
+                const weighing = weighings.find(w =>
+                    w.competitionDate === selectedCompetition.datum &&
+                    w.spot === i
+                );
+
+                if (weighing) {
+                    btn.classList.add('weighed');
+                    btn.title = `${weighing.weight} kg`;
+                }
+
+                grid.appendChild(btn);
+            }
+        }
+
+        // Select spot
+        function selectSpot(spotNumber) {
+            selectedSpot = spotNumber;
+
+            // Update UI
+            document.querySelectorAll('.spot-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            // Load participant info
+            loadParticipantInfo(spotNumber);
+
+            // Show weight input
+            document.getElementById('weightInput').classList.add('active');
+            document.getElementById('weightValue').value = '';
+            document.getElementById('weightValue').focus();
+        }
+
+        // Load participant info
+        function loadParticipantInfo(spotNumber) {
+            const infoDiv = document.getElementById('participantInfo');
+
+            // Find participant from draw results
+            const participant = drawResults.find(r => r.spot === spotNumber);
+
+            if (participant) {
+                infoDiv.innerHTML = `
+                    <div><strong>Plaats:</strong> ${spotNumber}</div>
+                    <div><strong>Naam:</strong> ${participant.name}</div>
+                    ${participant.isFixed ? '<div><i class="fas fa-thumbtack"></i> Vaste plaats</div>' : ''}
+                `;
+            } else {
+                infoDiv.innerHTML = `
+                    <div><strong>Plaats:</strong> ${spotNumber}</div>
+                    <div><em>Geen deelnemer op deze plaats</em></div>
+                `;
+            }
+        }
+
+        // Set quick weight
+        function setQuickWeight(weight) {
+            document.getElementById('weightValue').value = weight.toFixed(3);
+        }
+
+        // Save weight
+        function saveWeight() {
+            const weight = parseFloat(document.getElementById('weightValue').value);
+
+            if (isNaN(weight) || weight < 0) {
+                alert('Voer een geldig gewicht in');
+                return;
+            }
+
+            const participant = drawResults.find(r => r.spot === selectedSpot);
+            if (!participant) {
+                if (!confirm('Geen deelnemer gevonden voor plaats ' + selectedSpot + '. Toch opslaan?')) {
+                    return;
+                }
+            }
+
+            // Create weighing record
+            const weighing = {
+                id: Date.now() + Math.random(),
+                competitionDate: selectedCompetition.datum,
+                competitionType: selectedCompetition.wedstrijdtype,
+                spot: selectedSpot,
+                name: participant ? participant.name : `Plaats ${selectedSpot}`,
+                weight: weight,
+                weighedAt: new Date().toISOString(),
+                weighedBy: adminAuth.currentUser ? adminAuth.currentUser.username : 'Admin',
+                weighGroup: selectedGroup
+            };
+
+            // Remove existing weighing for this spot if any
+            weighings = weighings.filter(w =>
+                !(w.competitionDate === selectedCompetition.datum && w.spot === selectedSpot)
+            );
+
+            // Add new weighing
+            weighings.push(weighing);
+
+            // Save to localStorage
+            localStorage.setItem('weighings', JSON.stringify(weighings));
+
+            // Trigger storage event for live updates
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'weighings',
+                newValue: JSON.stringify(weighings)
+            }));
+
+            // Show success message
+            showAlert(`Plaats ${selectedSpot}: ${weight} kg opgeslagen!`);
+
+            // Close weight input
+            cancelWeight();
+
+            // Update UI
+            generateSpotGrid();
+            updateProgress();
+            displayWeighedList();
+        }
+
+        // Cancel weight input
+        function cancelWeight() {
+            document.getElementById('weightInput').classList.remove('active');
+            selectedSpot = null;
+
+            // Deselect spot
+            document.querySelectorAll('.spot-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        // Load weighings from localStorage
+        function loadWeighings() {
+            const stored = localStorage.getItem('weighings');
+            if (stored) {
+                weighings = JSON.parse(stored);
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            if (!selectedCompetition || !selectedGroup) return;
+
+            const startSpot = selectedGroup === 1 ? 1 : 22;
+            const endSpot = selectedGroup === 1 ? 21 : 43;
+            const totalSpots = endSpot - startSpot + 1;
+
+            const weighedSpots = weighings.filter(w =>
+                w.competitionDate === selectedCompetition.datum &&
+                w.spot >= startSpot &&
+                w.spot <= endSpot
+            ).length;
+
+            const percentage = (weighedSpots / totalSpots) * 100;
+
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = `${weighedSpots} / ${totalSpots}`;
+        }
+
+        // Display weighed list
+        function displayWeighedList() {
+            if (!selectedCompetition || !selectedGroup) return;
+
+            const startSpot = selectedGroup === 1 ? 1 : 22;
+            const endSpot = selectedGroup === 1 ? 21 : 43;
+
+            const groupWeighings = weighings.filter(w =>
+                w.competitionDate === selectedCompetition.datum &&
+                w.spot >= startSpot &&
+                w.spot <= endSpot
+            ).sort((a, b) => a.spot - b.spot);
+
+            const contentDiv = document.getElementById('weighedListContent');
+
+            if (groupWeighings.length === 0) {
+                contentDiv.innerHTML = '<div class="no-data">Nog geen plaatsen gewogen in deze groep</div>';
+                return;
+            }
+
+            contentDiv.innerHTML = groupWeighings.map(w => `
+                <div class="weighed-item">
+                    <div class="spot">${w.spot}</div>
+                    <div class="name">${w.name}</div>
+                    <div class="weight">${w.weight.toFixed(3)} kg</div>
+                    <button class="edit-btn" onclick="editWeight(${w.spot})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Edit weight
+        function editWeight(spotNumber) {
+            selectSpot(spotNumber);
+
+            const weighing = weighings.find(w =>
+                w.competitionDate === selectedCompetition.datum &&
+                w.spot === spotNumber
+            );
+
+            if (weighing) {
+                document.getElementById('weightValue').value = weighing.weight.toFixed(3);
+            }
+        }
+
+        // Show alert
+        function showAlert(message) {
+            const alert = document.getElementById('alertSuccess');
+            document.getElementById('alertMessage').textContent = message;
+            alert.classList.add('show');
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        // Listen for storage events (for real-time sync between tabs)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'weighings') {
+                loadWeighings();
+                if (selectedGroup) {
+                    generateSpotGrid();
+                    updateProgress();
+                    displayWeighedList();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

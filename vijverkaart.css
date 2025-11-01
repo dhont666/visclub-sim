@@ -1,0 +1,366 @@
+/**
+ * Vijverkaart Styling - Visvijver Plattegrond
+ * 43 plaatsen: Links 1-15, Boven 16-21, Rechts 22-37, Onder 38-43
+ */
+
+.vijverkaart-container {
+    background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.vijverkaart-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.vijverkaart-header h3 {
+    color: #2c5f7d;
+    margin: 0 0 10px 0;
+}
+
+.vijverkaart-header p {
+    color: #666;
+    margin: 0;
+}
+
+.vijver {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    aspect-ratio: 3/4;
+    background: linear-gradient(135deg, #7dd3f5 0%, #4fb3d9 100%);
+    border-radius: 20px;
+    box-shadow: inset 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.visplaats {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.visplaats:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Toegewezen plaatsen */
+.visplaats.bezet {
+    background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%);
+    border-color: #2c5f7d;
+    color: white;
+}
+
+/* Beschikbare plaatsen */
+.visplaats.vrij {
+    background: white;
+    border-color: #ddd;
+    color: #999;
+}
+
+/* Geselecteerde plaatsen (voor admin) */
+.visplaats.geselecteerd {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border-color: #ff9800;
+    color: white;
+}
+
+/* Linker kant: plaatsen 1-15 (gelijkmatige verdeling van onder naar boven) */
+.visplaats[data-plaats="1"] { left: -22px; top: calc(97% - 22px); }
+.visplaats[data-plaats="2"] { left: -22px; top: calc(90.5% - 22px); }
+.visplaats[data-plaats="3"] { left: -22px; top: calc(84% - 22px); }
+.visplaats[data-plaats="4"] { left: -22px; top: calc(77.5% - 22px); }
+.visplaats[data-plaats="5"] { left: -22px; top: calc(71% - 22px); }
+.visplaats[data-plaats="6"] { left: -22px; top: calc(64.5% - 22px); }
+.visplaats[data-plaats="7"] { left: -22px; top: calc(58% - 22px); }
+.visplaats[data-plaats="8"] { left: -22px; top: calc(51.5% - 22px); }
+.visplaats[data-plaats="9"] { left: -22px; top: calc(45% - 22px); }
+.visplaats[data-plaats="10"] { left: -22px; top: calc(38.5% - 22px); }
+.visplaats[data-plaats="11"] { left: -22px; top: calc(32% - 22px); }
+.visplaats[data-plaats="12"] { left: -22px; top: calc(25.5% - 22px); }
+.visplaats[data-plaats="13"] { left: -22px; top: calc(19% - 22px); }
+.visplaats[data-plaats="14"] { left: -22px; top: calc(12.5% - 22px); }
+.visplaats[data-plaats="15"] { left: -22px; top: calc(6% - 22px); }
+
+
+/* Boven kant: plaatsen 16-21 (gelijkmatige verdeling van links naar rechts) */
+.visplaats[data-plaats="16"] { left: calc(8.33% - 22px); top: -22px; }
+.visplaats[data-plaats="17"] { left: calc(25% - 22px); top: -22px; }
+.visplaats[data-plaats="18"] { left: calc(41.67% - 22px); top: -22px; }
+.visplaats[data-plaats="19"] { left: calc(58.33% - 22px); top: -22px; }
+.visplaats[data-plaats="20"] { left: calc(75% - 22px); top: -22px; }
+.visplaats[data-plaats="21"] { left: calc(91.67% - 22px); top: -22px; }
+
+/* Rechter kant: plaatsen 22-37 (gelijkmatige verdeling van boven naar onder, 16 plaatsen) */
+.visplaats[data-plaats="22"] { right: -22px; top: calc(6% - 22px); }
+.visplaats[data-plaats="23"] { right: -22px; top: calc(12% - 22px); }
+.visplaats[data-plaats="24"] { right: -22px; top: calc(18% - 22px); }
+.visplaats[data-plaats="25"] { right: -22px; top: calc(24% - 22px); }
+.visplaats[data-plaats="26"] { right: -22px; top: calc(30% - 22px); }
+.visplaats[data-plaats="27"] { right: -22px; top: calc(36% - 22px); }
+.visplaats[data-plaats="28"] { right: -22px; top: calc(42% - 22px); }
+.visplaats[data-plaats="29"] { right: -22px; top: calc(48% - 22px); }
+.visplaats[data-plaats="30"] { right: -22px; top: calc(54% - 22px); }
+.visplaats[data-plaats="31"] { right: -22px; top: calc(60% - 22px); }
+.visplaats[data-plaats="32"] { right: -22px; top: calc(66% - 22px); }
+.visplaats[data-plaats="33"] { right: -22px; top: calc(72% - 22px); }
+.visplaats[data-plaats="34"] { right: -22px; top: calc(78% - 22px); }
+.visplaats[data-plaats="35"] { right: -22px; top: calc(84% - 22px); }
+.visplaats[data-plaats="36"] { right: -22px; top: calc(90% - 22px); }
+.visplaats[data-plaats="37"] { right: -22px; top: calc(96% - 22px); }
+
+/* Onder kant: plaatsen 38-43 (van rechts naar links, 38 start rechts na plaats 37) */
+.visplaats[data-plaats="38"] { right: calc(8.33% - 22px); bottom: -22px; }
+.visplaats[data-plaats="39"] { right: calc(25% - 22px); bottom: -22px; }
+.visplaats[data-plaats="40"] { right: calc(41.67% - 22px); bottom: -22px; }
+.visplaats[data-plaats="41"] { right: calc(58.33% - 22px); bottom: -22px; }
+.visplaats[data-plaats="42"] { right: calc(75% - 22px); bottom: -22px; }
+.visplaats[data-plaats="43"] { right: calc(91.67% - 22px); bottom: -22px; }
+
+/* Tooltip voor namen */
+.visplaats-tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.visplaats:hover .visplaats-tooltip {
+    opacity: 1;
+}
+
+/* Legende */
+.vijverkaart-legende {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.legende-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.legende-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid;
+}
+
+.legende-icon.vrij {
+    background: white;
+    border-color: #ddd;
+}
+
+.legende-icon.bezet {
+    background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%);
+    border-color: #2c5f7d;
+}
+
+/* Homepage specific styling */
+#homepage-vijverkaart {
+    margin: 40px auto;
+    max-width: 1200px;
+    padding: 0 20px;
+    animation: fadeInSlideDown 0.6s ease-out;
+}
+
+@keyframes fadeInSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#homepage-vijverkaart .vijverkaart-container {
+    background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%);
+    border: 3px solid #2c5f7d;
+    box-shadow: 0 8px 30px rgba(44, 95, 125, 0.2);
+    animation: containerPulse 2s ease-in-out infinite;
+}
+
+@keyframes containerPulse {
+    0%, 100% {
+        box-shadow: 0 8px 30px rgba(44, 95, 125, 0.2);
+    }
+    50% {
+        box-shadow: 0 8px 40px rgba(44, 95, 125, 0.3);
+    }
+}
+
+#homepage-vijverkaart .vijverkaart-header {
+    background: linear-gradient(135deg, #2c5f7d 0%, #1e4558 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px 12px 0 0;
+    margin: -30px -30px 20px -30px;
+}
+
+#homepage-vijverkaart .vijverkaart-header h3 {
+    color: white;
+    font-size: 28px;
+    margin: 0 0 10px 0;
+}
+
+#homepage-vijverkaart .vijverkaart-header p {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+#homepage-vijverkaart .vijverkaart-header p strong {
+    color: #ffd700;
+    font-size: 18px;
+}
+
+#homepage-vijverkaart .vijver {
+    box-shadow: inset 0 6px 25px rgba(0, 0, 0, 0.2);
+    border: 3px solid #2c5f7d;
+}
+
+#homepage-vijverkaart .visplaats.bezet {
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    border-color: #ff8c00;
+    color: #333;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    animation: spotGlow 3s ease-in-out infinite;
+    width: 65px;
+    height: 65px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+    margin: -10px; /* Compensate for extra size to keep center point */
+}
+
+#homepage-vijverkaart .visplaats .plaats-nummer {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+#homepage-vijverkaart .visplaats .plaats-naam {
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+}
+
+@keyframes spotGlow {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+}
+
+#homepage-vijverkaart .visplaats.bezet:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.6);
+    animation: none; /* Stop glow animation on hover */
+}
+
+#homepage-vijverkaart .visplaats-tooltip {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#homepage-vijverkaart .visplaats:hover .visplaats-tooltip {
+    opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .vijver-met-lijst {
+        grid-template-columns: 1fr 350px !important;
+        gap: 20px !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .vijver-met-lijst {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
+    }
+
+    .deelnemers-lijst {
+        order: -1; /* Toon lijst boven de vijverkaart op mobiel */
+    }
+}
+
+@media (max-width: 768px) {
+    .vijver {
+        max-width: 100%;
+    }
+
+    .visplaats {
+        width: 35px;
+        height: 35px;
+        font-size: 11px;
+    }
+
+    #homepage-vijverkaart .visplaats.bezet {
+        width: 50px;
+        height: 50px;
+        margin: -7px;
+    }
+
+    .vijverkaart-legende {
+        font-size: 12px;
+    }
+
+    #homepage-vijverkaart .vijverkaart-header h3 {
+        font-size: 22px;
+    }
+
+    #homepage-vijverkaart .vijverkaart-header p {
+        font-size: 14px;
+    }
+}

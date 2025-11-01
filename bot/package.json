@@ -1,0 +1,26 @@
+{
+  "name": "visclub-sim-webbeheerder-bot",
+  "version": "1.0.0",
+  "description": "Automatische webbeheerder bot voor Visclub SiM website",
+  "main": "webbeheerder-bot.js",
+  "scripts": {
+    "start": "node webbeheerder-bot.js",
+    "test": "echo \"No tests specified yet\"",
+    "dev": "nodemon webbeheerder-bot.js"
+  },
+  "keywords": [
+    "visclub",
+    "automation",
+    "bot",
+    "social-media"
+  ],
+  "author": "Visclub SiM",
+  "license": "MIT",
+  "dependencies": {
+    "nodemailer": "^6.9.7",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

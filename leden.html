@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leden & Klassement - Visclub SiM</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bot/bot-chat-interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .members-section {
+            padding: 120px 0 80px;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-box i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-box h3 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box p {
+            color: var(--text-light);
+        }
+
+        .members-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            padding: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-bar button {
+            padding: 12px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--secondary-color);
+        }
+
+        .members-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .members-table thead {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .members-table th,
+        .members-table td {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .members-table th {
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .members-table th:hover {
+            background: var(--accent-color);
+        }
+
+        .members-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: var(--transition);
+        }
+
+        .members-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .member-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-jaar { background: #d4edda; color: #155724; }
+        .badge-jeugd { background: #fff3cd; color: #856404; }
+        .badge-senior { background: #d1ecf1; color: #0c5460; }
+        .badge-dagkaart { background: #f8d7da; color: #721c24; }
+
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .btn-view {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: var(--secondary-color);
+        }
+
+        .ranking-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .rank-1 { background: #ffd700; color: #333; }
+        .rank-2 { background: #c0c0c0; color: #333; }
+        .rank-3 { background: #cd7f32; color: white; }
+        .rank-other { background: var(--primary-color); color: white; }
+
+        .points-display {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Member Detail Modal */
+        .modal-detail {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-detail.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-detail-content {
+            background: white;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-detail-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-detail-header h2 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-detail-body {
+            padding: 2rem;
+        }
+
+        .member-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .info-item strong {
+            display: block;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .competitions-list {
+            margin-top: 2rem;
+        }
+
+        .competition-item {
+            padding: 1rem;
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .competition-date {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .competition-result {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .result-position {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .result-points {
+            padding: 5px 15px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .members-table {
+                font-size: 0.85rem;
+            }
+
+            .members-table th,
+            .members-table td {
+                padding: 0.5rem;
+            }
+
+            .stat-box h3 {
+                font-size: 2rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-bar button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-fish"></i>
+                <span>Visclub SiM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="kalender.html" class="nav-link">Kalender</a></li>
+                <li><a href="inschrijven.html" class="nav-link">Inschrijven</a></li>
+                <li><a href="leden.html" class="nav-link active">Leden</a></li>
+                <li><a href="visvergunning.html" class="nav-link">Visvergunning</a></li>
+                <li><a href="weer.html" class="nav-link">Weer</a></li>
+                <li><a href="gallerij.html" class="nav-link">Gallerij</a></li>
+                <li><a href="route.html" class="nav-link">Route</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Members Section -->
+    <section class="members-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Leden & Klassement 2026</h2>
+                <div class="section-line"></div>
+                <p>Overzicht van alle leden en hun prestaties</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <i class="fas fa-users"></i>
+                    <h3 id="totalMembers">0</h3>
+                    <p>Totaal Leden</p>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-trophy"></i>
+                    <h3 id="activeMembers">0</h3>
+                    <p>Actieve Wedstrijdvissers</p>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-fish"></i>
+                    <h3 id="totalCompetitions">71</h3>
+                    <p>Wedstrijden 2026</p>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-chart-line"></i>
+                    <h3 id="avgParticipation">0</h3>
+                    <p>Gem. Deelname</p>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterMembers('all')">
+                    <i class="fas fa-users"></i> Alle Leden
+                </button>
+                <button class="filter-tab" onclick="filterMembers('jaar')">
+                    <i class="fas fa-star"></i> Jaarleden
+                </button>
+                <button class="filter-tab" onclick="filterMembers('jeugd')">
+                    <i class="fas fa-child"></i> Jeugd
+                </button>
+                <button class="filter-tab" onclick="filterMembers('senior')">
+                    <i class="fas fa-user-tie"></i> Senioren
+                </button>
+                <button class="filter-tab" onclick="filterMembers('klassement')">
+                    <i class="fas fa-medal"></i> Klassement
+                </button>
+            </div>
+
+            <!-- Members Table -->
+            <div class="members-table-container">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Zoek op naam, lidnummer..." onkeyup="searchMembers()">
+                    <button onclick="searchMembers()">
+                        <i class="fas fa-search"></i> Zoeken
+                    </button>
+                </div>
+
+                <table class="members-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)"><i class="fas fa-sort"></i> Rank</th>
+                            <th onclick="sortTable(1)"><i class="fas fa-sort"></i> Lid #</th>
+                            <th onclick="sortTable(2)"><i class="fas fa-sort"></i> Naam</th>
+                            <th onclick="sortTable(3)"><i class="fas fa-sort"></i> Type</th>
+                            <th onclick="sortTable(4)"><i class="fas fa-sort"></i> Geldig Tot</th>
+                            <th onclick="sortTable(5)"><i class="fas fa-sort"></i> Wedstrijden</th>
+                            <th onclick="sortTable(6)"><i class="fas fa-sort"></i> Punten</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                        <!-- Data will be loaded via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="visvergunning.html" class="btn btn-primary btn-large">
+                    <i class="fas fa-plus-circle"></i> Nieuw Lid Aanmelden
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Visclub SiM</h3>
+                    <p>Gepassioneerd vissen in Merksplas sinds jaren. Lid worden of meedoen aan onze wedstrijden? Neem contact op!</p>
+                    <p><small>Nijverheidsstraat 6, 2330 Merksplas</small></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="kalender.html">Kalender</a></li>
+                        <li><a href="inschrijven.html">Inschrijven</a></li>
+                        <li><a href="leden.html">Leden</a></li>
+                        <li><a href="inschrijvingen.html">Inschrijvingen</a></li>
+                        <li><a href="visvergunning.html">Visvergunning</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Volg ons</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/visclubsim" target="_blank" title="Volg ons op Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@visclubsim" target="_blank" title="Bekijk onze YouTube kanaal"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Blijf op de hoogte van al ons nieuws!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Visclub SiM Merksplas. Alle rechten voorbehouden.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Vis Advies Bot Scripts -->
+    <script src="bot/weer-vangst-bot.js"></script>
+    <script src="bot/bot-chat-interface.js"></script>
+
+    <script src="script.js"></script>
+    <script>
+        // Members data - will be loaded from backend/database
+        let membersData = [];
+        let competitionHistory = {};
+
+        let currentFilter = 'all';
+        let sortDirection = 'asc';
+        let currentSortColumn = 6; // Default sort by points
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            await fetchMembersData();
+            loadMembers();
+            updateStatistics();
+        });
+
+        // Fetch members data from localStorage
+        async function fetchMembersData() {
+            try {
+                // Load from localStorage (same storage used by admin panel)
+                const storedMembers = localStorage.getItem('mock_members');
+                if (storedMembers) {
+                    const members = JSON.parse(storedMembers);
+
+                    // Transform to display format with ranking data
+                    membersData = members.map((member, index) => {
+                        return {
+                            id: member.id || String(index + 1).padStart(3, '0'),
+                            name: `${member.firstName} ${member.lastName}`,
+                            type: getMemberType(member.membershipType),
+                            validUntil: '31-12-2026', // Default validity
+                            competitions: member.competitions || 0,
+                            points: member.points || 0,
+                            email: member.email || '',
+                            phone: member.phone || '',
+                            address: member.address || '',
+                            joined: member.createdAt ? new Date(member.createdAt).toLocaleDateString('nl-NL') : 'Onbekend'
+                        };
+                    });
+
+                    console.log('✅ Loaded', membersData.length, 'members from localStorage');
+                } else {
+                    membersData = [];
+                    console.log('ℹ️ No members found in localStorage');
+                }
+
+                competitionHistory = {};
+            } catch (error) {
+                console.error('Error loading members data:', error);
+                membersData = [];
+                competitionHistory = {};
+            }
+        }
+
+        // Helper function to map membership type
+        function getMemberType(membershipType) {
+            const typeMap = {
+                'Jaarlid': 'jaar',
+                'Jeugd': 'jeugd',
+                'Senior': 'senior',
+                'Senior 65+': 'senior',
+                'Dagkaart': 'dagkaart'
+            };
+            return typeMap[membershipType] || 'jaar';
+        }
+
+        function loadMembers(filter = 'all') {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = '';
+
+            // Sort by points (descending) for ranking
+            let sortedMembers = [...membersData].sort((a, b) => b.points - a.points);
+
+            // Filter if needed
+            if (filter !== 'all' && filter !== 'klassement') {
+                sortedMembers = sortedMembers.filter(m => m.type === filter);
+            }
+
+            sortedMembers.forEach((member, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+
+                const badgeClass = `badge-${member.type}`;
+                const typeLabel = {
+                    'jaar': 'Jaarlid',
+                    'jeugd': 'Jeugd',
+                    'senior': 'Senior 65+',
+                    'dagkaart': 'Dagkaart'
+                }[member.type];
+
+                const row = `
+                    <tr>
+                        <td><span class="ranking-badge ${rankClass}">${rank}</span></td>
+                        <td><strong>${member.id}</strong></td>
+                        <td>${member.name}</td>
+                        <td><span class="member-badge ${badgeClass}">${typeLabel}</span></td>
+                        <td>${member.validUntil}</td>
+                        <td><strong>${member.competitions}</strong></td>
+                        <td><span class="points-display">${member.points}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function filterMembers(type) {
+            currentFilter = type;
+
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.filter-tab').classList.add('active');
+
+            loadMembers(type);
+        }
+
+        function searchMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#membersTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function sortTable(columnIndex) {
+            const tbody = document.getElementById('membersTableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            sortDirection = currentSortColumn === columnIndex ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
+            currentSortColumn = columnIndex;
+
+            rows.sort((a, b) => {
+                let aVal = a.cells[columnIndex].textContent.trim();
+                let bVal = b.cells[columnIndex].textContent.trim();
+
+                // Handle numeric values
+                if (!isNaN(aVal) && !isNaN(bVal)) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function updateStatistics() {
+            document.getElementById('totalMembers').textContent = membersData.length;
+
+            const activeMembers = membersData.filter(m => m.competitions > 0).length;
+            document.getElementById('activeMembers').textContent = activeMembers;
+
+            const avgCompetitions = Math.round(
+                membersData.reduce((sum, m) => sum + m.competitions, 0) / membersData.length
+            );
+            document.getElementById('avgParticipation').textContent = avgCompetitions;
+        }
+
+    </script>
+</body>
+</html>

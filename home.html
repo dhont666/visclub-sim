@@ -277,6 +277,23 @@
                                 heroSection.insertAdjacentElement('afterend', section);
                             }
 
+                            // Maak deelnemerslijst met startnummers
+                            const toewijzingenArray = Object.entries(dataToShow.toewijzingen).map(([plaats, info]) => ({
+                                plaats: plaats,
+                                naam: info.naam
+                            })).sort((a, b) => {
+                                const numA = parseInt(a.plaats.replace(/\D/g, ''));
+                                const numB = parseInt(b.plaats.replace(/\D/g, ''));
+                                return numA - numB;
+                            });
+
+                            const deelnemersHTML = toewijzingenArray.map(item => `
+                                <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                    <span style="font-weight: 500; color: #2c3e50;">Plaats ${item.plaats}</span>
+                                    <span style="color: #34495e;">${item.naam}</span>
+                                </div>
+                            `).join('');
+
                             section.innerHTML = `
                                 <section style="padding: 60px 0; background: #f0f8ff;">
                                     <div class="container">
@@ -288,7 +305,25 @@
                                                 ${dataToShow.aantalDeelnemers} deelnemers • Laatst bijgewerkt: ${new Date(dataToShow.gepubliceerdOp).toLocaleString('nl-NL')}
                                             </p>
                                         </div>
-                                        <div id="homepage-vijverkaart" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto;"></div>
+                                        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 30px; margin-top: 40px; align-items: start;">
+                                            <div id="homepage-vijverkaart" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></div>
+                                            <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                                <h3 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                                                    <i class="fas fa-list-ol"></i>
+                                                    Deelnemers
+                                                </h3>
+                                                <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">
+                                                    ${deelnemersHTML}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <style>
+                                            @media (max-width: 968px) {
+                                                #homepage-vijverkaart-section .container > div[style*="grid"] {
+                                                    grid-template-columns: 1fr !important;
+                                                }
+                                            }
+                                        </style>
                                     </div>
                                 </section>
                             `;

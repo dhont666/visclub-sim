@@ -1170,6 +1170,11 @@
                 return;
             }
 
+            if (!selectedCompetition) {
+                alert('Geen wedstrijd geselecteerd');
+                return;
+            }
+
             // Get start numbers for participants
             const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
 
@@ -1179,24 +1184,42 @@
                 startNumber: startNumbers[result.name] || null
             }));
 
-            // Save to localStorage with publish flag
+            // Save to localStorage with publish flag (legacy format)
             const publishData = {
                 competition: selectedCompetition,
                 results: resultsWithStartNumbers,
                 publishedAt: new Date().toISOString(),
-                publishedBy: adminAuth.currentUser.username
+                publishedBy: adminAuth.currentUser ? adminAuth.currentUser.username : 'admin'
             };
 
             localStorage.setItem('published_draw', JSON.stringify(publishData));
 
-            // Publiceren via vijverkaart systeem
-            if (window.adminVijverkaart && selectedCompetition) {
-                window.adminVijverkaart.publiceerNaarHomepage({
-                    naam: selectedCompetition.wedstrijdtype || 'Wedstrijd',
-                    datum: selectedCompetition.datum,
-                    type: selectedCompetition.type || 'Algemeen'
-                });
-            }
+            // Publiceren via vijverkaart systeem (nieuwe methode)
+            // Converteer drawResults naar toewijzingen format
+            const toewijzingen = {};
+            drawResults.forEach(result => {
+                if (result.spot) {
+                    toewijzingen[result.spot] = {
+                        naam: result.name,
+                        email: ''
+                    };
+                }
+            });
+
+            // Sla direct op in vijverkaart_actueel format
+            const vijverkaartData = {
+                datum: new Date().toISOString(),
+                wedstrijd: selectedCompetition.wedstrijdtype || 'Wedstrijd',
+                toewijzingen: toewijzingen,
+                aantalDeelnemers: drawResults.length,
+                wedstrijdNaam: selectedCompetition.wedstrijdtype || 'Wedstrijd',
+                wedstrijdDatum: selectedCompetition.datum,
+                wedstrijdType: selectedCompetition.type || 'Algemeen',
+                gepubliceerdOp: new Date().toISOString()
+            };
+
+            localStorage.setItem('vijverkaart_actueel', JSON.stringify(vijverkaartData));
+            console.log('✅ Vijverkaart gepubliceerd naar homepage:', vijverkaartData);
 
             // Show success message
             document.getElementById('publishSuccess').style.display = 'block';

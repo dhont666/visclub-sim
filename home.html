@@ -266,7 +266,7 @@
                     const verschilDagen = (nu - gepubliceerd) / (1000 * 60 * 60 * 24);
 
                     if (verschilDagen <= 7) {
-                        // Voeg sectie toe NA de hero sectie
+                        // Voeg sectie toe VOOR de hero sectie (bovenaan)
                         const heroSection = document.querySelector('.hero');
                         if (heroSection) {
                             // Maak de sectie dynamisch aan als hij niet bestaat
@@ -274,7 +274,7 @@
                             if (!section) {
                                 section = document.createElement('div');
                                 section.id = 'homepage-vijverkaart-section';
-                                heroSection.insertAdjacentElement('afterend', section);
+                                heroSection.insertAdjacentElement('beforebegin', section);
                             }
 
                             // Maak deelnemerslijst met startnummers
@@ -335,6 +335,16 @@
                                 showLegend: true
                             });
                             vijverkaart.render(dataToShow.toewijzingen);
+
+                            // Maak de vijverkaart groter via CSS transform
+                            setTimeout(() => {
+                                const svg = document.querySelector('#homepage-vijverkaart svg');
+                                if (svg) {
+                                    svg.style.transform = 'scale(1.5)';
+                                    svg.style.transformOrigin = 'top left';
+                                    svg.parentElement.style.minHeight = '700px';
+                                }
+                            }, 100);
 
                             console.log('✅ Plaatsentrekking getoond op homepage');
                         }

@@ -336,13 +336,23 @@
                             });
                             vijverkaart.render(dataToShow.toewijzingen);
 
-                            // Maak de vijverkaart groter via CSS transform
+                            // Maak de vijverkaart veel groter
                             setTimeout(() => {
-                                const svg = document.querySelector('#homepage-vijverkaart svg');
-                                if (svg) {
-                                    svg.style.transform = 'scale(1.5)';
-                                    svg.style.transformOrigin = 'top left';
-                                    svg.parentElement.style.minHeight = '700px';
+                                const vijverElement = document.querySelector('#homepage-vijverkaart .vijver');
+                                const visplaatsen = document.querySelectorAll('#homepage-vijverkaart .visplaats');
+
+                                if (vijverElement) {
+                                    // Vergroten van de vijver container
+                                    vijverElement.style.maxWidth = '1200px';
+                                    vijverElement.style.height = '800px';
+                                    vijverElement.style.margin = '0 auto';
+
+                                    // Vergroot alle visplaatsen
+                                    visplaatsen.forEach(plaats => {
+                                        plaats.style.width = '60px';
+                                        plaats.style.height = '60px';
+                                        plaats.style.fontSize = '18px';
+                                    });
                                 }
                             }, 100);
 

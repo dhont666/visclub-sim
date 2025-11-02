@@ -305,14 +305,14 @@
                                                 ${dataToShow.aantalDeelnemers} deelnemers • Laatst bijgewerkt: ${new Date(dataToShow.gepubliceerdOp).toLocaleString('nl-NL')}
                                             </p>
                                         </div>
-                                        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 30px; margin-top: 40px; align-items: start;">
-                                            <div id="homepage-vijverkaart" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></div>
+                                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 40px; align-items: start;">
+                                            <div id="homepage-vijverkaart" style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-height: 600px;"></div>
                                             <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                                                 <h3 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 20px; display: flex; align-items: center; gap: 10px;">
                                                     <i class="fas fa-list-ol"></i>
                                                     Deelnemers
                                                 </h3>
-                                                <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">
+                                                <div style="max-height: 600px; overflow-y: auto; padding-right: 5px;">
                                                     ${deelnemersHTML}
                                                 </div>
                                             </div>

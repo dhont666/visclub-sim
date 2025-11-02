@@ -269,7 +269,14 @@
                         // Voeg sectie toe NA de hero sectie
                         const heroSection = document.querySelector('.hero');
                         if (heroSection) {
-                            const section = document.getElementById('homepage-vijverkaart-section');
+                            // Maak de sectie dynamisch aan als hij niet bestaat
+                            let section = document.getElementById('homepage-vijverkaart-section');
+                            if (!section) {
+                                section = document.createElement('div');
+                                section.id = 'homepage-vijverkaart-section';
+                                heroSection.insertAdjacentElement('afterend', section);
+                            }
+
                             section.innerHTML = `
                                 <section style="padding: 60px 0; background: #f0f8ff;">
                                     <div class="container">

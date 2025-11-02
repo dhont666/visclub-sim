@@ -347,11 +347,16 @@
                                     vijverElement.style.height = '800px';
                                     vijverElement.style.margin = '0 auto';
 
-                                    // Vergroot alle visplaatsen
+                                    // Vergroot alle visplaatsen en disable interactie
                                     visplaatsen.forEach(plaats => {
                                         plaats.style.width = '60px';
                                         plaats.style.height = '60px';
                                         plaats.style.fontSize = '18px';
+                                        plaats.style.cursor = 'default';
+                                        plaats.style.pointerEvents = 'none';
+                                        // Verwijder hover effect
+                                        plaats.onmouseenter = null;
+                                        plaats.onmouseleave = null;
                                     });
                                 }
                             }, 100);

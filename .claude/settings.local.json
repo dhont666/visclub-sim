@@ -11,7 +11,8 @@
       "Bash(nslookup:*)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

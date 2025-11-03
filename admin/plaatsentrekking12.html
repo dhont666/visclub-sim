@@ -1,260 +1,4 @@
-<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Plaatsentrekking - Visclub SiM Admin</title><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="stylesheet" href="admin-style.css"><link rel="stylesheet" href="../vijverkaart.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
-.draw-container {
-max-width: 1200px;
-margin: 0 auto;
-padding: 20px;
-}
-.competition-selector {
-background: white;
-padding: 25px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-margin-bottom: 25px;
-}
-.participants-section {
-background: white;
-padding: 25px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-margin-bottom: 25px;
-}
-.participants-list {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-gap: 10px;
-margin-top: 15px;
-}
-.participant-item {
-display: flex;
-align-items: center;
-padding: 10px;
-background: #f8f9fa;
-border-radius: 5px;
-font-size: 14px;
-}
-.participant-item input[type="checkbox"] {
-margin-right: 10px;
-}
-.fixed-positions-section {
-background: #f8f9fa;
-padding: 25px;
-border-radius: 10px;
-border-left: 4px solid #2c5f7d;
-margin-bottom: 25px;
-}
-.fixed-position-input {
-display: grid;
-grid-template-columns: 2fr 1fr auto;
-gap: 10px;
-margin-bottom: 15px;
-}
-.fixed-positions-list {
-display: flex;
-flex-wrap: wrap;
-gap: 10px;
-margin-top: 15px;
-}
-.fixed-position-badge {
-background: white;
-border: 2px solid #2c5f7d;
-padding: 8px 15px;
-border-radius: 20px;
-display: flex;
-align-items: center;
-gap: 10px;
-}
-.fixed-position-badge .remove-btn {
-background: #dc3545;
-color: white;
-border: none;
-border-radius: 50%;
-width: 20px;
-height: 20px;
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-font-size: 12px;
-}
-.draw-controls {
-background: white;
-padding: 30px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-text-align: center;
-margin-bottom: 25px;
-}
-.draw-animation {
-display: none;
-text-align: center;
-padding: 40px;
-}
-.draw-animation.active {
-display: block;
-}
-.drawing-number {
-font-size: 72px;
-font-weight: bold;
-color: #2c5f7d;
-animation: pulse 0.5s ease-in-out infinite;
-}
-@keyframes pulse {
-0%, 100% { transform: scale(1); }
-50% { transform: scale(1.1); }
-}
-.results-section {
-display: none;
-background: white;
-padding: 25px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.results-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-gap: 15px;
-margin-top: 20px;
-}
-.result-card {
-background: #f8f9fa;
-padding: 15px;
-border-radius: 8px;
-border-left: 4px solid #2c5f7d;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-.result-card.fixed {
-background: #fff8e1;
-border-left-color: #ffc107;
-}
-.result-spot {
-background: #2c5f7d;
-color: white;
-width: 50px;
-height: 50px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 20px;
-font-weight: bold;
-}
-.result-card.fixed .result-spot {
-background: #ffc107;
-}
-.publish-section {
-background: #e8f4f8;
-padding: 25px;
-border-radius: 10px;
-border: 2px dashed #2c5f7d;
-text-align: center;
-margin-top: 25px;
-}
-.publish-btn {
-background: #28a745;
-color: white;
-border: none;
-padding: 15px 40px;
-font-size: 18px;
-border-radius: 50px;
-cursor: pointer;
-display: inline-flex;
-align-items: center;
-gap: 10px;
-transition: all 0.3s;
-}
-.publish-btn:hover {
-background: #218838;
-transform: translateY(-2px);
-box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-}
-.publish-btn:disabled {
-background: #6c757d;
-cursor: not-allowed;
-}
-.vijver-spot-btn {
-width: 50px;
-height: 50px;
-border: 2px solid #ddd;
-background: white;
-border-radius: 8px;
-font-size: 16px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.2s;
-color: #999;
-}
-.vijver-spot-btn:hover:not(:disabled) {
-transform: scale(1.05);
-box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.vijver-spot-btn.selected {
-background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%);
-border-color: #2c5f7d;
-color: white;
-}
-.vijver-spot-btn.fixed {
-background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
-border-color: #ff5722;
-color: white;
-cursor: not-allowed;
-}
-.vijver-spot-btn:disabled {
-opacity: 0.7;
-}
-#admin-vijverkaart .visplaats.vijver-selected {
-background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%) !important;
-border-color: #2c5f7d !important;
-color: white !important;
-transform: scale(1.05);
-}
-#admin-vijverkaart .visplaats.vijver-unselected {
-background: #f0f0f0 !important;
-border-color: #ddd !important;
-color: #999 !important;
-opacity: 0.6;
-}
-#admin-vijverkaart .visplaats.vijver-fixed {
-background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%) !important;
-border-color: #ff5722 !important;
-color: white !important;
-transform: scale(1.05);
-}
-#admin-vijverkaart .visplaats.vijver-selected:hover,
-#admin-vijverkaart .visplaats.vijver-unselected:hover {
-transform: scale(1.15) !important;
-box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-}
-#admin-vijverkaart .visplaats.vijver-fixed:hover {
-transform: scale(1.05) !important;
-opacity: 0.8;
-}
-</style></head><body><header class="admin-header" style="background: #2c5f7d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;"><div style="display: flex; align-items: center; gap: 20px;"><a href="index.html" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-arrow-left"></i> Terug naar Dashboard
-</a><h1 style="margin: 0; font-size: 24px;"><i class="fas fa-random"></i> Plaatsentrekking
-</h1></div><div id="adminInfo" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-user-circle"></i><span id="adminName">Admin</span></div></header><div class="draw-container"><div id="quickSetupSection" class="competition-selector" style="display: none; background: #fff3cd; border-left: 4px solid #ffc107;"><h3 style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Geen Data Gevonden</h3><p style="color: #856404; margin-bottom: 15px;">
-Er zijn nog geen leden of wedstrijden. Klik hieronder om snel demo data toe te voegen voor testen.
-</p><button class="btn btn-primary btn-large" onclick="quickSetupDemo()" style="margin-right: 10px;"><i class="fas fa-magic"></i> Voeg Demo Data Toe (Test Modus)
-</button><a href="index.html" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Leden Handmatig Toevoegen
-</a></div><div class="competition-selector"><h3><i class="fas fa-calendar-alt"></i> Selecteer Wedstrijd</h3><select id="competitionSelect" class="form-control" style="width: 100%; padding: 12px; font-size: 16px;"><option value="">Kies een wedstrijd...</option></select><div id="competitionInfo" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;"><div><strong>Datum:</strong><span id="compDate">-</span></div><div><strong>Type:</strong><span id="compType">-</span></div><div><strong>Deelnemers:</strong><span id="compParticipants">0</span></div><div><strong>Status:</strong><span id="compStatus" class="badge">Nog niet getrokken</span></div></div></div></div><div class="participants-section" id="participantsSection" style="display: none;"><h3><i class="fas fa-users"></i> Ingeschreven Deelnemers</h3><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; gap: 10px; font-weight: normal;"><input type="checkbox" id="selectAll"><span>Selecteer alle deelnemers voor loting</span></label></div><div class="participants-list" id="participantsList"></div></div><div class="vijver-selection-info" id="vijverSelectionInfo" style="display: none; background: #e7f3ff; padding: 20px; border-radius: 10px; border-left: 4px solid #0066cc; margin-bottom: 25px;"><h4 style="margin: 0 0 10px 0; color: #0066cc;"><i class="fas fa-info-circle"></i> Selecteer Vijvernummers</h4><p style="margin: 0 0 15px 0; color: #333;">Klik op de nummers in de vijverkaart hieronder om plaatsen te selecteren/deselecteren voor de loting.</p><div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;"><button class="btn btn-success" onclick="selectAllSpots()"><i class="fas fa-check-double"></i> Selecteer Alle Plaatsen
-</button><button class="btn btn-secondary" onclick="deselectAllSpots()"><i class="fas fa-times"></i> Deselecteer Alles
-</button><div style="padding: 8px 15px; background: white; border-radius: 5px; border: 2px solid #2c5f7d;"><strong>Geselecteerd:</strong><span id="selectedSpotsCount">43</span> van 43 plaatsen
-</div></div><div style="margin-top: 15px; padding: 12px; background: white; border-radius: 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 14px;"><div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Geselecteerd</div><div><span style="display: inline-block; width: 20px; height: 20px; background: #ddd; border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Niet geselecteerd</div><div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Vast toegewezen</div></div></div><div class="fixed-positions-section" id="fixedPositionsSection" style="display: none;"><h3><i class="fas fa-thumbtack"></i> Vaste Plaatsen Toewijzen (Optioneel)</h3><p style="color: #666; margin-bottom: 20px;">Wijs specifieke plaatsen toe aan deelnemers voordat de loting start</p><div class="fixed-position-input"><input type="text" id="fixedName" class="form-control" placeholder="Naam deelnemer" list="participantsDatalist"><datalist id="participantsDatalist"></datalist><input type="number" id="fixedSpot" class="form-control" placeholder="Plaats (1-43)" min="1" max="43"><button class="btn btn-primary" onclick="addFixedPosition()"><i class="fas fa-plus"></i> Toevoegen
-</button></div><div><h4>Toegewezen vaste plaatsen:</h4><div class="fixed-positions-list" id="fixedPositionsList"><p style="color: #999;">Nog geen vaste plaatsen toegewezen</p></div></div></div><div class="draw-controls" id="drawControls" style="display: none;"><h2 style="margin-bottom: 10px;">Klaar voor de trekking?</h2><p style="color: #666; margin-bottom: 20px;"><span id="selectedCount">0</span> deelnemers geselecteerd voor loting
-</p><button class="btn btn-primary btn-large" id="startDrawBtn" onclick="startDraw()"><i class="fas fa-random"></i> Start Automatische Trekking
-</button><div class="draw-animation" id="drawAnimation"><div class="drawing-number" id="drawingNumber">??</div><p>Plaatsen worden getrokken...</p></div></div><div class="vijverkaart-section" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px;"><h3><i class="fas fa-map-marked-alt"></i> Visvijver Plattegrond</h3><p style="color: #666; margin-bottom: 20px;">Overzicht van alle visplaatsen (43 plaatsen)</p><div id="admin-vijverkaart"></div></div><div class="results-section" id="resultsSection"><h3><i class="fas fa-check-circle"></i> Trekking Resultaat</h3><div class="results-grid" id="resultsGrid"></div><div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;"><button class="btn btn-secondary" onclick="exportResults()"><i class="fas fa-download"></i> Exporteer CSV
-</button><button class="btn btn-secondary" onclick="printResults()"><i class="fas fa-print"></i> Print
-</button><button class="btn btn-secondary" onclick="resetDraw()"><i class="fas fa-redo"></i> Opnieuw Trekken
-</button></div><div class="publish-section"><h3 style="margin-bottom: 10px;"><i class="fas fa-globe"></i> Publiceer naar Website
-</h3><p style="color: #666; margin-bottom: 20px;">
-Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
-</p><button class="publish-btn" id="publishBtn" onclick="publishResults()"><i class="fas fa-upload"></i> Publiceer Resultaten
-</button><p style="margin-top: 15px; color: #28a745; display: none;" id="publishSuccess"><i class="fas fa-check-circle"></i> Succesvol gepubliceerd!
-</p></div></div></div>
-<script src="admin-auth.js"></script>
-<script src="data-api.js"></script>
-<script src="../script.js"></script>
-<script>
+<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Plaatsentrekking - Visclub SiM Admin</title><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="stylesheet" href="admin-style.css"><link rel="stylesheet" href="../vijverkaart.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style> .draw-container { max-width: 1200px; margin: 0 auto; padding: 20px; } .competition-selector { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; } .participants-section { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; } .participants-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-top: 15px; } .participant-item { display: flex; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 14px; } .participant-item input[type="checkbox"] { margin-right: 10px; } .fixed-positions-section { background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #2c5f7d; margin-bottom: 25px; } .fixed-position-input { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 15px; } .fixed-positions-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; } .fixed-position-badge { background: white; border: 2px solid #2c5f7d; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 10px; } .fixed-position-badge .remove-btn { background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; } .draw-controls { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; margin-bottom: 25px; } .draw-animation { display: none; text-align: center; padding: 40px; } .draw-animation.active { display: block; } .drawing-number { font-size: 72px; font-weight: bold; color: #2c5f7d; animation: pulse 0.5s ease-in-out infinite; } @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } } .results-section { display: none; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); } .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; } .result-card { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #2c5f7d; display: flex; justify-content: space-between; align-items: center; } .result-card.fixed { background: #fff8e1; border-left-color: #ffc107; } .result-spot { background: #2c5f7d; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; } .result-card.fixed .result-spot { background: #ffc107; } .publish-section { background: #e8f4f8; padding: 25px; border-radius: 10px; border: 2px dashed #2c5f7d; text-align: center; margin-top: 25px; } .publish-btn { background: #28a745; color: white; border: none; padding: 15px 40px; font-size: 18px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; } .publish-btn:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); } .publish-btn:disabled { background: #6c757d; cursor: not-allowed; } .vijver-spot-btn { width: 50px; height: 50px; border: 2px solid #ddd; background: white; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #999; } .vijver-spot-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); } .vijver-spot-btn.selected { background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%); border-color: #2c5f7d; color: white; } .vijver-spot-btn.fixed { background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-color: #ff5722; color: white; cursor: not-allowed; } .vijver-spot-btn:disabled { opacity: 0.7; } #admin-vijverkaart .visplaats.vijver-selected { background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%) !important; border-color: #2c5f7d !important; color: white !important; transform: scale(1.05); } #admin-vijverkaart .visplaats.vijver-unselected { background: #f0f0f0 !important; border-color: #ddd !important; color: #999 !important; opacity: 0.6; } #admin-vijverkaart .visplaats.vijver-fixed { background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%) !important; border-color: #ff5722 !important; color: white !important; transform: scale(1.05); } #admin-vijverkaart .visplaats.vijver-selected:hover, #admin-vijverkaart .visplaats.vijver-unselected:hover { transform: scale(1.15) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; } #admin-vijverkaart .visplaats.vijver-fixed:hover { transform: scale(1.05) !important; opacity: 0.8; } </style></head><body><header class="admin-header" style="background: #2c5f7d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;"><div style="display: flex; align-items: center; gap: 20px;"><a href="index.html" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px;"><i class="fas fa-arrow-left"></i> Terug naar Dashboard </a><h1 style="margin: 0; font-size: 24px;"><i class="fas fa-random"></i> Plaatsentrekking </h1></div><div id="adminInfo" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-user-circle"></i><span id="adminName">Admin</span></div></header><div class="draw-container"><a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;"><i class="fas fa-arrow-left"></i> Terug naar overzicht </a><div id="quickSetupSection" class="competition-selector" style="display: none; background: #fff3cd; border-left: 4px solid #ffc107;"><h3 style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Geen Data Gevonden</h3><p style="color: #856404; margin-bottom: 15px;"> Er zijn nog geen leden of wedstrijden. Klik hieronder om snel demo data toe te voegen voor testen. </p><button class="btn btn-primary btn-large" onclick="quickSetupDemo()" style="margin-right: 10px;"><i class="fas fa-magic"></i> Voeg Demo Data Toe (Test Modus) </button><a href="index.html" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Leden Handmatig Toevoegen </a></div><div class="competition-selector"><h3><i class="fas fa-calendar-alt"></i> Selecteer Wedstrijd</h3><select id="competitionSelect" class="form-control" style="width: 100%; padding: 12px; font-size: 16px;"><option value="">Kies een wedstrijd...</option></select><div id="competitionInfo" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;"><div><strong>Datum:</strong><span id="compDate">-</span></div><div><strong>Type:</strong><span id="compType">-</span></div><div><strong>Deelnemers:</strong><span id="compParticipants">0</span></div><div><strong>Status:</strong><span id="compStatus" class="badge">Nog niet getrokken</span></div></div></div></div><div class="participants-section" id="participantsSection" style="display: none;"><h3><i class="fas fa-users"></i> Ingeschreven Deelnemers</h3><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; gap: 10px; font-weight: normal;"><input type="checkbox" id="selectAll"><span>Selecteer alle deelnemers voor loting</span></label></div><div class="participants-list" id="participantsList"></div></div><div class="vijver-selection-info" id="vijverSelectionInfo" style="display: none; background: #e7f3ff; padding: 20px; border-radius: 10px; border-left: 4px solid #0066cc; margin-bottom: 25px;"><h4 style="margin: 0 0 10px 0; color: #0066cc;"><i class="fas fa-info-circle"></i> Selecteer Vijvernummers</h4><p style="margin: 0 0 15px 0; color: #333;">Klik op de nummers in de vijverkaart hieronder om plaatsen te selecteren/deselecteren voor de loting.</p><div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;"><button class="btn btn-success" onclick="selectAllSpots()"><i class="fas fa-check-double"></i> Selecteer Alle Plaatsen </button><button class="btn btn-secondary" onclick="deselectAllSpots()"><i class="fas fa-times"></i> Deselecteer Alles </button><div style="padding: 8px 15px; background: white; border-radius: 5px; border: 2px solid #2c5f7d;"><strong>Geselecteerd:</strong><span id="selectedSpotsCount">43</span> van 43 plaatsen </div></div><div style="margin-top: 15px; padding: 12px; background: white; border-radius: 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 14px;"><div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #2c5f7d 0%, #4a7fa0 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Geselecteerd</div><div><span style="display: inline-block; width: 20px; height: 20px; background: #ddd; border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Niet geselecteerd</div><div><span style="display: inline-block; width: 20px; height: 20px; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-radius: 50%; vertical-align: middle; margin-right: 8px;"></span>Vast toegewezen</div></div></div><div class="fixed-positions-section" id="fixedPositionsSection" style="display: none;"><h3><i class="fas fa-thumbtack"></i> Vaste Plaatsen Toewijzen (Optioneel)</h3><p style="color: #666; margin-bottom: 20px;">Wijs specifieke plaatsen toe aan deelnemers voordat de loting start</p><div class="fixed-position-input"><input type="text" id="fixedName" class="form-control" placeholder="Naam deelnemer" list="participantsDatalist"><datalist id="participantsDatalist"></datalist><input type="number" id="fixedSpot" class="form-control" placeholder="Plaats (1-43)" min="1" max="43"><button class="btn btn-primary" onclick="addFixedPosition()"><i class="fas fa-plus"></i> Toevoegen </button></div><div><h4>Toegewezen vaste plaatsen:</h4><div class="fixed-positions-list" id="fixedPositionsList"><p style="color: #999;">Nog geen vaste plaatsen toegewezen</p></div></div></div><div class="draw-controls" id="drawControls" style="display: none;"><h2 style="margin-bottom: 10px;">Klaar voor de trekking?</h2><p style="color: #666; margin-bottom: 20px;"><span id="selectedCount">0</span> deelnemers geselecteerd voor loting </p><button class="btn btn-primary btn-large" id="startDrawBtn" onclick="startDraw()"><i class="fas fa-random"></i> Start Automatische Trekking </button><div class="draw-animation" id="drawAnimation"><div class="drawing-number" id="drawingNumber">??</div><p>Plaatsen worden getrokken...</p></div></div><div class="vijverkaart-section" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px;"><h3><i class="fas fa-map-marked-alt"></i> Visvijver Plattegrond</h3><p style="color: #666; margin-bottom: 20px;">Overzicht van alle visplaatsen (43 plaatsen)</p><div id="admin-vijverkaart"></div></div><div class="results-section" id="resultsSection"><h3><i class="fas fa-check-circle"></i> Trekking Resultaat</h3><div class="results-grid" id="resultsGrid"></div><div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;"><button class="btn btn-secondary" onclick="exportResults()"><i class="fas fa-download"></i> Exporteer CSV </button><button class="btn btn-secondary" onclick="printResults()"><i class="fas fa-print"></i> Print </button><button class="btn btn-secondary" onclick="resetDraw()"><i class="fas fa-redo"></i> Opnieuw Trekken </button></div><div class="publish-section"><h3 style="margin-bottom: 10px;"><i class="fas fa-globe"></i> Publiceer naar Website </h3><p style="color: #666; margin-bottom: 20px;"> Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers </p><div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;"><button class="publish-btn" id="publishBtn" onclick="publishResults()"><i class="fas fa-upload"></i> Publiceer Resultaten </button><button class="publish-btn" style="background: #17a2b8;" onclick="generateDemoWeighings()"><i class="fas fa-flask"></i> Genereer Demo Wegingen </button></div><p style="margin-top: 15px; color: #28a745; display: none;" id="publishSuccess"><i class="fas fa-check-circle"></i> Succesvol gepubliceerd! </p><p style="margin-top: 15px; color: #17a2b8; display: none;" id="demoSuccess"><i class="fas fa-check-circle"></i> Demo wegingen gegenereerd! <a href="../live-uitslag.html" target="_blank" style="color: #0056b3; text-decoration: underline;">Bekijk live scherm</a></p></div></div></div> <script src="admin-auth.js"></script> <script src="data-api.js"></script> <script src="../script.js"></script> <script>
         let selectedCompetition = null;
         let participants = [];
         let selectedParticipants = [];
@@ -327,8 +71,19 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 } else {
                     quickSetup.style.display = 'none';
                 }
+                const demoCompsStored = localStorage.getItem('demo_competitions');
+                let demoCompetitions = [];
+                if (demoCompsStored) {
+                    try {
+                        demoCompetitions = JSON.parse(demoCompsStored);
+                        console.log('✅ Found demo competitions in localStorage:', demoCompetitions.length);
+                    } catch (e) {
+                        console.error('Error parsing demo competitions:', e);
+                    }
+                }
+                const allCompetitions = [...window.calendarData, ...demoCompetitions];
                 console.log('🔍 Filtering competitions from calendar data...');
-                validCompetitions = window.calendarData.filter(event => {
+                validCompetitions = allCompetitions.filter(event => {
                     const [day, month, year] = event.datum.split('-').map(Number);
                     const eventDate = new Date(year, month - 1, day);
                     eventDate.setHours(0, 0, 0, 0);
@@ -748,6 +503,10 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 alert('Geen resultaten om te publiceren');
                 return;
             }
+            if (!selectedCompetition) {
+                alert('Geen wedstrijd geselecteerd');
+                return;
+            }
             const startNumbers = JSON.parse(localStorage.getItem('member_start_numbers') || '{}');
             const resultsWithStartNumbers = drawResults.map(result => ({
                 ...result,
@@ -757,16 +516,30 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 competition: selectedCompetition,
                 results: resultsWithStartNumbers,
                 publishedAt: new Date().toISOString(),
-                publishedBy: adminAuth.currentUser.username
+                publishedBy: adminAuth.currentUser ? adminAuth.currentUser.username : 'admin'
             };
             localStorage.setItem('published_draw', JSON.stringify(publishData));
-            if (window.adminVijverkaart && selectedCompetition) {
-                window.adminVijverkaart.publiceerNaarHomepage({
-                    naam: selectedCompetition.wedstrijdtype || 'Wedstrijd',
-                    datum: selectedCompetition.datum,
-                    type: selectedCompetition.type || 'Algemeen'
-                });
-            }
+            const toewijzingen = {};
+            drawResults.forEach(result => {
+                if (result.spot) {
+                    toewijzingen[result.spot] = {
+                        naam: result.name,
+                        email: ''
+                    };
+                }
+            });
+            const vijverkaartData = {
+                datum: new Date().toISOString(),
+                wedstrijd: selectedCompetition.wedstrijdtype || 'Wedstrijd',
+                toewijzingen: toewijzingen,
+                aantalDeelnemers: drawResults.length,
+                wedstrijdNaam: selectedCompetition.wedstrijdtype || 'Wedstrijd',
+                wedstrijdDatum: selectedCompetition.datum,
+                wedstrijdType: selectedCompetition.type || 'Algemeen',
+                gepubliceerdOp: new Date().toISOString()
+            };
+            localStorage.setItem('vijverkaart_actueel', JSON.stringify(vijverkaartData));
+            console.log('✅ Vijverkaart gepubliceerd naar homepage:', vijverkaartData);
             document.getElementById('publishSuccess').style.display = 'block';
             document.getElementById('publishBtn').disabled = true;
             document.getElementById('publishBtn').innerHTML = '<i class="fas fa-check"></i> Gepubliceerd';
@@ -891,6 +664,58 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
         function openStartNumberManager() {
             alert('Gebruik de tabel hieronder om startnummers aan te passen.\n\nOf klik op "Automatisch Toewijzen" voor snelle toewijzing.');
         }
+        function generateDemoWeighings() {
+            if (!drawResults || drawResults.length === 0) {
+                alert('❌ Eerst een trekking uitvoeren voordat je demo wegingen kunt genereren!');
+                return;
+            }
+            if (!selectedCompetition) {
+                alert('❌ Geen wedstrijd geselecteerd!');
+                return;
+            }
+            if (!confirm('Demo wegingen genereren voor deze trekking?\n\nDit zal realistische wegingen toevoegen voor alle deelnemers.\n\nBestaande wegingen voor deze datum worden verwijderd.')) {
+                return;
+            }
+            try {
+                const allWeighings = JSON.parse(localStorage.getItem('weighings') || '[]');
+                const filteredWeighings = allWeighings.filter(w => w.competitionDate !== selectedCompetition.datum);
+                const demoWeighings = drawResults.map(result => {
+                    const randomBase = Math.random();
+                    let weight;
+                    if (randomBase < 0.1) {
+                        weight = 0.5 + Math.random() * 1.5;
+                    } else if (randomBase < 0.7) {
+                        weight = 2 + Math.random() * 6;
+                    } else if (randomBase < 0.95) {
+                        weight = 8 + Math.random() * 4;
+                    } else {
+                        weight = 12 + Math.random() * 3;
+                    }
+                    return {
+                        id: `demo_${result.spot}_${Date.now()}`,
+                        name: result.name,
+                        spot: result.spot,
+                        weight: parseFloat(weight.toFixed(3)),
+                        competitionDate: selectedCompetition.datum,
+                        competitionType: selectedCompetition.wedstrijdtype || 'Demo Wedstrijd',
+                        timestamp: new Date().toISOString(),
+                        isDemo: true
+                    };
+                });
+                const newWeighings = [...filteredWeighings, ...demoWeighings];
+                localStorage.setItem('weighings', JSON.stringify(newWeighings));
+                console.log(`✅ ${demoWeighings.length} demo wegingen gegenereerd`);
+                const successMsg = document.getElementById('demoSuccess');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 10000);
+                alert(`✅ ${demoWeighings.length} demo wegingen gegenereerd!\n\nGa naar het live scherm om de resultaten te bekijken.\n\n💡 Tip: Open live-uitslag.html in een nieuw venster.`);
+            } catch (error) {
+                console.error('Fout bij genereren demo wegingen:', error);
+                alert('❌ Fout bij genereren demo wegingen: ' + error.message);
+            }
+        }
         async function quickSetupDemo() {
             if (!confirm('Dit voegt demo leden en wedstrijden toe voor testen.\n\nDoorgaan?')) {
                 return;
@@ -963,9 +788,7 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 alert('Fout bij toevoegen demo data: ' + error.message);
             }
         }
-    </script>
-<script src="../vijverkaart.js"></script>
-<script>
+    </script> <script src="../vijverkaart.js"></script> <script>
         let adminVijverkaart = null;
         function initVijverkaart() {
             console.log('🗺️ Initializing vijverkaart...');
@@ -1004,5 +827,4 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 updateVijverkaartNaTrekking();
             }, 500);
         };
-    </script>
-</body></html>
+    </script> </body></html>

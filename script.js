@@ -682,6 +682,20 @@ permitForm?.addEventListener('submit', function(e) {
 
     console.log('Permit application data:', data);
 
+    // Get existing applications to check for duplicates
+    const applications = JSON.parse(localStorage.getItem('mock_permits') || '[]');
+
+    // Check for duplicates by email or rijksregisternummer
+    const duplicate = applications.find(app =>
+        app.email.toLowerCase() === (data.email || '').toLowerCase() ||
+        (app.rijksregisternummer && data.rijksregisternummer && app.rijksregisternummer === data.rijksregisternummer)
+    );
+
+    if (duplicate) {
+        alert(`⚠️ Je hebt al een vergunning aangevraagd!\n\nEr bestaat al een aanvraag met dit email adres of rijksregisternummer.\nStatus: ${duplicate.status === 'pending' ? 'In Afwachting' : duplicate.status === 'approved' ? 'Goedgekeurd' : 'Afgewezen'}\n\nNeem contact op met de administratie voor meer informatie.`);
+        return;
+    }
+
     // Save permit application to localStorage for admin approval
     const permitApplication = {
         id: 'permit_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -693,6 +707,7 @@ permitForm?.addEventListener('submit', function(e) {
         city: data.city || '',
         postal: data.postal || '',
         birthdate: data.birthdate || '',
+        rijksregisternummer: data.rijksregisternummer || '',
         permitType: data.permitType || '',
         remarks: data.remarks || '',
         applicationDate: new Date().toISOString(),
@@ -701,8 +716,7 @@ permitForm?.addEventListener('submit', function(e) {
         approvedDate: null
     };
 
-    // Get existing applications from mock_permits (used by admin panel DataAPI)
-    const applications = JSON.parse(localStorage.getItem('mock_permits') || '[]');
+    // Add to existing applications array (already loaded above)
     applications.push(permitApplication);
     localStorage.setItem('mock_permits', JSON.stringify(applications));
 

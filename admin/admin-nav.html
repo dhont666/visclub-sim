@@ -1,61 +1,28 @@
-<!-- Admin Navigation Bar -->
-<nav style="background: #2c5f7d; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 30px;">
-            <h2 style="margin: 0; color: white; font-size: 18px;">
-                <i class="fas fa-fish"></i> Visclub SiM Admin
-            </h2>
-            <div style="display: flex; gap: 15px;">
-                <a href="index.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;">
-                    <i class="fas fa-home"></i> Dashboard
-                </a>
-                <a href="contact-berichten.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s; position: relative;">
-                    <i class="fas fa-envelope"></i> Berichten
-                    <span id="navContactBadge" class="nav-badge" style="display: none;">0</span>
-                </a>
-                <a href="vergunningen.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s; position: relative;">
-                    <i class="fas fa-file-contract"></i> Vergunningen
-                    <span id="navPermitsBadge" class="nav-badge" style="display: none;">0</span>
-                </a>
-                <a href="plaatsentrekking.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;">
-                    <i class="fas fa-random"></i> Plaatsentrekking
-                </a>
-                <a href="admin-chat.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;">
-                    <i class="fas fa-comments"></i> Chat
-                </a>
-            </div>
-        </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <a href="../home.html" target="_blank" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;">
-                <i class="fas fa-external-link-alt"></i> Website
-            </a>
-            <span style="color: white; opacity: 0.8; font-size: 14px;">
-                <i class="fas fa-user-circle"></i> Admin
-            </span>
-        </div>
-    </div>
-</nav>
-
-<style>
-    .nav-badge {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        background: #dc3545;
-        color: white;
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-
-    nav a:hover {
-        background: rgba(255,255,255,0.1);
-    }
+<nav style="background: #2c5f7d; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"><div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;"><div style="display: flex; align-items: center; gap: 30px;"><h2 style="margin: 0; color: white; font-size: 18px;"><i class="fas fa-fish"></i> Visclub SiM Admin
+</h2><div style="display: flex; gap: 15px;"><a href="index.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;"><i class="fas fa-home"></i> Dashboard
+</a><a href="contact-berichten.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s; position: relative;"><i class="fas fa-envelope"></i> Berichten
+<span id="navContactBadge" class="nav-badge" style="display: none;">0</span></a><a href="vergunningen.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s; position: relative;"><i class="fas fa-file-contract"></i> Vergunningen
+<span id="navPermitsBadge" class="nav-badge" style="display: none;">0</span></a><a href="plaatsentrekking.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;"><i class="fas fa-random"></i> Plaatsentrekking
+</a><a href="admin-chat.html" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;"><i class="fas fa-comments"></i> Chat
+</a></div></div><div style="display: flex; gap: 15px; align-items: center;"><a href="../home.html" target="_blank" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 5px; transition: all 0.3s;"><i class="fas fa-external-link-alt"></i> Website
+</a><span style="color: white; opacity: 0.8; font-size: 14px;"><i class="fas fa-user-circle"></i> Admin
+</span></div></div></nav><style>
+.nav-badge {
+position: absolute;
+top: 2px;
+right: 2px;
+background: #dc3545;
+color: white;
+font-size: 10px;
+padding: 2px 6px;
+border-radius: 10px;
+font-weight: 600;
+}
+nav a:hover {
+background: rgba(255,255,255,0.1);
+}
 </style>
-
 <script>
-    // Update navigation badges
     function updateNavBadges() {
         const contactMessages = JSON.parse(localStorage.getItem('contact_messages') || '[]');
         const unreadContact = contactMessages.filter(m => m.status === 'unread').length;
@@ -64,7 +31,6 @@
             contactBadge.textContent = unreadContact;
             contactBadge.style.display = unreadContact > 0 ? 'block' : 'none';
         }
-
         const permitApplications = JSON.parse(localStorage.getItem('permit_applications') || '[]');
         const pendingPermits = permitApplications.filter(a => a.status === 'pending').length;
         const permitBadge = document.getElementById('navPermitsBadge');
@@ -73,7 +39,6 @@
             permitBadge.style.display = pendingPermits > 0 ? 'block' : 'none';
         }
     }
-
     document.addEventListener('DOMContentLoaded', updateNavBadges);
     setInterval(updateNavBadges, 30000);
 </script>

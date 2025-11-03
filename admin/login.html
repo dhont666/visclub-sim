@@ -1,116 +1,86 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Visclub SiM</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="admin-style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #333;
-        }
-        .login-container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .login-container h2 {
-            margin-bottom: 25px;
-            color: #2c5f7d;
-            font-size: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .login-container h2 i {
-            font-size: 32px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
-            width: calc(100% - 24px);
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        .form-group input[type="text"]:focus,
-        .form-group input[type="password"]:focus {
-            outline: none;
-            border-color: #2c5f7d;
-            box-shadow: 0 0 0 3px rgba(44, 95, 125, 0.2);
-        }
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background-color: #2c5f7d;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .btn-login:hover {
-            background-color: #1a3a4d;
-            transform: translateY(-2px);
-        }
-        .error-message {
-            color: #e74c3c;
-            margin-top: 20px;
-            font-size: 14px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Gebruikersnaam</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Wachtwoord</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn-login">Login</button>
-            <p id="errorMsg" class="error-message"></p>
-        </form>
-    </div>
-
-    <script>
-        // LOKALE MODUS - Geen backend nodig
-        const USE_LOCAL_MODE = true; // Zet op false als je backend wilt gebruiken
-        const API_URL = 'http://localhost:3001/api';
-
-        // Standaard admin credentials voor lokale modus
+<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin Login - Visclub SiM</title><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="stylesheet" href="admin-style.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: #f0f2f5;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+margin: 0;
+color: #333;
+}
+.login-container {
+background-color: #ffffff;
+padding: 40px;
+border-radius: 12px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+width: 100%;
+max-width: 400px;
+text-align: center;
+}
+.login-container h2 {
+margin-bottom: 25px;
+color: #2c5f7d;
+font-size: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+}
+.login-container h2 i {
+font-size: 32px;
+}
+.form-group {
+margin-bottom: 20px;
+text-align: left;
+}
+.form-group label {
+display: block;
+margin-bottom: 8px;
+font-weight: 600;
+color: #555;
+}
+.form-group input[type="text"],
+.form-group input[type="password"] {
+width: calc(100% - 24px);
+padding: 12px;
+border: 1px solid #e0e0e0;
+border-radius: 8px;
+font-size: 16px;
+transition: border-color 0.3s;
+}
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus {
+outline: none;
+border-color: #2c5f7d;
+box-shadow: 0 0 0 3px rgba(44, 95, 125, 0.2);
+}
+.btn-login {
+width: 100%;
+padding: 14px;
+background-color: #2c5f7d;
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 18px;
+font-weight: 700;
+cursor: pointer;
+transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-login:hover {
+background-color: #1a3a4d;
+transform: translateY(-2px);
+}
+.error-message {
+color: #e74c3c;
+margin-top: 20px;
+font-size: 14px;
+display: none;
+}
+</style></head><body><div class="login-container"><h2><i class="fas fa-user-shield"></i> Admin Login</h2><form id="loginForm"><div class="form-group"><label for="username">Gebruikersnaam</label><input type="text" id="username" name="username" required></div><div class="form-group"><label for="password">Wachtwoord</label><input type="password" id="password" name="password" required></div><button type="submit" class="btn-login">Login</button><p id="errorMsg" class="error-message"></p></form></div>
+<script>
+        const USE_LOCAL_MODE = true; 
+        const API_URL = 'http:
         const LOCAL_ADMINS = {
             'admin': 'admin123',
             'visclub': 'visclub2026',
@@ -118,18 +88,13 @@
             'maarten.borghs': 'visclub2026',
             'kevin.vandun': 'visclub2026'
         };
-
         document.getElementById('loginForm').addEventListener('submit', async e => {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
-
             if (USE_LOCAL_MODE) {
-                // Lokale authenticatie zonder backend
                 if (LOCAL_ADMINS[user] && LOCAL_ADMINS[user] === pass) {
                     console.log('✅ Lokale login succesvol voor:', user);
-
-                    // Map usernames to display names
                     const displayNames = {
                         'admin': 'Admin',
                         'visclub': 'Visclub',
@@ -137,8 +102,6 @@
                         'maarten.borghs': 'Maarten Borghs',
                         'kevin.vandun': 'Kevin Van Dun'
                     };
-
-                    // Maak mock token en gebruiker aan
                     const mockUser = {
                         username: user,
                         name: displayNames[user] || user.charAt(0).toUpperCase() + user.slice(1),
@@ -146,21 +109,13 @@
                         email: user + '@visclubsim.local',
                         loginTime: new Date().toISOString()
                     };
-
                     const mockToken = 'local_mock_token_' + Date.now();
-
                     console.log('💾 Opslaan in localStorage:', mockUser);
-
-                    // Sla op in localStorage
                     localStorage.setItem('visclubsim_admin', JSON.stringify(mockUser));
                     localStorage.setItem('visclubsim_token', mockToken);
                     localStorage.setItem('admin_name', mockUser.name);
-
-                    // Verifieer dat data is opgeslagen
                     const saved = localStorage.getItem('visclubsim_admin');
                     console.log('✔️ Verificatie - Data opgeslagen:', saved);
-
-                    // Wacht even voor de redirect zodat localStorage tijd heeft om te schrijven
                     setTimeout(() => {
                         console.log('🔄 Redirect naar dashboard...');
                         window.location.href = 'index.html';
@@ -171,16 +126,13 @@
                     document.getElementById('errorMsg').style.display = 'block';
                 }
             } else {
-                // Backend API authenticatie
                 try {
                     const response = await fetch(`${API_URL}/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username: user, password: pass })
                     });
-
                     const data = await response.json();
-
                     if (data.success) {
                         localStorage.setItem('adminToken', data.token);
                         window.location.href = 'index.html';
@@ -194,8 +146,6 @@
                 }
             }
         });
-
-        // Toon info over lokale modus
         console.log('🔧 ADMIN PANEL - Lokale Modus:', USE_LOCAL_MODE);
         if (USE_LOCAL_MODE) {
             console.log('👤 Beschikbare accounts:');
@@ -206,5 +156,4 @@
             console.log('   - Gebruiker: kevin.vandun, Wachtwoord: visclub2026');
         }
     </script>
-</body>
-</html>
+</body></html>

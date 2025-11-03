@@ -238,9 +238,44 @@ class DataAPI {
     }
 
     async deleteMember(id) {
-        let members = await this.getMembers();
-        members = members.filter(m => m.id !== id);
-        await this.save('members', members);
+        console.log('🗑️ deleteMember called with ID:', id);
+
+        // Get member info before deleting
+        const members = await this.getMembers();
+        const member = members.find(m => m.id === id || String(m.id) === String(id));
+
+        if (!member) {
+            throw new Error('Lid niet gevonden');
+        }
+
+        console.log('Found member to delete:', member.name);
+
+        // 1. Delete from members list
+        const filteredMembers = members.filter(m => m.id !== id && String(m.id) !== String(id));
+        await this.save('members', filteredMembers);
+        console.log('✅ Deleted from members list');
+
+        // 2. Delete all registrations for this member
+        let registrations = await this.getRegistrations();
+        const beforeRegCount = registrations.length;
+        registrations = registrations.filter(r =>
+            !(r.email && member.email && r.email.toLowerCase() === member.email.toLowerCase()) &&
+            !(r.memberNumber && r.memberNumber === member.memberNumber) &&
+            !(r.name && member.name && r.name.toLowerCase() === member.name.toLowerCase())
+        );
+        await this.save('registrations', registrations);
+        console.log(`✅ Deleted ${beforeRegCount - registrations.length} registrations`);
+
+        // 3. Delete permit if exists
+        let permits = await this.getPermits();
+        const beforePermitCount = permits.length;
+        permits = permits.filter(p =>
+            !(p.email && member.email && p.email.toLowerCase() === member.email.toLowerCase())
+        );
+        await this.save('permits', permits);
+        console.log(`✅ Deleted ${beforePermitCount - permits.length} permits`);
+
+        console.log('✅ Member completely deleted from all systems');
         return true;
     }
 
@@ -298,9 +333,20 @@ class DataAPI {
     }
 
     async deletePermit(id) {
+        console.log('🗑️ deletePermit called with ID:', id, typeof id);
         let permits = await this.getPermits();
-        permits = permits.filter(p => p.id !== id);
+        console.log('📋 Current permits before delete:', permits.length);
+        console.log('All permit IDs:', permits.map(p => ({ id: p.id, type: typeof p.id })));
+
+        // Filter using both strict and loose comparison
+        const beforeCount = permits.length;
+        permits = permits.filter(p => p.id !== id && String(p.id) !== String(id));
+        const afterCount = permits.length;
+
+        console.log(`Removed ${beforeCount - afterCount} permit(s)`);
+
         await this.save('permits', permits);
+        console.log('✅ Permits saved to storage');
         return true;
     }
 

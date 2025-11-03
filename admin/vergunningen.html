@@ -1,398 +1,260 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visvergunning Aanvragen - Visclub SiM Admin</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="admin-style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .permits-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .permits-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .filters {
-            display: flex;
-            gap: 10px;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .filter-btn.active {
-            background: #2c5f7d;
-            color: white;
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .stat-box h3 {
-            font-size: 32px;
-            margin: 0 0 5px 0;
-            color: #2c5f7d;
-        }
-
-        .stat-box p {
-            margin: 0;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .permits-grid {
-            display: grid;
-            gap: 15px;
-        }
-
-        .permit-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #ffc107;
-            transition: all 0.3s;
-        }
-
-        .permit-card.pending {
-            border-left-color: #ffc107;
-        }
-
-        .permit-card.approved {
-            border-left-color: #28a745;
-        }
-
-        .permit-card.rejected {
-            border-left-color: #dc3545;
-        }
-
-        .permit-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-
-        .permit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .applicant-info h4 {
-            margin: 0 0 5px 0;
-            color: #333;
-            font-size: 18px;
-        }
-
-        .applicant-info p {
-            margin: 0;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .permit-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-approved {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .permit-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .detail-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .permit-actions {
-            display: flex;
-            gap: 10px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-
-        .action-btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .action-btn.approve {
-            background: #28a745;
-            color: white;
-        }
-
-        .action-btn.reject {
-            background: #dc3545;
-            color: white;
-        }
-
-        .action-btn.view {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .action-btn.delete {
-            background: #6c757d;
-            color: white;
-        }
-
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            max-width: 700px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            padding: 25px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-body {
-            padding: 25px;
-        }
-
-        .modal-footer {
-            padding: 20px 25px;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-        }
-    </style>
-</head>
-<body>
-    <div class="permits-container">
-        <!-- Terug naar overzicht knop -->
-        <a href="index.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2c5f7d; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s;">
-            <i class="fas fa-arrow-left"></i> Terug naar overzicht
-        </a>
-
-        <div class="permits-header">
-            <div>
-                <h1 style="margin: 0 0 5px 0; color: #2c5f7d;">
-                    <i class="fas fa-file-contract"></i> Visvergunning Aanvragen
-                </h1>
-                <p style="margin: 0; color: #666;">Beheer en goedkeur visvergunning aanvragen</p>
-            </div>
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">
-                    <i class="fas fa-list"></i> Alle
-                </button>
-                <button class="filter-btn" data-filter="pending">
-                    <i class="fas fa-clock"></i> In afwachting
-                </button>
-                <button class="filter-btn" data-filter="approved">
-                    <i class="fas fa-check"></i> Goedgekeurd
-                </button>
-                <button class="filter-btn" data-filter="rejected">
-                    <i class="fas fa-times"></i> Afgewezen
-                </button>
-                <button class="filter-btn" data-filter="new" onclick="showNewApplicationForm()" style="background: #28a745; color: white; margin-left: auto;">
-                    <i class="fas fa-plus"></i> Nieuwe Aanvraag
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-bar">
-            <div class="stat-box">
-                <h3 id="totalApplications">0</h3>
-                <p>Totaal Aanvragen</p>
-            </div>
-            <div class="stat-box">
-                <h3 id="pendingApplications" style="color: #ffc107;">0</h3>
-                <p>In Afwachting</p>
-            </div>
-            <div class="stat-box">
-                <h3 id="approvedApplications" style="color: #28a745;">0</h3>
-                <p>Goedgekeurd</p>
-            </div>
-            <div class="stat-box">
-                <h3 id="rejectedApplications" style="color: #dc3545;">0</h3>
-                <p>Afgewezen</p>
-            </div>
-        </div>
-
-        <!-- Applications List -->
-        <div class="permits-grid" id="permitsGrid">
-            <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
-                <i class="fas fa-file-contract" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
-                <h3 style="color: #999;">Geen aanvragen gevonden</h3>
-                <p style="color: #999;">Er zijn nog geen visvergunning aanvragen ontvangen.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Details Modal -->
-    <div class="modal" id="detailsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle" style="margin: 0; color: #2c5f7d;">Aanvraag Details</h2>
-                <button class="close-modal" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Details will be loaded here -->
-            </div>
-            <div class="modal-footer" id="modalFooter">
-                <!-- Actions will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <script src="admin-auth.js"></script>
-    <script src="data-api.js"></script>
-    <script>
+<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Visvergunning Aanvragen - Visclub SiM Admin</title><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="stylesheet" href="admin-style.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
+.permits-container {
+max-width: 1400px;
+margin: 0 auto;
+padding: 20px;
+}
+.permits-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 30px;
+background: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.filters {
+display: flex;
+gap: 10px;
+}
+.filter-btn {
+padding: 8px 16px;
+border: 1px solid #ddd;
+background: white;
+border-radius: 5px;
+cursor: pointer;
+transition: all 0.3s;
+}
+.filter-btn.active {
+background: #2c5f7d;
+color: white;
+}
+.stats-bar {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 15px;
+margin-bottom: 30px;
+}
+.stat-box {
+background: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+text-align: center;
+}
+.stat-box h3 {
+font-size: 32px;
+margin: 0 0 5px 0;
+color: #2c5f7d;
+}
+.stat-box p {
+margin: 0;
+color: #666;
+font-size: 14px;
+}
+.permits-grid {
+display: grid;
+gap: 15px;
+}
+.permit-card {
+background: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+border-left: 4px solid #ffc107;
+transition: all 0.3s;
+}
+.permit-card.pending {
+border-left-color: #ffc107;
+}
+.permit-card.approved {
+border-left-color: #28a745;
+}
+.permit-card.rejected {
+border-left-color: #dc3545;
+}
+.permit-card:hover {
+box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+transform: translateY(-2px);
+}
+.permit-header {
+display: flex;
+justify-content: space-between;
+align-items: start;
+margin-bottom: 15px;
+}
+.applicant-info h4 {
+margin: 0 0 5px 0;
+color: #333;
+font-size: 18px;
+}
+.applicant-info p {
+margin: 0;
+color: #666;
+font-size: 14px;
+}
+.permit-status {
+padding: 6px 12px;
+border-radius: 20px;
+font-size: 12px;
+font-weight: 600;
+}
+.status-pending {
+background: #fff3cd;
+color: #856404;
+}
+.status-approved {
+background: #d4edda;
+color: #155724;
+}
+.status-rejected {
+background: #f8d7da;
+color: #721c24;
+}
+.permit-details {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 15px;
+margin-bottom: 15px;
+padding: 15px;
+background: #f8f9fa;
+border-radius: 8px;
+}
+.detail-item {
+display: flex;
+flex-direction: column;
+}
+.detail-label {
+font-size: 12px;
+color: #666;
+margin-bottom: 5px;
+}
+.detail-value {
+font-weight: 600;
+color: #333;
+}
+.permit-actions {
+display: flex;
+gap: 10px;
+padding-top: 15px;
+border-top: 1px solid #eee;
+}
+.action-btn {
+padding: 8px 16px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 14px;
+transition: all 0.3s;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.action-btn.approve {
+background: #28a745;
+color: white;
+}
+.action-btn.reject {
+background: #dc3545;
+color: white;
+}
+.action-btn.view {
+background: #17a2b8;
+color: white;
+}
+.action-btn.delete {
+background: #6c757d;
+color: white;
+}
+.action-btn:hover {
+opacity: 0.8;
+}
+.modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.5);
+z-index: 1000;
+align-items: center;
+justify-content: center;
+}
+.modal.active {
+display: flex;
+}
+.modal-content {
+background: white;
+border-radius: 15px;
+max-width: 700px;
+width: 90%;
+max-height: 80vh;
+overflow-y: auto;
+box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.modal-header {
+padding: 25px;
+border-bottom: 1px solid #eee;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.modal-body {
+padding: 25px;
+}
+.modal-footer {
+padding: 20px 25px;
+border-top: 1px solid #eee;
+display: flex;
+gap: 10px;
+justify-content: flex-end;
+}
+.close-modal {
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: #999;
+}
+</style></head><body><div class="permits-container"><div class="permits-header"><div><h1 style="margin: 0 0 5px 0; color: #2c5f7d;"><i class="fas fa-file-contract"></i> Visvergunning Aanvragen
+</h1><p style="margin: 0; color: #666;">Beheer en goedkeur visvergunning aanvragen</p></div><div class="filters"><button class="filter-btn active" data-filter="all"><i class="fas fa-list"></i> Alle
+</button><button class="filter-btn" data-filter="pending"><i class="fas fa-clock"></i> In afwachting
+</button><button class="filter-btn" data-filter="approved"><i class="fas fa-check"></i> Goedgekeurd
+</button><button class="filter-btn" data-filter="rejected"><i class="fas fa-times"></i> Afgewezen
+</button><button class="filter-btn" data-filter="new" onclick="showNewApplicationForm()" style="background: #28a745; color: white; margin-left: auto;"><i class="fas fa-plus"></i> Nieuwe Aanvraag
+</button></div></div><div class="stats-bar"><div class="stat-box"><h3 id="totalApplications">0</h3><p>Totaal Aanvragen</p></div><div class="stat-box"><h3 id="pendingApplications" style="color: #ffc107;">0</h3><p>In Afwachting</p></div><div class="stat-box"><h3 id="approvedApplications" style="color: #28a745;">0</h3><p>Goedgekeurd</p></div><div class="stat-box"><h3 id="rejectedApplications" style="color: #dc3545;">0</h3><p>Afgewezen</p></div></div><div class="permits-grid" id="permitsGrid"><div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;"><i class="fas fa-file-contract" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i><h3 style="color: #999;">Geen aanvragen gevonden</h3><p style="color: #999;">Er zijn nog geen visvergunning aanvragen ontvangen.</p></div></div></div><div class="modal" id="detailsModal"><div class="modal-content"><div class="modal-header"><h2 id="modalTitle" style="margin: 0; color: #2c5f7d;">Aanvraag Details</h2><button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
+<script src="admin-auth.js"></script>
+<script src="data-api.js"></script>
+<script>
         let applications = [];
         let currentApplicationId = null;
-
-        // Wait for scripts to load
         async function init() {
-            // Wait for dataAPI to be ready
             let retries = 0;
             while (!window.dataAPI && retries < 20) {
                 console.log('⏳ Waiting for DataAPI to load...');
                 await new Promise(resolve => setTimeout(resolve, 100));
                 retries++;
             }
-
             if (!window.dataAPI) {
                 console.error('❌ DataAPI not available after 2 seconds');
                 alert('Data systeem niet beschikbaar. Ververs de pagina.');
                 return;
             }
-
             console.log('✅ DataAPI ready');
             await loadApplications();
             setupFilters();
         }
-
         document.addEventListener('DOMContentLoaded', init);
-
         async function loadApplications(filter = 'all') {
             const grid = document.getElementById('permitsGrid');
-
             try {
-                // Use local dataAPI instead of fetch
                 console.log('📊 Loading permits from dataAPI...');
                 applications = await window.dataAPI.getPermits();
-
                 console.log('📋 Loaded permits:', applications);
-
-                // Normalize data structure - handle both formats
                 applications = applications.map(app => {
                     if (app.address && typeof app.address === 'object') {
-                        // Flatten address object
                         return {
                             ...app,
                             street: app.address.street || app.street || '',
@@ -402,18 +264,14 @@
                     }
                     return app;
                 });
-
                 let filteredApplications = applications;
                 if (filter !== 'all') {
                     filteredApplications = applications.filter(a => a.status === filter);
                 }
-
-                // Update stats
                 document.getElementById('totalApplications').textContent = applications.length;
                 document.getElementById('pendingApplications').textContent = applications.filter(a => a.status === 'pending').length;
                 document.getElementById('approvedApplications').textContent = applications.filter(a => a.status === 'approved').length;
                 document.getElementById('rejectedApplications').textContent = applications.filter(a => a.status === 'rejected').length;
-
                 if (filteredApplications.length === 0) {
                     grid.innerHTML = `
                         <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
@@ -424,10 +282,7 @@
                     `;
                     return;
                 }
-
-                // Sort by date (newest first)
                 filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
-
                 grid.innerHTML = filteredApplications.map(app => `
                 <div class="permit-card ${app.status}">
                     <div class="permit-header">
@@ -439,7 +294,6 @@
                             ${getStatusLabel(app.status)}
                         </span>
                     </div>
-
                     <div class="permit-details">
                         <div class="detail-item">
                             <span class="detail-label">Vergunning Type</span>
@@ -458,14 +312,12 @@
                             <span class="detail-value">${formatDateTime(app.applicationDate)}</span>
                         </div>
                     </div>
-
                     ${app.remarks ? `
                         <div style="padding: 10px; background: #fff3cd; border-radius: 5px; margin-bottom: 15px;">
                             <strong><i class="fas fa-comment"></i> Opmerkingen:</strong>
                             <p style="margin: 5px 0 0 0; color: #666;">${app.remarks}</p>
                         </div>
                     ` : ''}
-
                     ${app.status === 'approved' ? `
                         <div style="padding: 10px; background: #d4edda; border-radius: 5px; margin-bottom: 15px;">
                             <i class="fas fa-check-circle" style="color: #28a745;"></i>
@@ -473,7 +325,6 @@
                             door ${app.approvedBy || 'Admin'} op ${formatDateTime(app.approvedDate)}
                         </div>
                     ` : ''}
-
                     <div class="permit-actions">
                         <button class="action-btn view" onclick="viewDetails('${app.id}')">
                             <i class="fas fa-eye"></i> Bekijken
@@ -506,7 +357,6 @@
                 return;
             }
         }
-
         function setupFilters() {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -516,13 +366,10 @@
                 });
             });
         }
-
         function viewDetails(id) {
             const app = applications.find(a => a.id === id);
             if (!app) return;
-
             currentApplicationId = id;
-
             document.getElementById('modalTitle').textContent = `Aanvraag: ${app.firstName} ${app.lastName}`;
             document.getElementById('modalBody').innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
@@ -570,7 +417,6 @@
                     ` : ''}
                 </div>
             `;
-
             document.getElementById('modalFooter').innerHTML = `
                 ${app.status === 'pending' ? `
                     <button class="action-btn approve" onclick="approveApplication('${app.id}')">
@@ -584,38 +430,28 @@
                     <i class="fas fa-trash"></i> Verwijderen
                 </button>
             `;
-
             document.getElementById('detailsModal').classList.add('active');
         }
-
         function closeModal() {
             document.getElementById('detailsModal').classList.remove('active');
             currentApplicationId = null;
         }
-
         async function approveApplication(id) {
             const app = applications.find(a => a.id === id);
             if (!app) return;
-
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} wilt goedkeuren?\n\nDeze persoon wordt automatisch toegevoegd aan de ledenlijst.`)) {
                 try {
                     app.status = 'approved';
                     app.approvedBy = adminAuth.getCurrentUser()?.name || 'Admin';
                     app.approvedDate = new Date().toISOString();
-
-                    // Update via dataAPI
                     await window.dataAPI.updatePermit(id, {
                         status: 'approved',
                         approvedBy: app.approvedBy,
                         approvedDate: app.approvedDate
                     });
-
-                    // Add to members list via dataAPI
                     await addToMembers(app);
-
                     await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
                     closeModal();
-
                     alert('✅ Aanvraag goedgekeurd!\n\n' + app.firstName + ' ' + app.lastName + ' is toegevoegd aan de ledenlijst.');
                 } catch (error) {
                     console.error('Error approving permit:', error);
@@ -623,31 +459,24 @@
                 }
             }
         }
-
         async function rejectApplication(id) {
             const app = applications.find(a => a.id === id);
             if (!app) return;
-
             const reason = prompt('Optioneel: Geef een reden voor afwijzing:');
-
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} wilt afwijzen?`)) {
                 try {
                     app.status = 'rejected';
                     app.rejectedBy = adminAuth.getCurrentUser()?.name || 'Admin';
                     app.rejectedDate = new Date().toISOString();
                     app.rejectionReason = reason || '';
-
-                    // Update via dataAPI
                     await window.dataAPI.updatePermit(id, {
                         status: 'rejected',
                         rejectedBy: app.rejectedBy,
                         rejectedDate: app.rejectedDate,
                         rejectionReason: app.rejectionReason
                     });
-
                     await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
                     closeModal();
-
                     alert('❌ Aanvraag afgewezen.');
                 } catch (error) {
                     console.error('Error rejecting permit:', error);
@@ -655,16 +484,12 @@
                 }
             }
         }
-
         async function deleteApplication(id) {
             const app = applications.find(a => a.id === id);
             if (!app) return;
-
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} definitief wilt verwijderen?`)) {
                 try {
-                    // Delete via dataAPI
                     await window.dataAPI.deletePermit(id);
-
                     await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
                     closeModal();
                 } catch (error) {
@@ -673,15 +498,11 @@
                 }
             }
         }
-
         async function addToMembers(app) {
             try {
-                // Determine if person is youth based on birthdate
                 const birthDate = new Date(app.birthdate);
                 const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
                 const isYouth = age < 16;
-
-                // Prepare member data
                 const memberData = {
                     firstName: app.firstName,
                     lastName: app.lastName,
@@ -689,47 +510,36 @@
                     phone: app.phone,
                     membershipType: isYouth ? 'Jeugd' : 'Jaarlid'
                 };
-
-                // Add member via dataAPI
                 const newMember = await window.dataAPI.addMember(memberData);
                 console.log('✅ Member added:', newMember);
-
                 return newMember;
             } catch (error) {
                 console.error('Error adding member:', error);
                 throw error;
             }
         }
-
         async function addAsMember(permitId, type) {
             const app = applications.find(a => a.id === permitId);
             if (!app) {
                 alert('❌ Vergunning niet gevonden.');
                 return;
             }
-
-            // Check if already a member
             try {
                 const existingMembers = await window.dataAPI.getMembers();
                 const alreadyExists = existingMembers.some(m =>
                     m.email === app.email ||
                     (m.firstName === app.firstName && m.lastName === app.lastName)
                 );
-
                 if (alreadyExists) {
                     alert('⚠️ Deze persoon is al toegevoegd als lid.');
                     return;
                 }
-
-                // Determine age and membership type
                 const birthDate = new Date(app.birthdate);
                 const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
                 const isYouth = age < 16;
                 const isSenior = age >= 65;
-
                 let membershipType;
                 if (type === 'wedstrijd') {
-                    // Wedstrijd lid - deelname aan competitie
                     if (isYouth) {
                         membershipType = 'Jeugd';
                     } else if (isSenior) {
@@ -738,11 +548,8 @@
                         membershipType = 'Jaarlid';
                     }
                 } else {
-                    // Vergunning lid - alleen vissen, geen wedstrijden
                     membershipType = 'Dagkaart';
                 }
-
-                // Prepare member data
                 const memberData = {
                     firstName: app.firstName,
                     lastName: app.lastName,
@@ -752,28 +559,21 @@
                     address: `${app.street}, ${app.postal} ${app.city}`,
                     birthdate: app.birthdate
                 };
-
-                // Add member via dataAPI
                 const newMember = await window.dataAPI.addMember(memberData);
                 console.log('✅ Member added:', newMember);
-
                 const typeName = type === 'wedstrijd' ? 'Wedstrijd Lid' : 'Vergunninghouder';
                 alert(`✅ ${app.firstName} ${app.lastName} is toegevoegd als ${typeName} (${membershipType})!`);
-
             } catch (error) {
                 console.error('Error adding member:', error);
                 alert('❌ Fout bij toevoegen lid: ' + error.message);
             }
         }
-
         function showNewApplicationForm() {
             const modal = document.getElementById('detailsModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const modalFooter = document.getElementById('modalFooter');
-
             modalTitle.textContent = 'Nieuwe Vergunning Aanvraag';
-
             modalBody.innerHTML = `
                 <form id="newApplicationForm" style="display: grid; gap: 15px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -786,7 +586,6 @@
                             <input type="text" id="newLastName" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                         </div>
                     </div>
-
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email *</label>
@@ -797,12 +596,10 @@
                             <input type="tel" id="newPhone" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                         </div>
                     </div>
-
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Straat en Nummer *</label>
                         <input type="text" id="newStreet" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                     </div>
-
                     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Postcode *</label>
@@ -813,27 +610,23 @@
                             <input type="text" id="newCity" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                         </div>
                     </div>
-
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Geboortedatum *</label>
                         <input type="date" id="newBirthdate" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                     </div>
-
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Type Vergunning *</label>
                         <select id="newPermitType" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                             <option value="">-- Kies type --</option>
                             <option value="jaarvergunning">Jaarvergunning (€75)</option>
                             <option value="jeugdvergunning">Jeugdvergunning -16 jaar (€30)</option>
-                            <option value="wedstrijdvisser">Wedstrijdvisser (€60)</option>
+                            <option value="dagkaart">Dagkaart (€60)</option>
                         </select>
                     </div>
-
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Opmerkingen</label>
                         <textarea id="newRemarks" rows="3" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;"></textarea>
                     </div>
-
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status *</label>
                         <select id="newStatus" required style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
@@ -844,7 +637,6 @@
                     </div>
                 </form>
             `;
-
             modalFooter.innerHTML = `
                 <button onclick="closeModal()" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     <i class="fas fa-times"></i> Annuleren
@@ -853,18 +645,14 @@
                     <i class="fas fa-save"></i> Aanvraag Toevoegen
                 </button>
             `;
-
-            modal.classList.add('active');
+            modal.style.display = 'flex';
         }
-
         async function submitNewApplication() {
             const form = document.getElementById('newApplicationForm');
-
             if (!form.checkValidity()) {
                 alert('⚠️ Vul alle verplichte velden in');
                 return;
             }
-
             const newApplication = {
                 firstName: document.getElementById('newFirstName').value,
                 lastName: document.getElementById('newLastName').value,
@@ -878,7 +666,6 @@
                 remarks: document.getElementById('newRemarks').value,
                 status: document.getElementById('newStatus').value
             };
-
             try {
                 await window.dataAPI.addPermit(newApplication);
                 await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
@@ -889,13 +676,11 @@
                 alert('❌ Fout bij toevoegen aanvraag: ' + error.message);
             }
         }
-
         function formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
             return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
         }
-
         function formatDateTime(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
@@ -907,7 +692,6 @@
                 minute: '2-digit'
             });
         }
-
         function getStatusLabel(status) {
             const labels = {
                 'pending': 'In Afwachting',
@@ -916,26 +700,21 @@
             };
             return labels[status] || status;
         }
-
         function getPermitTypeLabel(type) {
             const labels = {
                 'year': 'Jaarvergunning (€75)',
                 'jaarvergunning': 'Jaarvergunning (€75)',
                 'jeugdvergunning': 'Jeugdvergunning -16 jaar (€30)',
-                'dagkaart': 'Wedstrijdvisser (€60)',
-                'wedstrijdvisser': 'Wedstrijdvisser (€60)',
-                'competition': 'Wedstrijdvisser (€60)',
+                'dagkaart': 'Dagkaart (€60)',
+                'competition': 'Wedstrijdvissers (€60)',
                 'youth': 'Jongeren (€37,50)'
             };
             return labels[type] || type;
         }
-
-        // Click outside modal to close
         document.getElementById('detailsModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
     </script>
-</body>
-</html>
+</body></html>

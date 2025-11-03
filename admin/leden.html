@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leden Beheer - Visclub SiM Admin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .members-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: #2c5f7d;
+            color: white;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            font-size: 32px;
+            margin: 0 0 5px 0;
+            color: #2c5f7d;
+        }
+
+        .stat-box p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .members-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .member-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #2c5f7d;
+            transition: all 0.3s;
+        }
+
+        .member-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .member-info h4 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .member-info p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .member-type {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .type-wedstrijd {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .type-vergunning {
+            background: #28a745;
+            color: white;
+        }
+
+        .type-jeugd {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .member-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .action-btn.edit {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            background: #2c5f7d;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #1e4a5f;
+        }
+    </style>
+</head>
+<body>
+    <div id="navigation"></div>
+
+    <div class="members-container">
+        <div class="members-header">
+            <div>
+                <div style="margin-bottom: 15px;">
+                    <button onclick="window.location.href='index.html'" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-arrow-left"></i> Terug naar Overzicht
+                    </button>
+                </div>
+                <h1 style="margin: 0 0 10px 0;"><i class="fas fa-users"></i> Leden Beheer</h1>
+                <p style="margin: 0; color: #666;">Beheer clubleden en hun gegevens</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Zoek op naam, email of lidnummer...">
+                    <button onclick="searchMembers()" class="btn-primary">
+                        <i class="fas fa-search"></i> Zoeken
+                    </button>
+                </div>
+                <button onclick="openAddMemberModal()" class="btn-primary">
+                    <i class="fas fa-user-plus"></i> Nieuw Lid
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all" onclick="filterMembers('all')">
+                    <i class="fas fa-users"></i> Alle
+                </button>
+                <button class="filter-btn" data-filter="wedstrijd" onclick="filterMembers('wedstrijd')">
+                    <i class="fas fa-trophy"></i> Wedstrijdvissers
+                </button>
+                <button class="filter-btn" data-filter="vergunning" onclick="filterMembers('vergunning')">
+                    <i class="fas fa-fish"></i> Vergunning
+                </button>
+                <button class="filter-btn" data-filter="jeugd" onclick="filterMembers('jeugd')">
+                    <i class="fas fa-child"></i> Jeugd
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-box">
+                <h3 id="totalMembers">0</h3>
+                <p>Totaal Leden</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="wedstrijdMembers">0</h3>
+                <p>Wedstrijdvissers</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="vergunningMembers">0</h3>
+                <p>Vergunning Houders</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="jeugdMembers">0</h3>
+                <p>Jeugdleden</p>
+            </div>
+        </div>
+
+        <!-- Members Grid -->
+        <div class="members-grid" id="membersGrid">
+            <!-- Members will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Edit Member Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Lid Bewerken</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Form will be loaded here -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <!-- Buttons will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-auth.js"></script>
+    <script src="data-api.js"></script>
+    <script src="admin-badges.js"></script>
+
+    <script>
+        let members = [];
+        let currentFilter = 'all';
+        let currentMemberId = null;
+
+        // Load navigation
+        fetch('admin-nav.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('navigation').innerHTML = html;
+            });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMembers();
+            setupSearch();
+        });
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                searchMembers();
+            });
+        }
+
+        async function loadMembers(filter = 'all') {
+            const grid = document.getElementById('membersGrid');
+
+            try {
+                console.log('📊 Loading members from dataAPI...');
+                members = await window.dataAPI.getMembers();
+
+                console.log('📋 Loaded members:', members);
+
+                let filteredMembers = members;
+
+                // Apply filter
+                if (filter !== 'all') {
+                    filteredMembers = members.filter(m => {
+                        if (filter === 'jeugd') {
+                            return m.isYouth === true || m.isYouth === 'true';
+                        }
+                        return m.membershipType === filter;
+                    });
+                }
+
+                // Update stats
+                console.log('📊 Member types:', members.map(m => ({ name: m.name, type: m.membershipType })));
+                document.getElementById('totalMembers').textContent = members.length;
+                document.getElementById('wedstrijdMembers').textContent = members.filter(m => m.membershipType === 'wedstrijd').length;
+                document.getElementById('vergunningMembers').textContent = members.filter(m => m.membershipType === 'vergunning').length;
+                document.getElementById('jeugdMembers').textContent = members.filter(m => m.isYouth === true || m.isYouth === 'true').length;
+
+                if (filteredMembers.length === 0) {
+                    grid.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+                            <i class="fas fa-users" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
+                            <h3 style="color: #999;">Geen leden gevonden</h3>
+                            <p style="color: #999;">Er zijn geen leden met dit filter.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort by member number
+                filteredMembers.sort((a, b) => (a.memberNumber || 0) - (b.memberNumber || 0));
+
+                grid.innerHTML = filteredMembers.map(member => `
+                    <div class="member-card">
+                        <div class="member-header">
+                            <div class="member-info">
+                                <h4><i class="fas fa-user"></i> ${member.name || 'Geen naam'}</h4>
+                                <p><i class="fas fa-envelope"></i> ${member.email || 'Geen email'} | <i class="fas fa-phone"></i> ${member.phone || 'Geen telefoon'}</p>
+                            </div>
+                            <span class="member-type type-${member.membershipType || 'vergunning'}">
+                                ${getMemberTypeLabel(member)}
+                            </span>
+                        </div>
+
+                        <div class="member-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Lidnummer</span>
+                                <span class="detail-value">#${member.memberNumber || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Type</span>
+                                <span class="detail-value">${getMemberTypeLabel(member)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Adres</span>
+                                <span class="detail-value">${member.address || 'Geen adres'}</span>
+                            </div>
+                            ${member.birthdate ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">Geboortedatum</span>
+                                    <span class="detail-value">${formatDate(member.birthdate)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="member-actions">
+                            <button class="action-btn edit" onclick="editMember('${member.id}')">
+                                <i class="fas fa-edit"></i> Bewerken
+                            </button>
+                            <button class="action-btn delete" onclick="deleteMember('${member.id}')">
+                                <i class="fas fa-trash"></i> Verwijderen
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading members:', error);
+                alert('Fout bij laden leden: ' + error.message);
+            }
+        }
+
+        function filterMembers(filter) {
+            currentFilter = filter;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.filter-btn').classList.add('active');
+
+            loadMembers(filter);
+        }
+
+        function searchMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchTerm) {
+                loadMembers(currentFilter);
+                return;
+            }
+
+            const filteredMembers = members.filter(m => {
+                return (m.name && m.name.toLowerCase().includes(searchTerm)) ||
+                       (m.email && m.email.toLowerCase().includes(searchTerm)) ||
+                       (m.memberNumber && String(m.memberNumber).includes(searchTerm));
+            });
+
+            // Apply current filter on top of search
+            let finalMembers = filteredMembers;
+            if (currentFilter !== 'all') {
+                finalMembers = filteredMembers.filter(m => {
+                    if (currentFilter === 'jeugd') {
+                        return m.isYouth === true || m.isYouth === 'true';
+                    }
+                    return m.membershipType === currentFilter;
+                });
+            }
+
+            displayFilteredMembers(finalMembers);
+        }
+
+        function displayFilteredMembers(filteredMembers) {
+            const grid = document.getElementById('membersGrid');
+
+            if (filteredMembers.length === 0) {
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+                        <i class="fas fa-search" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i>
+                        <h3 style="color: #999;">Geen resultaten</h3>
+                        <p style="color: #999;">Geen leden gevonden met deze zoekopdracht.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredMembers.sort((a, b) => (a.memberNumber || 0) - (b.memberNumber || 0));
+
+            grid.innerHTML = filteredMembers.map(member => `
+                <div class="member-card">
+                    <div class="member-header">
+                        <div class="member-info">
+                            <h4><i class="fas fa-user"></i> ${member.name || 'Geen naam'}</h4>
+                            <p><i class="fas fa-envelope"></i> ${member.email || 'Geen email'} | <i class="fas fa-phone"></i> ${member.phone || 'Geen telefoon'}</p>
+                        </div>
+                        <span class="member-type type-${member.membershipType || 'vergunning'}">
+                            ${getMemberTypeLabel(member)}
+                        </span>
+                    </div>
+
+                    <div class="member-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Lidnummer</span>
+                            <span class="detail-value">#${member.memberNumber || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Type</span>
+                            <span class="detail-value">${getMemberTypeLabel(member)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Adres</span>
+                            <span class="detail-value">${member.address || 'Geen adres'}</span>
+                        </div>
+                        ${member.birthdate ? `
+                            <div class="detail-item">
+                                <span class="detail-label">Geboortedatum</span>
+                                <span class="detail-value">${formatDate(member.birthdate)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="member-actions">
+                        <button class="action-btn edit" onclick="editMember('${member.id}')">
+                            <i class="fas fa-edit"></i> Bewerken
+                        </button>
+                        <button class="action-btn delete" onclick="deleteMember('${member.id}')">
+                            <i class="fas fa-trash"></i> Verwijderen
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editMember(id) {
+            console.log('✏️ Edit member called with ID:', id);
+
+            let member = members.find(m => m.id === id);
+            if (!member) {
+                member = members.find(m => String(m.id) === String(id));
+            }
+
+            if (!member) {
+                alert('❌ Lid niet gevonden!');
+                return;
+            }
+
+            currentMemberId = id;
+
+            document.getElementById('modalTitle').textContent = `Lid Bewerken: ${member.name}`;
+            document.getElementById('modalBody').innerHTML = `
+                <form id="editMemberForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Naam *</label>
+                            <input type="text" id="editName" value="${member.name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lidnummer *</label>
+                            <input type="number" id="editMemberNumber" value="${member.memberNumber || ''}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="editEmail" value="${member.email || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefoon</label>
+                            <input type="tel" id="editPhone" value="${member.phone || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adres</label>
+                        <input type="text" id="editAddress" value="${member.address || ''}">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Geboortedatum</label>
+                            <input type="date" id="editBirthdate" value="${member.birthdate || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Lidmaatschap Type *</label>
+                            <select id="editMembershipType" required>
+                                <option value="wedstrijd" ${member.membershipType === 'wedstrijd' ? 'selected' : ''}>Wedstrijdvisser</option>
+                                <option value="vergunning" ${member.membershipType === 'vergunning' ? 'selected' : ''}>Vergunning</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editIsYouth" ${member.isYouth ? 'checked' : ''}>
+                            Jeugdlid (-16 jaar)
+                        </label>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('modalFooter').innerHTML = `
+                <button onclick="closeModal()" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-times"></i> Annuleren
+                </button>
+                <button onclick="saveMember()" style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-save"></i> Opslaan
+                </button>
+            `;
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function saveMember() {
+            const name = document.getElementById('editName').value.trim();
+            const memberNumber = parseInt(document.getElementById('editMemberNumber').value);
+            const email = document.getElementById('editEmail').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const address = document.getElementById('editAddress').value.trim();
+            const birthdate = document.getElementById('editBirthdate').value;
+            const membershipType = document.getElementById('editMembershipType').value;
+            const isYouth = document.getElementById('editIsYouth').checked;
+
+            if (!name || !email || !memberNumber) {
+                alert('⚠️ Vul alle verplichte velden in!');
+                return;
+            }
+
+            try {
+                await window.dataAPI.updateMember(currentMemberId, {
+                    name,
+                    memberNumber,
+                    email,
+                    phone,
+                    address,
+                    birthdate,
+                    membershipType,
+                    isYouth
+                });
+
+                await loadMembers(currentFilter);
+                closeModal();
+                alert('✅ Lid succesvol bijgewerkt!');
+            } catch (error) {
+                console.error('Error updating member:', error);
+                alert('❌ Fout bij bijwerken lid: ' + error.message);
+            }
+        }
+
+        async function deleteMember(id) {
+            console.log('🗑️ Delete member called with ID:', id);
+
+            let member = members.find(m => m.id === id);
+            if (!member) {
+                member = members.find(m => String(m.id) === String(id));
+            }
+
+            if (!member) {
+                alert('❌ Lid niet gevonden!');
+                return;
+            }
+
+            if (confirm(`Weet je zeker dat je ${member.name} definitief wilt verwijderen?\n\n⚠️ Dit zal het lid verwijderen van:\n- Ledenlijst\n- Alle klassementen\n- Alle wedstrijdresultaten\n- Alle inschrijvingen\n\nDeze actie kan niet ongedaan worden gemaakt!`)) {
+                try {
+                    console.log('Attempting to delete member via dataAPI...');
+
+                    // Delete member via dataAPI
+                    await window.dataAPI.deleteMember(id);
+
+                    console.log('✅ Member deleted successfully');
+                    await loadMembers(currentFilter);
+                    alert('✅ Lid succesvol verwijderd uit alle systemen!');
+                } catch (error) {
+                    console.error('Error deleting member:', error);
+                    alert('❌ Fout bij verwijderen lid: ' + error.message);
+                }
+            }
+        }
+
+        function openAddMemberModal() {
+            currentMemberId = null;
+
+            document.getElementById('modalTitle').textContent = 'Nieuw Lid Toevoegen';
+            document.getElementById('modalBody').innerHTML = `
+                <form id="addMemberForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Naam *</label>
+                            <input type="text" id="newName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lidnummer *</label>
+                            <input type="number" id="newMemberNumber" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="newEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefoon</label>
+                            <input type="tel" id="newPhone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adres</label>
+                        <input type="text" id="newAddress">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Geboortedatum</label>
+                            <input type="date" id="newBirthdate">
+                        </div>
+                        <div class="form-group">
+                            <label>Lidmaatschap Type *</label>
+                            <select id="newMembershipType" required>
+                                <option value="">-- Kies type --</option>
+                                <option value="wedstrijd">Wedstrijdvisser</option>
+                                <option value="vergunning">Vergunning</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="newIsYouth">
+                            Jeugdlid (-16 jaar)
+                        </label>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('modalFooter').innerHTML = `
+                <button onclick="closeModal()" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-times"></i> Annuleren
+                </button>
+                <button onclick="addNewMember()" style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-plus"></i> Toevoegen
+                </button>
+            `;
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function addNewMember() {
+            const name = document.getElementById('newName').value.trim();
+            const memberNumber = parseInt(document.getElementById('newMemberNumber').value);
+            const email = document.getElementById('newEmail').value.trim();
+            const phone = document.getElementById('newPhone').value.trim();
+            const address = document.getElementById('newAddress').value.trim();
+            const birthdate = document.getElementById('newBirthdate').value;
+            const membershipType = document.getElementById('newMembershipType').value;
+            const isYouth = document.getElementById('newIsYouth').checked;
+
+            if (!name || !email || !memberNumber || !membershipType) {
+                alert('⚠️ Vul alle verplichte velden in!');
+                return;
+            }
+
+            // Check for duplicate member number or email
+            const duplicate = members.find(m =>
+                m.memberNumber === memberNumber ||
+                m.email.toLowerCase() === email.toLowerCase()
+            );
+
+            if (duplicate) {
+                alert(`⚠️ Dit lid bestaat al!\n\nEr is al een lid met ${duplicate.memberNumber === memberNumber ? 'lidnummer ' + memberNumber : 'email ' + email}`);
+                return;
+            }
+
+            try {
+                const newMember = {
+                    id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    name,
+                    memberNumber,
+                    email,
+                    phone,
+                    address,
+                    birthdate,
+                    membershipType,
+                    isYouth,
+                    joinDate: new Date().toISOString()
+                };
+
+                await window.dataAPI.addMember(newMember);
+                await loadMembers(currentFilter);
+                closeModal();
+                alert('✅ Nieuw lid succesvol toegevoegd!');
+            } catch (error) {
+                console.error('Error adding member:', error);
+                alert('❌ Fout bij toevoegen lid: ' + error.message);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentMemberId = null;
+        }
+
+        function getMemberTypeLabel(member) {
+            if (member.isYouth === true || member.isYouth === 'true') {
+                return 'Jeugdlid';
+            }
+            if (member.membershipType === 'wedstrijd') {
+                return 'Wedstrijdvisser';
+            }
+            if (member.membershipType === 'vergunning') {
+                return 'Vergunning';
+            }
+            return 'Onbekend';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>

@@ -14,7 +14,8 @@
       "Bash(node -e:*)",
       "Bash(timeout 10 node:*)",
       "Bash(timeout 5 node:*)",
-      "Bash(node database/verify-schema.js:*)"
+      "Bash(node database/verify-schema.js:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

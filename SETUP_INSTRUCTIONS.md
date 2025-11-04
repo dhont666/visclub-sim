@@ -57,11 +57,18 @@ node database/verify-schema.js
 ✅ Database schema is complete and ready!
 ```
 
-**Als tabellen ontbreken:**
+**Als je "relation already exists" error ziet:**
+✅ Goed nieuws! Je tabellen bestaan al. Doe dit:
+
 1. Ga naar Supabase Dashboard → SQL Editor
-2. Open en run `database/schema.sql` (maakt tabellen aan)
-3. Open en run `database/rls-policies.sql` (security policies)
-4. Run verificatie script opnieuw
+2. **Kopieer en run:** `database/create-views-only.sql` (maakt views aan)
+3. **Kopieer en run:** `database/update-rls-only.sql` (security policies)
+4. Run verificatie script opnieuw: `node database/verify-schema.js`
+
+**Als tabellen écht ontbreken (zeer onwaarschijnlijk):**
+1. Ga naar Supabase Dashboard → SQL Editor
+2. Open en run `database/schema.sql` (maakt alles aan)
+3. Run verificatie script opnieuw
 
 ### Stap 4: Server Starten (1 min)
 

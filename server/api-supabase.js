@@ -11,6 +11,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { createClient } = require('@supabase/supabase-js');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -113,6 +115,27 @@ const authLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 
+// Security headers with Helmet
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable for now (can be configured later)
+    crossOriginEmbedderPolicy: false
+}));
+
+// Input validation helper
+function validate(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            error: 'Validation failed',
+            details: errors.array().map(err => ({
+                field: err.path,
+                message: err.msg
+            }))
+        });
+    }
+    next();
+}
+
 // =============================================
 // JWT AUTHENTICATION MIDDLEWARE
 // =============================================
@@ -135,11 +158,23 @@ if (JWT_SECRET.length < 32) {
     process.exit(1);
 }
 
-if (JWT_SECRET === 'your-secret-key-change-this-in-production' ||
-    JWT_SECRET === 'change-me' ||
-    JWT_SECRET === 'secret') {
-    console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is using a default/weak value');
-    console.error('   Never use default values in production!');
+// Blacklist of known weak/example secrets
+const WEAK_SECRETS = [
+    'your-secret-key-change-this-in-production',
+    'your-super-secret-jwt-key-at-least-32-characters-long',
+    'change-this-to-a-very-long-random-string-keep-it-secret',
+    'change-me',
+    'secret',
+    'password',
+    'admin',
+    'test',
+    '12345678901234567890123456789012'
+];
+
+if (WEAK_SECRETS.includes(JWT_SECRET)) {
+    console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is using a known weak/example value');
+    console.error(`   Current value matches example from .env.example`);
+    console.error('   Generate a strong secret with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
     process.exit(1);
 }
 
@@ -216,14 +251,19 @@ app.get('/api/health', async (req, res) => {
     }
 });
 
-// Login
-app.post('/api/auth/login', async (req, res) => {
+// Login with validation
+app.post('/api/auth/login', [
+    body('username')
+        .trim()
+        .notEmpty().withMessage('Username is required')
+        .isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters')
+        .matches(/^[a-zA-Z0-9._-]+$/).withMessage('Username can only contain letters, numbers, dots, underscores and dashes'),
+    body('password')
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], validate, async (req, res) => {
     try {
         const { username, password } = req.body;
-
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Username and password required' });
-        }
 
         // Query admin user using Supabase client
         const { data, error } = await supabase

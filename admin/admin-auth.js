@@ -9,17 +9,22 @@ class AdminAuth {
         this.authComplete = false;
 
         // ============================================
-        // CONFIGURATIE - WIJZIG DIT VOOR DEPLOYMENT
+        // CONFIGURATION - Uses global APP_CONFIG
         // ============================================
 
-        // ONTWIKKELING (Lokaal): Zet op true
-        // PRODUCTIE (Railway): Zet op false
-        this.USE_LOCAL_MODE = true; // ← WIJZIG NAAR false VOOR DEPLOYMENT!
+        // Get configuration from config.js (loaded before this file)
+        this.config = window.APP_CONFIG || {
+            USE_LOCAL_MODE: false,  // Default: use backend API
+            API_BASE_URL: window.location.origin + '/api'
+        };
 
-        // Railway backend API URL
-        // Vervang door je Railway app URL (krijg je na deployment)
-        this.API_BASE_URL = 'https://jouw-app.up.railway.app/api';
-        // ☝️ WIJZIG DIT NAAR JE RAILWAY URL!
+        this.USE_LOCAL_MODE = this.config.USE_LOCAL_MODE;
+        this.API_BASE_URL = this.config.API_BASE_URL;
+
+        console.log('🔐 AdminAuth initialized:', {
+            mode: this.USE_LOCAL_MODE ? 'Local Storage' : 'Backend API',
+            apiUrl: this.API_BASE_URL
+        });
 
         this.init();
     }

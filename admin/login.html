@@ -86,79 +86,61 @@ display: none;
         const CONFIG = window.APP_CONFIG || { USE_LOCAL_MODE: false, API_BASE_URL: window.location.origin + '/api' };
         const USE_LOCAL_MODE = CONFIG.USE_LOCAL_MODE;
         const API_URL = CONFIG.API_BASE_URL + '/auth';
-        const LOCAL_ADMINS = {
-            'admin': 'admin123',
-            'visclub': 'visclub2026',
-            'kevin.dhont': 'visclub2026',
-            'maarten.borghs': 'visclub2026',
-            'kevin.vandun': 'visclub2026'
-        };
+
+        // SECURITY FIX: Hardcoded credentials removed
+        // Local mode is now disabled by default in config.js
+        // All authentication goes through backend API
+
         document.getElementById('loginForm').addEventListener('submit', async e => {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
+
+            // SECURITY: Only backend authentication allowed
             if (USE_LOCAL_MODE) {
-                if (LOCAL_ADMINS[user] && LOCAL_ADMINS[user] === pass) {
-                    console.log('✅ Lokale login succesvol voor:', user);
-                    const displayNames = {
-                        'admin': 'Admin',
-                        'visclub': 'Visclub',
-                        'kevin.dhont': 'Kevin Dhont',
-                        'maarten.borghs': 'Maarten Borghs',
-                        'kevin.vandun': 'Kevin Van Dun'
-                    };
-                    const mockUser = {
-                        username: user,
-                        name: displayNames[user] || user.charAt(0).toUpperCase() + user.slice(1),
-                        role: 'admin',
-                        email: user + '@visclubsim.local',
-                        loginTime: new Date().toISOString()
-                    };
-                    const mockToken = 'local_mock_token_' + Date.now();
-                    console.log('💾 Opslaan in localStorage:', mockUser);
-                    localStorage.setItem('visclubsim_admin', JSON.stringify(mockUser));
-                    localStorage.setItem('visclubsim_token', mockToken);
-                    localStorage.setItem('admin_name', mockUser.name);
-                    const saved = localStorage.getItem('visclubsim_admin');
-                    console.log('✔️ Verificatie - Data opgeslagen:', saved);
-                    setTimeout(() => {
-                        console.log('🔄 Redirect naar dashboard...');
-                        window.location.href = 'index.html';
-                    }, 100);
+                console.warn('⚠️ Local mode is enabled but hardcoded credentials are removed for security');
+                console.warn('⚠️ Please use backend API authentication');
+                document.getElementById('errorMsg').textContent = 'Local mode is disabled for security. Please configure backend API.';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+
+            // Backend API authentication
+            try {
+                document.getElementById('errorMsg').style.display = 'none';
+
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    console.log('✅ Login successful');
+
+                    // Store auth data
+                    localStorage.setItem('visclubsim_token', data.token);
+                    localStorage.setItem('visclubsim_admin', JSON.stringify(data.user || { username: user }));
+
+                    // Redirect to dashboard
+                    window.location.href = 'index.html';
                 } else {
-                    console.error('❌ Login mislukt voor:', user);
-                    document.getElementById('errorMsg').textContent = 'Ongeldige gebruikersnaam of wachtwoord';
+                    document.getElementById('errorMsg').textContent = data.error || 'Ongeldige gebruikersnaam of wachtwoord';
                     document.getElementById('errorMsg').style.display = 'block';
                 }
-            } else {
-                try {
-                    const response = await fetch(`${API_URL}/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: user, password: pass })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        localStorage.setItem('adminToken', data.token);
-                        window.location.href = 'index.html';
-                    } else {
-                        document.getElementById('errorMsg').textContent = data.message || 'Fout bij login';
-                        document.getElementById('errorMsg').style.display = 'block';
-                    }
-                } catch (error) {
-                    document.getElementById('errorMsg').textContent = 'Kan geen verbinding maken met de login server. Zet USE_LOCAL_MODE op true voor lokaal werken.';
-                    document.getElementById('errorMsg').style.display = 'block';
-                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                document.getElementById('errorMsg').textContent = 'Kan geen verbinding maken met de server. Controleer of de backend API draait.';
+                document.getElementById('errorMsg').style.display = 'block';
             }
         });
-        console.log('🔧 ADMIN PANEL - Lokale Modus:', USE_LOCAL_MODE);
-        if (USE_LOCAL_MODE) {
-            console.log('👤 Beschikbare accounts:');
-            console.log('   - Gebruiker: admin, Wachtwoord: admin123');
-            console.log('   - Gebruiker: visclub, Wachtwoord: visclub2026');
-            console.log('   - Gebruiker: kevin.dhont, Wachtwoord: visclub2026');
-            console.log('   - Gebruiker: maarten.borghs, Wachtwoord: visclub2026');
-            console.log('   - Gebruiker: kevin.vandun, Wachtwoord: visclub2026');
-        }
+
+        // Log configuration (no credentials!)
+        console.log('🔧 Admin Login Configured:', {
+            mode: USE_LOCAL_MODE ? 'Local (Disabled)' : 'Backend API',
+            apiUrl: API_URL
+        });
     </script>
 </body></html>

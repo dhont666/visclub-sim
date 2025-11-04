@@ -6,17 +6,21 @@
 class DataAPI {
     constructor() {
         // ============================================
-        // CONFIGURATIE - WIJZIG DIT VOOR DEPLOYMENT
+        // LOAD CONFIGURATION
         // ============================================
 
-        // ONTWIKKELING (Lokaal): Zet op true
-        // PRODUCTIE (Railway): Zet op false
-        this.USE_LOCAL_MODE = true; // ← WIJZIG NAAR false VOOR DEPLOYMENT!
+        // Get configuration from config.js (loaded before this file)
+        this.config = window.APP_CONFIG || {
+            USE_LOCAL_MODE: false,  // Default: use backend
+            API_BASE_URL: window.location.origin + '/api',
+            ENABLE_OFFLINE_FALLBACK: true,
+            DEBUG: false
+        };
 
-        // Railway backend API URL
-        // Vervang door je Railway app URL (krijg je na deployment)
-        this.API_BASE_URL = 'https://jouw-app.up.railway.app/api';
-        // ☝️ WIJZIG DIT NAAR JE RAILWAY URL!
+        this.USE_LOCAL_MODE = this.config.USE_LOCAL_MODE;
+        this.API_BASE_URL = this.config.API_BASE_URL;
+        this.apiAvailable = true;
+        this.offlineQueue = [];
 
         this.cache = {
             registrations: null,
@@ -28,15 +32,163 @@ class DataAPI {
                 club: null,
                 veteran: null,
                 recent: null
-            }
+            },
+            lastUpdate: {}
         };
 
         const mode = this.USE_LOCAL_MODE ? 'Local Storage' : 'Backend API';
         console.log(`📊 DataAPI initialized - using ${mode}`);
+        console.log(`🌐 API Base URL: ${this.API_BASE_URL}`);
 
         if (this.USE_LOCAL_MODE) {
             this.initializeMockData();
+        } else {
+            // Check API connectivity on startup
+            this.checkAPIConnection();
         }
+    }
+
+    // Check if backend API is reachable
+    async checkAPIConnection() {
+        try {
+            const token = localStorage.getItem('visclubsim_token');
+            const response = await fetch(`${this.API_BASE_URL}/health`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
+                signal: AbortSignal.timeout(5000)  // 5 second timeout
+            });
+
+            this.apiAvailable = response.ok;
+
+            if (!this.apiAvailable && this.config.ENABLE_OFFLINE_FALLBACK) {
+                console.warn('⚠️ Backend API unavailable, offline fallback enabled');
+                this.showOfflineNotice();
+                this.startOfflineRetry();
+            } else if (this.apiAvailable) {
+                console.log('✅ Backend API is reachable');
+                this.hideOfflineNotice();
+                this.syncOfflineQueue();
+            }
+        } catch (error) {
+            this.apiAvailable = false;
+            if (this.config.ENABLE_OFFLINE_FALLBACK) {
+                console.warn('⚠️ Backend API unreachable, offline mode enabled:', error.message);
+                this.showOfflineNotice();
+                this.startOfflineRetry();
+            } else {
+                console.error('❌ Backend API unreachable and offline mode disabled:', error);
+            }
+        }
+    }
+
+    // Show offline notice banner
+    showOfflineNotice() {
+        let notice = document.getElementById('offline-notice');
+        if (!notice) {
+            notice = document.createElement('div');
+            notice.id = 'offline-notice';
+            notice.innerHTML = `
+                <div style="background: #ff9800; color: white; padding: 10px; text-align: center; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">
+                    ⚠️ Backend niet bereikbaar - Offline modus actief. Wijzigingen worden later gesynchroniseerd.
+                </div>
+            `;
+            document.body.insertBefore(notice, document.body.firstChild);
+        }
+    }
+
+    // Hide offline notice banner
+    hideOfflineNotice() {
+        const notice = document.getElementById('offline-notice');
+        if (notice) {
+            notice.remove();
+        }
+    }
+
+    // Retry connection periodically
+    startOfflineRetry() {
+        if (this.retryInterval) return;  // Already running
+
+        this.retryInterval = setInterval(async () => {
+            await this.checkAPIConnection();
+            if (this.apiAvailable) {
+                clearInterval(this.retryInterval);
+                this.retryInterval = null;
+            }
+        }, this.config.OFFLINE_RETRY_INTERVAL || 30000);
+    }
+
+    // Sync operations that were queued while offline
+    async syncOfflineQueue() {
+        const queueKey = 'offline_queue';
+        const storedQueue = localStorage.getItem(queueKey);
+
+        if (storedQueue) {
+            this.offlineQueue = JSON.parse(storedQueue);
+        }
+
+        if (this.offlineQueue.length > 0 && this.apiAvailable) {
+            console.log(`🔄 Syncing ${this.offlineQueue.length} offline operations...`);
+
+            const successfulOps = [];
+            const failedOps = [];
+
+            for (const operation of this.offlineQueue) {
+                try {
+                    await this.executeQueuedOperation(operation);
+                    successfulOps.push(operation);
+                    console.log('✅ Synced operation:', operation.type);
+                } catch (error) {
+                    console.error('❌ Failed to sync operation:', operation.type, error);
+                    failedOps.push(operation);
+                }
+            }
+
+            // Keep only failed operations in queue
+            this.offlineQueue = failedOps;
+            localStorage.setItem(queueKey, JSON.stringify(failedOps));
+
+            if (successfulOps.length > 0) {
+                alert(`✅ ${successfulOps.length} offline wijzigingen gesynchroniseerd!`);
+            }
+        }
+    }
+
+    // Execute a queued operation
+    async executeQueuedOperation(operation) {
+        const { method, endpoint, data } = operation;
+
+        const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('visclubsim_token')}`
+            },
+            body: data ? JSON.stringify(data) : undefined
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    // Queue operation for later sync
+    queueOperation(method, endpoint, data) {
+        const operation = {
+            id: Date.now() + Math.random(),
+            timestamp: new Date().toISOString(),
+            method,
+            endpoint,
+            data
+        };
+
+        this.offlineQueue.push(operation);
+        localStorage.setItem('offline_queue', JSON.stringify(this.offlineQueue));
+
+        console.log('📋 Operation queued for sync:', operation);
     }
 
     // Initialize empty data if localStorage is empty

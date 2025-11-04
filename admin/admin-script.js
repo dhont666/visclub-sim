@@ -536,6 +536,40 @@ window.exportData = function exportData() {
     alert('✅ Alle data geëxporteerd naar JSON!');
 }
 
+// Download ALL data including localStorage
+window.downloadAllData = function downloadAllData() {
+    // Collect all data from localStorage
+    const allData = {
+        timestamp: new Date().toISOString(),
+        registrations: allRegistrations,
+        payments: allPayments,
+        members: allMembers,
+        weighings: JSON.parse(localStorage.getItem('weighings') || '[]'),
+        draws: {},
+        permits: JSON.parse(localStorage.getItem('permits') || '[]'),
+        contactMessages: JSON.parse(localStorage.getItem('contactMessages') || '[]'),
+        calendarData: window.calendarData || []
+    };
+
+    // Collect all draw data
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('draw_')) {
+            allData.draws[key] = JSON.parse(localStorage.getItem(key));
+        }
+    });
+
+    // Create JSON file
+    const json = JSON.stringify(allData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `visclub-sim-complete-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    alert('✅ Volledige database backup gedownload!');
+}
+
 
 async function editRegistration(id) {
     const reg = allRegistrations.find(r => r.id === id);

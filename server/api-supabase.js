@@ -10,6 +10,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { createClient } = require('@supabase/supabase-js');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,38 +44,142 @@ console.log('   URL:', process.env.SUPABASE_URL);
 // MIDDLEWARE
 // =============================================
 
+// CORS Configuration (Security Fix)
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8000',
+    process.env.CORS_ORIGIN,
+    process.env.FRONTEND_URL
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        // Check if origin is in whitelist or if wildcard is explicitly set
+        if (process.env.CORS_ORIGIN === '*') {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`⚠️ CORS blocked request from: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request logging
+// Request logging with sanitization
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    const sanitizedBody = req.body ? { ...req.body } : {};
+    // Don't log sensitive fields
+    if (sanitizedBody.password) sanitizedBody.password = '[REDACTED]';
+    if (sanitizedBody.token) sanitizedBody.token = '[REDACTED]';
+
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`,
+        req.query ? `Query: ${JSON.stringify(req.query)}` : '');
     next();
 });
+
+// Rate limiting for all API requests
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Stricter rate limiting for auth endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 login attempts per windowMs
+    message: 'Too many login attempts, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false, // Count even successful requests
+});
+
+app.use('/api/', apiLimiter);
+app.use('/api/auth/login', authLimiter);
 
 // =============================================
 // JWT AUTHENTICATION MIDDLEWARE
 // =============================================
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+// SECURITY FIX: Validate JWT_SECRET exists and is strong enough
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+    console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is not set');
+    console.error('   Set JWT_SECRET in .env file (minimum 32 characters)');
+    console.error('   Example: JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long');
+    process.exit(1);
+}
+
+if (JWT_SECRET.length < 32) {
+    console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is too short');
+    console.error(`   Current length: ${JWT_SECRET.length} characters`);
+    console.error('   Required: At least 32 characters');
+    console.error('   Generate a strong secret: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+    process.exit(1);
+}
+
+if (JWT_SECRET === 'your-secret-key-change-this-in-production' ||
+    JWT_SECRET === 'change-me' ||
+    JWT_SECRET === 'secret') {
+    console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is using a default/weak value');
+    console.error('   Never use default values in production!');
+    process.exit(1);
+}
+
+console.log('✅ JWT_SECRET validated (length:', JWT_SECRET.length, 'characters)');
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-        return res.status(401).json({ error: 'Access token required' });
+        return res.status(401).json({
+            error: 'Access token required',
+            code: 'NO_TOKEN'
+        });
     }
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            return res.status(403).json({ error: 'Invalid or expired token' });
+            console.warn('⚠️ JWT verification failed:', err.message);
+
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    error: 'Token has expired',
+                    code: 'TOKEN_EXPIRED'
+                });
+            }
+
+            if (err.name === 'JsonWebTokenError') {
+                return res.status(403).json({
+                    error: 'Invalid token',
+                    code: 'INVALID_TOKEN'
+                });
+            }
+
+            return res.status(403).json({
+                error: 'Token verification failed',
+                code: 'VERIFICATION_FAILED'
+            });
         }
+
         req.user = user;
         next();
     });

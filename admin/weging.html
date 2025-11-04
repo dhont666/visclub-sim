@@ -551,6 +551,17 @@
                 return;
             }
 
+            // Wait for calendarData to be available
+            let retries = 0;
+            while (!window.calendarData && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            if (!window.calendarData) {
+                console.error('CalendarData not available after waiting');
+            }
+
             await loadCompetitions();
             loadWeighings();
         });
@@ -559,38 +570,24 @@
         async function loadCompetitions() {
             const select = document.getElementById('competitionSelect');
 
-            // Check if we have stored draws (trekkingen)
-            const allDrawKeys = Object.keys(localStorage).filter(key => key.startsWith('draw_'));
-
-            if (allDrawKeys.length === 0) {
-                select.innerHTML = '<option value="">Geen trekkingen gevonden - Doe eerst een trekking</option>';
-                console.log('No draws found in localStorage');
+            // Load all competitions from calendarData (from script.js)
+            if (!window.calendarData || window.calendarData.length === 0) {
+                select.innerHTML = '<option value="">Geen wedstrijden gevonden in kalender</option>';
+                console.log('No calendarData found');
                 return;
             }
 
-            // Load all draws and extract competition info
-            const competitions = [];
-            allDrawKeys.forEach(key => {
-                const drawData = JSON.parse(localStorage.getItem(key));
-                if (drawData && drawData.competition) {
-                    competitions.push({
-                        key: key,
-                        datum: drawData.competition.datum,
-                        wedstrijdtype: drawData.competition.wedstrijdtype || drawData.competition.type,
-                        timestamp: drawData.timestamp
-                    });
-                }
-            });
+            // Get all competitions from calendar
+            const competitions = window.calendarData.map(event => ({
+                datum: event.datum,
+                wedstrijdtype: event.wedstrijdtype,
+                timestamp: new Date(event.datum.split('-').reverse().join('-')).getTime()
+            }));
 
-            if (competitions.length === 0) {
-                select.innerHTML = '<option value="">Geen geldige trekkingen gevonden</option>';
-                return;
-            }
+            // Sort by date (most recent first)
+            competitions.sort((a, b) => b.timestamp - a.timestamp);
 
-            // Sort by timestamp (most recent first)
-            competitions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            console.log('Found competitions:', competitions);
+            console.log('Found competitions from calendar:', competitions.length);
 
             // Add options
             competitions.forEach((comp, index) => {

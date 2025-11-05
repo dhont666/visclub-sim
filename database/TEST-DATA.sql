@@ -159,15 +159,15 @@ ON CONFLICT DO NOTHING;
 -- STEP 4: Add Test Registrations
 -- =============================================================================
 INSERT INTO registrations (competition_id, member_id, registration_date, status, payment_status)
-SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, '2025-12-10', 'confirmed', 'paid' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
+SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, '2025-12-10 10:00:00'::timestamp, 'confirmed', 'paid' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
 UNION ALL
-SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::uuid, '2025-12-11', 'confirmed', 'paid' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
+SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::uuid, '2025-12-11 11:30:00'::timestamp, 'confirmed', 'paid' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
 UNION ALL
-SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::uuid, '2025-12-12', 'pending', 'pending' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
+SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::uuid, '2025-12-12 09:15:00'::timestamp, 'pending', 'pending' FROM competitions WHERE name = 'Kerstwedstrijd 2025'
 UNION ALL
-SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, '2026-01-02', 'confirmed', 'paid' FROM competitions WHERE name = 'Nieuwjaarswedstrijd 2026'
+SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, '2026-01-02 14:20:00'::timestamp, 'confirmed', 'paid' FROM competitions WHERE name = 'Nieuwjaarswedstrijd 2026'
 UNION ALL
-SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::uuid, '2026-01-03', 'confirmed', 'paid' FROM competitions WHERE name = 'Nieuwjaarswedstrijd 2026'
+SELECT id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::uuid, '2026-01-03 16:45:00'::timestamp, 'confirmed', 'paid' FROM competitions WHERE name = 'Nieuwjaarswedstrijd 2026'
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================

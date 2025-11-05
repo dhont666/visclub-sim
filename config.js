@@ -18,7 +18,7 @@
         // API Configuration
         API_BASE_URL: isLocal
             ? 'http://localhost:3000/api'  // Local development
-            : `${window.location.origin}/api`,  // Production (same origin)
+            : 'https://visclub-sim-production.up.railway.app/api',  // Production Railway backend
 
         // Cache Configuration
         CACHE_TTL: 5 * 60 * 1000,  // 5 minutes cache for public data

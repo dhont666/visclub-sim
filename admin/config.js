@@ -18,7 +18,7 @@
         // API Configuration
         API_BASE_URL: isLocal
             ? 'http://localhost:3000/api'  // Local development
-            : `${window.location.origin}/api`,  // Production (same origin)
+            : 'https://visclub-sim-production.up.railway.app/api',  // Production Railway backend
 
         // Mode Configuration (ALWAYS use backend API)
         USE_LOCAL_MODE: false,  // ✅ Always use Supabase backend

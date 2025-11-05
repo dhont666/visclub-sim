@@ -63,7 +63,6 @@ WITH member_results AS (
     SELECT
         r.member_id,
         m.name AS member_name,
-        m.member_number,
         r.competition_id,
         r.points,
         c.date AS competition_date,
@@ -89,7 +88,6 @@ best_results AS (
     SELECT
         member_id,
         member_name,
-        member_number,
         points,
         competition_date
     FROM member_results
@@ -99,7 +97,6 @@ best_results AS (
 SELECT
     member_id,
     member_name,
-    member_number,
     SUM(points) as total_points,
     COUNT(*) as competitions_counted,
     ROUND(AVG(points)::numeric, 2) as avg_points,
@@ -109,7 +106,7 @@ SELECT
         ORDER BY SUM(points) ASC, AVG(points) ASC
     ) as ranking_position
 FROM best_results
-GROUP BY member_id, member_name, member_number
+GROUP BY member_id, member_name
 -- Must have at least 10 competitions to be ranked
 HAVING COUNT(*) >= 10
 ORDER BY total_points ASC, avg_points ASC;
@@ -125,7 +122,6 @@ CREATE OR REPLACE VIEW veteran_ranking AS
 SELECT
     m.id as member_id,
     m.name AS member_name,
-    m.member_number,
     SUM(r.points) as total_points,
     COUNT(*) as competitions_count,
     ROUND(AVG(r.points)::numeric, 2) as avg_points,
@@ -148,7 +144,7 @@ WHERE
     AND COALESCE(c.status, 'completed') = 'completed'
     -- Exclude absent members
     AND COALESCE(r.is_absent, false) = false
-GROUP BY m.id, m.name, m.member_number
+GROUP BY m.id, m.name
 -- Must have at least 5 competitions to be ranked
 HAVING COUNT(*) >= 5
 ORDER BY total_points ASC, avg_points ASC;
@@ -170,7 +166,6 @@ SELECT
             json_build_object(
                 'position', r.position,
                 'member_name', m.name,
-                'member_number', m.member_number,
                 'points', r.points,
                 'weight_kg', COALESCE(r.weight_kg, 0),
                 'fish_count', COALESCE(r.fish_count, 0),
@@ -240,7 +235,6 @@ CREATE OR REPLACE VIEW member_statistics AS
 SELECT
     m.id as member_id,
     m.name AS member_name,
-    m.member_number,
     COALESCE(m.is_veteran, false) as is_veteran,
     -- Competition counts
     COUNT(DISTINCT r.competition_id) as total_competitions,
@@ -265,7 +259,7 @@ SELECT
 FROM members m
 LEFT JOIN results r ON m.id::text = r.member_id::text
 WHERE COALESCE(m.is_active, true) = true
-GROUP BY m.id, m.name, m.member_number, m.is_veteran;
+GROUP BY m.id, m.name, m.is_veteran;
 
 -- =============================================================================
 -- STEP 8: GRANT PERMISSIONS (Essential for Supabase)

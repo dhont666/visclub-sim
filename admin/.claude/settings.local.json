@@ -16,7 +16,10 @@
       "Bash(timeout 5 node:*)",
       "Bash(node database/verify-schema.js:*)",
       "Bash(node:*)",
-      "Bash(del check-column-types.sql FINAL-DEPLOY-VIEWS.sql 2)"
+      "Bash(del check-column-types.sql FINAL-DEPLOY-VIEWS.sql 2)",
+      "WebSearch",
+      "WebFetch(domain:www.belgianhosting.be)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

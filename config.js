@@ -17,8 +17,8 @@
 
         // API Configuration
         API_BASE_URL: isLocal
-            ? 'http://localhost:3000/api'  // Local development
-            : 'https://visclub-sim-production.up.railway.app/api',  // Production Railway backend
+            ? 'http://localhost/vissersclub-sim-website/api'  // Local PHP development
+            : 'https://your-cloud86-domain.com/api',  // Production Cloud86 (UPDATE THIS!)
 
         // Cache Configuration
         CACHE_TTL: 5 * 60 * 1000,  // 5 minutes cache for public data

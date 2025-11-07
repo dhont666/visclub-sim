@@ -4,8 +4,24 @@
  * Main API router and endpoints
  */
 
-// Enable CORS
-header('Access-Control-Allow-Origin: *');
+// Load dependencies first
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/auth.php';
+
+// CORS Configuration (Secure)
+$config = require __DIR__ . '/config.php';
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+
+// Check if origin is allowed
+if (in_array($origin, $config['cors']['allowed_origins'])) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Credentials: true');
+} elseif ($origin === '') {
+    // Allow requests with no origin (e.g., Postman, curl)
+    header('Access-Control-Allow-Origin: *');
+}
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
@@ -15,11 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
-// Load dependencies
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/database.php';
-require_once __DIR__ . '/auth.php';
 
 // Get request method and path
 $method = $_SERVER['REQUEST_METHOD'];
@@ -49,6 +60,25 @@ function sendError($message, $statusCode = 400) {
     sendResponse(['success' => false, 'error' => $message], $statusCode);
 }
 
+// Helper function to sanitize input
+function sanitizeInput($data) {
+    if (is_array($data)) {
+        return array_map('sanitizeInput', $data);
+    }
+    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+}
+
+// Helper function to validate boolean
+function validateBoolean($value) {
+    if ($value === 'true' || $value === '1' || $value === 1 || $value === true) {
+        return true;
+    }
+    if ($value === 'false' || $value === '0' || $value === 0 || $value === false) {
+        return false;
+    }
+    return null;
+}
+
 // =============================================================================
 // ROUTING
 // =============================================================================
@@ -73,14 +103,56 @@ try {
             sendError('Username and password required', 400);
         }
 
+        // Rate limiting: Check failed login attempts
+        session_start();
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitKey = 'login_attempts_' . md5($ip);
+
+        if (!isset($_SESSION[$rateLimitKey])) {
+            $_SESSION[$rateLimitKey] = ['count' => 0, 'first_attempt' => time()];
+        }
+
+        $attempts = $_SESSION[$rateLimitKey];
+        $timeWindow = 900; // 15 minutes
+
+        // Reset if time window passed
+        if (time() - $attempts['first_attempt'] > $timeWindow) {
+            $_SESSION[$rateLimitKey] = ['count' => 0, 'first_attempt' => time()];
+            $attempts = $_SESSION[$rateLimitKey];
+        }
+
+        // Block if too many attempts
+        if ($attempts['count'] >= 5) {
+            $waitTime = $timeWindow - (time() - $attempts['first_attempt']);
+            sendError("Too many login attempts. Try again in " . ceil($waitTime / 60) . " minutes.", 429);
+        }
+
         $user = $db->fetchOne(
             'SELECT * FROM admin_users WHERE username = ? AND is_active = TRUE',
             [$input['username']]
         );
 
-        if (!$user || !Auth::verifyPassword($input['password'], $user['password_hash'])) {
+        // Constant-time comparison to prevent timing attacks
+        $loginSuccess = false;
+        if ($user) {
+            $loginSuccess = Auth::verifyPassword($input['password'], $user['password_hash']);
+        } else {
+            // Hash a dummy password to keep timing consistent
+            Auth::verifyPassword('dummy_password_to_keep_timing_consistent', '$2y$10$dummyhash');
+        }
+
+        if (!$loginSuccess) {
+            // Increment failed attempts
+            $_SESSION[$rateLimitKey]['count']++;
+
+            // Log failed attempt
+            error_log("Failed login attempt for username: " . $input['username'] . " from IP: " . $ip);
+
             sendError('Invalid credentials', 401);
         }
+
+        // Reset rate limit on successful login
+        unset($_SESSION[$rateLimitKey]);
 
         // Update last login
         $db->execute(
@@ -124,8 +196,9 @@ try {
     if ($path === 'members' && $method === 'GET') {
         Auth::requireAuth();
 
-        $active = isset($_GET['active']) ? $_GET['active'] === 'true' : null;
-        $veteran = isset($_GET['veteran']) ? $_GET['veteran'] === 'true' : null;
+        // Sanitize and validate query parameters
+        $active = isset($_GET['active']) ? validateBoolean($_GET['active']) : null;
+        $veteran = isset($_GET['veteran']) ? validateBoolean($_GET['veteran']) : null;
 
         $sql = 'SELECT * FROM members WHERE 1=1';
         $params = [];

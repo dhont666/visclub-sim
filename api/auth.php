@@ -5,10 +5,13 @@
  */
 
 class Auth {
-    private static $config;
+    private static $config = null;
 
     public static function init() {
-        self::$config = require __DIR__ . '/config.php';
+        // Only load config once (cached)
+        if (self::$config === null) {
+            self::$config = require __DIR__ . '/config.php';
+        }
     }
 
     /**

@@ -4,29 +4,69 @@
  * Database and JWT configuration
  */
 
-// Error reporting (disable in production!)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Error reporting
+// ⚠️  SECURITY: Set display_errors to 0 in production!
+// Development: Show all errors
+// Production: Log errors, don't display
+$isProduction = !in_array($_SERVER['SERVER_NAME'] ?? 'localhost', ['localhost', '127.0.0.1']);
 
-// Database Configuration
+if ($isProduction) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 0);  // Don't show errors to users
+    ini_set('log_errors', 1);      // Log errors to file
+} else {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);  // Show errors in development
+}
+
+// =============================================================================
+// DATABASE CONFIGURATION
+// =============================================================================
+// ⚠️  TODO: Update these values in Cloud86 Plesk!
+// Get these from: Plesk → Databases → Your Database
 define('DB_HOST', 'localhost');  // Cloud86 MySQL host
-define('DB_NAME', 'your_database_name');  // Set in Cloud86 Plesk
-define('DB_USER', 'your_database_user');  // Set in Cloud86 Plesk
-define('DB_PASS', 'your_database_password');  // Set in Cloud86 Plesk
+define('DB_NAME', 'your_database_name');  // ⚠️  CHANGE THIS!
+define('DB_USER', 'your_database_user');  // ⚠️  CHANGE THIS!
+define('DB_PASS', 'your_database_password');  // ⚠️  CHANGE THIS!
 define('DB_CHARSET', 'utf8mb4');
 
-// JWT Configuration
+// Security check: Prevent deployment with default credentials
+if (DB_NAME === 'your_database_name' || DB_USER === 'your_database_user') {
+    die('ERROR: Please configure database credentials in api/config.php before deploying!');
+}
+
+// =============================================================================
+// JWT CONFIGURATION
+// =============================================================================
+// ⚠️  CRITICAL: Change JWT_SECRET before deploying!
+// Generate a strong secret with: php -r "echo bin2hex(random_bytes(32));"
+// Or use: https://randomkeygen.com (Fort Knox password)
 define('JWT_SECRET', 'CHANGE_THIS_TO_STRONG_SECRET_KEY_64_CHARACTERS_MINIMUM_LENGTH_XXXX');
 define('JWT_ALGORITHM', 'HS256');
 define('JWT_EXPIRATION', 86400); // 24 hours in seconds
 
-// CORS Configuration
+// Security check: Prevent deployment with default JWT secret
+if (JWT_SECRET === 'CHANGE_THIS_TO_STRONG_SECRET_KEY_64_CHARACTERS_MINIMUM_LENGTH_XXXX' || strlen(JWT_SECRET) < 64) {
+    die('ERROR: Please set a strong JWT_SECRET (64+ characters) in api/config.php before deploying!');
+}
+
+// =============================================================================
+// CORS CONFIGURATION
+// =============================================================================
+// ⚠️  TODO: Update with your actual domain!
+// Only these origins can access your API
 $allowed_origins = [
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'http://127.0.0.1:3000',
-    'https://your-cloud86-domain.com',  // Update with your Cloud86 domain
+    'http://localhost:3000',           // Local development
+    'http://localhost:8000',           // Local development (alt port)
+    'http://127.0.0.1:3000',          // Local development (IP)
+    'https://your-cloud86-domain.com',  // ⚠️  CHANGE THIS to your domain!
+    'https://www.your-cloud86-domain.com',  // ⚠️  With www
 ];
+
+// Security check: Prevent deployment with default domain
+if (in_array('https://your-cloud86-domain.com', $allowed_origins) && $isProduction) {
+    error_log('WARNING: CORS still has default domain configured. Update api/config.php!');
+}
 
 // Timezone
 date_default_timezone_set('Europe/Brussels');

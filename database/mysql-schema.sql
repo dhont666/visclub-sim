@@ -300,14 +300,15 @@ GROUP BY m.id, m.name, m.member_number, m.is_veteran
 ORDER BY m.name;
 
 -- =============================================================================
--- INITIAL DATA: ADMIN USER
+-- INITIAL DATA: ADMIN USERS
 -- =============================================================================
--- Default admin user (password: 'admin123' - CHANGE THIS!)
--- Password hash generated with PHP password_hash('admin123', PASSWORD_BCRYPT)
+-- Admin accounts for Visclub SiM management
+-- Passwords are securely hashed with bcrypt
 INSERT INTO admin_users (username, password_hash, email, full_name, role, is_active)
 VALUES
-    ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@visclub-sim.be', 'Administrator', 'admin', TRUE),
-    ('visclub', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'info@visclub-sim.be', 'Visclub SiM', 'admin', TRUE);
+    ('kevin.dhont', '$2b$12$uytyI7ZVvyBYfrdDkreG9u9cDeWgIG2g3w6dCrbWMcWwvHwl9Em9G', 'kevin.dhont@visclub-sim.be', 'Kevin Dhont', 'admin', TRUE),
+    ('kevin.vandun', '$2b$12$7g3nQrRUAYIIYDNMI74r4ufQE5vsS3/zb8anikCGhr874MsIFUeGS', 'kevin.vandun@visclub-sim.be', 'Kevin van dun', 'admin', TRUE),
+    ('maarten.borghs', '$2b$12$566Uf8m5ByfFjjA3PVvemOBLLSEsva/zktUuA3bnkE1U2Nhk18VWO', 'maarten.borghs@visclub-sim.be', 'Maarten Borghs', 'admin', TRUE);
 
 -- =============================================================================
 -- DONE!

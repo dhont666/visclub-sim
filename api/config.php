@@ -38,10 +38,10 @@ if (DB_NAME === 'your_database_name' || DB_USER === 'your_database_user') {
 // =============================================================================
 // JWT CONFIGURATION
 // =============================================================================
-// ⚠️  CRITICAL: Change JWT_SECRET before deploying!
-// Generate a strong secret with: php -r "echo bin2hex(random_bytes(32));"
-// Or use: https://randomkeygen.com (Fort Knox password)
-define('JWT_SECRET', 'CHANGE_THIS_TO_STRONG_SECRET_KEY_64_CHARACTERS_MINIMUM_LENGTH_XXXX');
+// ⚠️  CRITICAL: This JWT secret is cryptographically secure
+// Generated with secrets.token_hex(32) - Do NOT share or commit to Git!
+// Keep this secret safe - it signs all authentication tokens
+define('JWT_SECRET', '74e9f9f50f73f82244aa025a6b98152cbcb21d57a6a21f6050464a0ebe9fed0e');
 define('JWT_ALGORITHM', 'HS256');
 define('JWT_EXPIRATION', 86400); // 24 hours in seconds
 
@@ -59,14 +59,11 @@ $allowed_origins = [
     'http://localhost:3000',           // Local development
     'http://localhost:8000',           // Local development (alt port)
     'http://127.0.0.1:3000',          // Local development (IP)
-    'https://your-cloud86-domain.com',  // ⚠️  CHANGE THIS to your domain!
-    'https://www.your-cloud86-domain.com',  // ⚠️  With www
+    'https://visclubsim.be',          // Production domain
+    'https://www.visclubsim.be',      // Production domain (with www)
 ];
 
-// Security check: Prevent deployment with default domain
-if (in_array('https://your-cloud86-domain.com', $allowed_origins) && $isProduction) {
-    error_log('WARNING: CORS still has default domain configured. Update api/config.php!');
-}
+// CORS configured for: visclubsim.be
 
 // Timezone
 date_default_timezone_set('Europe/Brussels');

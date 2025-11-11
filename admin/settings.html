@@ -290,11 +290,9 @@ Dit verwijdert alle leden, inschrijvingen, resultaten en instellingen uit de bro
             const currentUser = adminAuth.currentUser;
             if (users.length === 0) {
                 users = [
-                    { username: 'admin', password: 'admin123', name: 'Admin', role: 'admin' },
-                    { username: 'visclub', password: 'visclub2026', name: 'Visclub', role: 'admin' },
-                    { username: 'kevin.dhont', password: 'visclub2026', name: 'Kevin Dhont', role: 'admin' },
-                    { username: 'maarten.borghs', password: 'visclub2026', name: 'Maarten Borghs', role: 'admin' },
-                    { username: 'kevin.vandun', password: 'visclub2026', name: 'Kevin Van Dun', role: 'admin' }
+                    { username: 'kevin.dhont', password: 'KevinDhont2026!', name: 'Kevin Dhont', role: 'admin' },
+                    { username: 'kevin.vandun', password: 'KevinVD2026!', name: 'Kevin van dun', role: 'admin' },
+                    { username: 'maarten.borghs', password: 'MaartenB2026!', name: 'Maarten Borghs', role: 'admin' }
                 ];
                 localStorage.setItem('admin_users', JSON.stringify(users));
             }

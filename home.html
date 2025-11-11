@@ -59,5 +59,55 @@
     <script>
         document.addEventListener('DOMContentLoaded',function(){try{let d=null;if(localStorage.vijverkaart_actueel){const x=JSON.parse(localStorage.vijverkaart_actueel);const t={};x.results.forEach(r=>{t[r.spot]=r});d={toewijzingen:t,wedstrijdNaam:x.competition.wedstrijdtype||'Wedstrijd',wedstrijdDatum:x.competition.datum,aantalDeelnemers:x.results.length,gepubliceerdOp:x.publishedAt}}else if(localStorage.published_draw){const x=JSON.parse(localStorage.published_draw);const t={};x.results.forEach(r=>{t[r.spot]=r});d={toewijzingen:t,wedstrijdNaam:x.competition.wedstrijdtype||'Wedstrijd',wedstrijdDatum:x.competition.datum,aantalDeelnemers:x.results.length,gepubliceerdOp:x.publishedAt}}if(d){const g=new Date(d.gepubliceerdOp);const n=new Date();const v=(n-g)/(1000*60);if(v<=30){const h=document.querySelector('.hero');if(h){let s=document.getElementById('homepage-vijverkaart-section');if(!s){s=document.createElement('div');s.id='homepage-vijverkaart-section';h.insertAdjacentElement('beforebegin',s)}const a=Object.entries(d.toewijzingen).map(([p,i])=>({plaats:p,naam:i.naam})).sort((a,b)=>parseInt(a.plaats.replace(/\D/g,''))-parseInt(b.plaats.replace(/\D/g,'')));const l=a.map(i=>`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:white;border-radius:8px;margin-bottom:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)"><span style="font-weight:500;color:#2c3e50">Plaats ${i.plaats}</span><span style="color:#34495e">${i.naam}</span></div>`).join('');s.innerHTML=`<section style="padding:60px 0;background:#f0f8ff"><div class="container"><div class="section-header"><h2><i class="fas fa-map-marked-alt"></i> Actuele Plaatsentrekking</h2><div class="section-line"></div><p><strong>${d.wedstrijdNaam}</strong> - ${d.wedstrijdDatum}</p><p style="font-size:14px;color:#666;margin-top:10px">${d.aantalDeelnemers} deelnemers • Laatst bijgewerkt: ${new Date(d.gepubliceerdOp).toLocaleString('nl-NL')}</p></div><div style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:40px;align-items:start"><div id="homepage-vijverkaart" style="background:white;padding:40px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-height:600px"></div><div style="background:white;padding:25px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)"><h3 style="margin:0 0 20px 0;color:#2c3e50;font-size:20px;display:flex;align-items:center;gap:10px"><i class="fas fa-list-ol"></i>Deelnemers</h3><div style="max-height:600px;overflow-y:auto;padding-right:5px">${l}</div></div></div><style>@media(max-width:968px){[style*="grid-template-columns:2fr"]{grid-template-columns:1fr!important}}</style></div></section>`;const w=new Vijverkaart('homepage-vijverkaart',{interactive:false,showHeader:false,showLegend:true});w.render(d.toewijzingen);setTimeout(()=>{const ve=document.querySelector('#homepage-vijverkaart .vijver');const vp=document.querySelectorAll('#homepage-vijverkaart .visplaats');if(ve){ve.style.maxWidth='1200px';ve.style.height='800px';ve.style.margin='0 auto';vp.forEach(p=>{p.style.width='60px';p.style.height='60px';p.style.fontSize='18px';p.style.cursor='default';p.style.pointerEvents='none';p.onmouseenter=null;p.onmouseleave=null})}},100);const r=30-v;setTimeout(()=>{localStorage.removeItem('published_draw');localStorage.removeItem('vijverkaart_actueel');const se=document.getElementById('homepage-vijverkaart-section');if(se)se.remove()},r*60*1000)}}}else{localStorage.removeItem('published_draw');localStorage.removeItem('vijverkaart_actueel')}}catch(e){console.error('Fout:',e)}});
     </script>
+
+    <!-- Hero Background Slideshow - Automatically uses all gallery images -->
+    <script>
+        // Haal alle foto's uit de gallerij en wissel ze af op de homepagina
+        (function() {
+            // Laad gallerij pagina om images te extraheren
+            fetch('gallerij.html')
+                .then(response => response.text())
+                .then(html => {
+                    // Parse HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Vind alle gallery images (alleen eigen foto's, niet Unsplash)
+                    let galleryImages = Array.from(doc.querySelectorAll('.gallery-item img'))
+                        .map(img => img.getAttribute('src'))
+                        .filter(src => src && src.startsWith('images/'));
+
+                    // Als er geen images zijn, gebruik fallback
+                    if (galleryImages.length === 0) {
+                        galleryImages = ['images/wedstrijdvijver.jpg', 'images/vrije-vijver.jpg'];
+                    }
+
+                    // Start slideshow
+                    let currentIndex = 0;
+
+                    // Creëer een style element voor de dynamische achtergrond
+                    const styleElement = document.createElement('style');
+                    document.head.appendChild(styleElement);
+
+                    function rotateBackground() {
+                        currentIndex = (currentIndex + 1) % galleryImages.length;
+                        const newImageUrl = galleryImages[currentIndex];
+
+                        // Update de CSS regel dynamisch
+                        styleElement.textContent = `
+                            .hero::before {
+                                background-image: url('${newImageUrl}') !important;
+                            }
+                        `;
+                    }
+
+                    // Wissel elke 5 seconden van achtergrond
+                    setInterval(rotateBackground, 5000);
+                })
+                .catch(err => {
+                    console.log('Kon gallerij niet laden, gebruik standaard foto\'s');
+                });
+        })();
+    </script>
 </body>
 </html>

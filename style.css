@@ -156,8 +156,9 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1503510378184-de3a84897e7f?w=1920') center/cover;
+    background: url('images/wedstrijdvijver.jpg') center/cover;
     opacity: 0.3;
+    transition: background-image 1s ease-in-out;
 }
 
 .hero-overlay {

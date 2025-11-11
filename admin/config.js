@@ -18,7 +18,7 @@
         // API Configuration
         API_BASE_URL: isLocal
             ? 'http://localhost/vissersclub-sim-website/api'  // Local PHP development
-            : 'https://your-cloud86-domain.com/api',  // Production Cloud86 (UPDATE THIS!)
+            : 'https://www.visclubsim.be/api',  // Production Cloud86
 
         // Mode Configuration (ALWAYS use backend API)
         USE_LOCAL_MODE: false,  // ✅ Always use PHP/MySQL backend

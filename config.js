@@ -44,4 +44,7 @@
     // Make config globally available
     window.CONFIG = CONFIG;
 
+    // Also export API_BASE_URL directly for backward compatibility
+    window.API_BASE_URL = CONFIG.API_BASE_URL;
+
 })();

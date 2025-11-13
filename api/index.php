@@ -538,6 +538,251 @@ try {
     }
 
     // =============================================================================
+    // PUBLIC CONTACT MESSAGES ENDPOINTS (NO AUTH REQUIRED)
+    // =============================================================================
+
+    // POST /public/contact
+    if ($path === 'public/contact' && $method === 'POST') {
+        // Validate required fields
+        $required = ['name', 'email', 'subject', 'message'];
+        foreach ($required as $field) {
+            if (empty($input[$field])) {
+                sendError("Field '$field' is required", 400);
+            }
+        }
+
+        // Sanitize inputs
+        $name = sanitizeInput($input['name']);
+        $email = filter_var($input['email'], FILTER_VALIDATE_EMAIL);
+        $subject = sanitizeInput($input['subject']);
+        $message = sanitizeInput($input['message']);
+
+        if (!$email) {
+            sendError('Invalid email address', 400);
+        }
+
+        // Insert into database
+        $sql = 'INSERT INTO contact_messages (name, email, subject, message, status)
+                VALUES (?, ?, ?, ?, ?)';
+
+        $params = [$name, $email, $subject, $message, 'unread'];
+
+        $db->execute($sql, $params);
+        $newId = $db->lastInsertId();
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Contact bericht ontvangen',
+            'id' => $newId
+        ], 201);
+    }
+
+    // GET /contact-messages (Protected - Admin only)
+    if ($path === 'contact-messages' && $method === 'GET') {
+        Auth::requireAuth();
+
+        $status = $_GET['status'] ?? null;
+
+        $sql = 'SELECT * FROM contact_messages';
+        $params = [];
+
+        if ($status) {
+            $sql .= ' WHERE status = ?';
+            $params[] = $status;
+        }
+
+        $sql .= ' ORDER BY created_at DESC';
+
+        $messages = $db->fetchAll($sql, $params);
+        sendResponse(['success' => true, 'data' => $messages]);
+    }
+
+    // PUT /contact-messages/:id (Protected - Admin only)
+    if (preg_match('/^contact-messages\/(\d+)$/', $path, $matches) && $method === 'PUT') {
+        Auth::requireAuth();
+
+        $id = $matches[1];
+
+        $sql = 'UPDATE contact_messages SET ';
+        $updates = [];
+        $params = [];
+
+        if (isset($input['status'])) {
+            $updates[] = 'status = ?';
+            $params[] = $input['status'];
+        }
+
+        if (isset($input['reply_message'])) {
+            $updates[] = 'reply_message = ?';
+            $updates[] = 'replied_at = NOW()';
+            $params[] = $input['reply_message'];
+        }
+
+        if (empty($updates)) {
+            sendError('No fields to update', 400);
+        }
+
+        $sql .= implode(', ', $updates) . ' WHERE id = ?';
+        $params[] = $id;
+
+        $rowCount = $db->execute($sql, $params);
+
+        if ($rowCount === 0) {
+            sendError('Message not found', 404);
+        }
+
+        $message = $db->fetchOne('SELECT * FROM contact_messages WHERE id = ?', [$id]);
+        sendResponse(['success' => true, 'data' => $message]);
+    }
+
+    // =============================================================================
+    // PUBLIC REGISTRATION ENDPOINTS (NO AUTH REQUIRED)
+    // =============================================================================
+
+    // POST /public/register
+    if ($path === 'public/register' && $method === 'POST') {
+        // Validate required fields
+        $required = ['firstName', 'lastName', 'competition'];
+        foreach ($required as $field) {
+            if (empty($input[$field])) {
+                sendError("Field '$field' is required", 400);
+            }
+        }
+
+        // Sanitize inputs
+        $firstName = sanitizeInput($input['firstName']);
+        $lastName = sanitizeInput($input['lastName']);
+        $email = !empty($input['email']) ? filter_var($input['email'], FILTER_VALIDATE_EMAIL) : null;
+        $phone = sanitizeInput($input['phone'] ?? '');
+        $partnerFirstName = sanitizeInput($input['partnerFirstName'] ?? '');
+        $partnerLastName = sanitizeInput($input['partnerLastName'] ?? '');
+        $competition = sanitizeInput($input['competition']);
+        $paymentMethod = sanitizeInput($input['paymentMethod'] ?? 'qr');
+        $paymentReference = sanitizeInput($input['paymentReference'] ?? '');
+        $amount = sanitizeInput($input['amount'] ?? '');
+        $remarks = sanitizeInput($input['remarks'] ?? '');
+
+        // Determine competition date and name from competition string
+        // Expected format: "date - name" or index from calendarData
+        $competitionDate = '';
+        $competitionName = '';
+
+        if (strpos($competition, ' - ') !== false) {
+            list($competitionDate, $competitionName) = explode(' - ', $competition, 2);
+        } else {
+            // If it's just a number, use it as-is
+            $competitionDate = $competition;
+            $competitionName = $competition;
+        }
+
+        // Determine registration type
+        $registrationType = (!empty($partnerFirstName) && !empty($partnerLastName)) ? 'koppel' : 'solo';
+
+        // Insert into database
+        $sql = 'INSERT INTO public_registrations
+                (first_name, last_name, email, phone, partner_first_name, partner_last_name,
+                 competition_date, competition_name, registration_type, payment_method,
+                 payment_reference, amount, remarks, payment_status, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+        $params = [
+            $firstName,
+            $lastName,
+            $email,
+            $phone,
+            $partnerFirstName,
+            $partnerLastName,
+            $competitionDate,
+            $competitionName,
+            $registrationType,
+            $paymentMethod,
+            $paymentReference,
+            $amount,
+            $remarks,
+            'pending',
+            'pending'
+        ];
+
+        $db->execute($sql, $params);
+        $newId = $db->lastInsertId();
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Inschrijving ontvangen',
+            'id' => $newId,
+            'reference' => $paymentReference
+        ], 201);
+    }
+
+    // GET /public-registrations (Protected - Admin only)
+    if ($path === 'public-registrations' && $method === 'GET') {
+        Auth::requireAuth();
+
+        $competitionDate = $_GET['competition_date'] ?? null;
+        $status = $_GET['status'] ?? null;
+
+        $sql = 'SELECT * FROM public_registrations';
+        $params = [];
+        $conditions = [];
+
+        if ($competitionDate) {
+            $conditions[] = 'competition_date = ?';
+            $params[] = $competitionDate;
+        }
+
+        if ($status) {
+            $conditions[] = 'status = ?';
+            $params[] = $status;
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql .= ' ORDER BY created_at DESC';
+
+        $registrations = $db->fetchAll($sql, $params);
+        sendResponse(['success' => true, 'data' => $registrations]);
+    }
+
+    // PUT /public-registrations/:id (Protected - Admin only)
+    if (preg_match('/^public-registrations\/(\d+)$/', $path, $matches) && $method === 'PUT') {
+        Auth::requireAuth();
+
+        $id = $matches[1];
+
+        $sql = 'UPDATE public_registrations SET ';
+        $updates = [];
+        $params = [];
+
+        if (isset($input['status'])) {
+            $updates[] = 'status = ?';
+            $params[] = $input['status'];
+        }
+
+        if (isset($input['payment_status'])) {
+            $updates[] = 'payment_status = ?';
+            $params[] = $input['payment_status'];
+        }
+
+        if (empty($updates)) {
+            sendError('No fields to update', 400);
+        }
+
+        $sql .= implode(', ', $updates) . ' WHERE id = ?';
+        $params[] = $id;
+
+        $rowCount = $db->execute($sql, $params);
+
+        if ($rowCount === 0) {
+            sendError('Registration not found', 404);
+        }
+
+        $registration = $db->fetchOne('SELECT * FROM public_registrations WHERE id = ?', [$id]);
+        sendResponse(['success' => true, 'data' => $registration]);
+    }
+
+    // =============================================================================
     // 404 - Route not found
     // =============================================================================
     sendError('Endpoint not found', 404);

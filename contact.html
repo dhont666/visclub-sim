@@ -151,5 +151,55 @@
     <script src="bot/bot-chat-interface.js"></script>
 
     <script src="script.js"></script>
+    <script src="config.js"></script>
+    <script>
+        // Contact form submission handler
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verzenden...';
+
+            const formData = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                subject: document.getElementById('contactSubject').value,
+                message: document.getElementById('contactMessage').value
+            };
+
+            try {
+                // Send to API
+                const response = await fetch(`${API_BASE_URL}/public/contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    alert('✅ Bedankt voor je bericht!\n\nWe hebben je bericht ontvangen en nemen zo spoedig mogelijk contact met je op.');
+
+                    // Reset form
+                    this.reset();
+
+                    console.log('📧 Contact bericht verzonden:', result);
+                } else {
+                    throw new Error(result.error || 'Fout bij verzenden');
+                }
+            } catch (error) {
+                console.error('Error sending contact message:', error);
+                alert('❌ Er is een fout opgetreden bij het verzenden van je bericht.\n\nProbeer het later opnieuw of neem direct contact op via email.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            }
+        });
+    </script>
 </body>
 </html>

@@ -402,8 +402,87 @@ function getCompetitionFeeFromSelect(competitionIndex) {
     return event ? event.prijs : '€10,00';
 }
 
+// Save registration to database via API
+async function saveRegistrationToDatabase(registrationData, reference, amount, paymentMethod) {
+    // Get competition info from select
+    const competitionSelect = document.getElementById('competition');
+    const selectedOption = competitionSelect.options[competitionSelect.selectedIndex];
+    const competitionText = selectedOption ? selectedOption.textContent : registrationData.competition;
+
+    const data = {
+        firstName: registrationData.firstName,
+        lastName: registrationData.lastName,
+        email: registrationData.email || '',
+        phone: registrationData.phone || '',
+        partnerFirstName: registrationData.partnerFirstName || '',
+        partnerLastName: registrationData.partnerLastName || '',
+        competition: competitionText,
+        paymentMethod: paymentMethod,
+        paymentReference: reference,
+        amount: amount,
+        remarks: registrationData.remarks || ''
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/public/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            console.log('✅ Inschrijving opgeslagen in database:', result);
+            return result;
+        } else {
+            console.error('❌ Fout bij opslaan inschrijving:', result.error);
+            // Fallback to localStorage if API fails
+            saveRegistrationToLocalStorage(registrationData, reference, amount, paymentMethod);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error saving registration:', error);
+        // Fallback to localStorage if API fails
+        saveRegistrationToLocalStorage(registrationData, reference, amount, paymentMethod);
+        return null;
+    }
+}
+
+// Fallback: Save registration to localStorage
+function saveRegistrationToLocalStorage(registrationData, reference, amount, paymentMethod) {
+    const registration = {
+        id: Date.now().toString(),
+        name: `${registrationData.firstName} ${registrationData.lastName}`,
+        email: registrationData.email || '',
+        phone: registrationData.phone || '',
+        competition: registrationData.competition,
+        partner: registrationData.partnerFirstName ? `${registrationData.partnerFirstName} ${registrationData.partnerLastName}` : '',
+        type: registrationData.partnerFirstName ? 'koppel' : 'solo',
+        remarks: registrationData.remarks || '',
+        reference: reference,
+        amount: amount,
+        paymentMethod: paymentMethod,
+        paid: false,
+        date: new Date().toISOString(),
+        status: 'pending'
+    };
+
+    let registrations = JSON.parse(localStorage.getItem('registrations') || '[]');
+    registrations.push(registration);
+    localStorage.setItem('registrations', JSON.stringify(registrations));
+
+    console.log('📝 Inschrijving opgeslagen in localStorage (fallback):', registration);
+    return registration;
+}
+
 // Show onsite payment confirmation (betalen ter plaatse)
-function showOnsitePaymentConfirmation(amount, reference, registrationData) {
+async function showOnsitePaymentConfirmation(amount, reference, registrationData) {
+    // Save to database
+    await saveRegistrationToDatabase(registrationData, reference, amount, 'onsite');
+
     alert(`✅ Inschrijving succesvol!
 
 Naam: ${registrationData.firstName} ${registrationData.lastName}
@@ -420,7 +499,10 @@ Tot dan! 🎣`);
 }
 
 // Show payment modal
-function showPaymentModal(amount, reference, registrationData) {
+async function showPaymentModal(amount, reference, registrationData) {
+    // Save to database first
+    await saveRegistrationToDatabase(registrationData, reference, amount, 'qr');
+
     const modal = document.getElementById('paymentModal');
     const qrcodeContainer = document.getElementById('qrcode');
 

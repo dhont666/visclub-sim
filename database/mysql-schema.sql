@@ -6,6 +6,8 @@
 -- =============================================================================
 
 -- Drop existing tables (in correct order due to foreign keys)
+DROP TABLE IF EXISTS contact_messages;
+DROP TABLE IF EXISTS public_registrations;
 DROP TABLE IF EXISTS permits;
 DROP TABLE IF EXISTS registrations;
 DROP TABLE IF EXISTS results;
@@ -143,6 +145,53 @@ CREATE TABLE permits (
     INDEX idx_member (member_id),
     INDEX idx_status (status),
     INDEX idx_application_date (application_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
+-- TABLE 7: CONTACT MESSAGES (Public form submissions)
+-- =============================================================================
+CREATE TABLE contact_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
+    replied_at TIMESTAMP NULL,
+    reply_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_created (created_at),
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
+-- TABLE 8: PUBLIC REGISTRATIONS (Front-end competition registrations)
+-- =============================================================================
+CREATE TABLE public_registrations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    partner_first_name VARCHAR(100),
+    partner_last_name VARCHAR(100),
+    competition_date VARCHAR(20) NOT NULL,
+    competition_name VARCHAR(255) NOT NULL,
+    registration_type VARCHAR(20) DEFAULT 'solo',
+    payment_method VARCHAR(20) DEFAULT 'qr',
+    payment_reference VARCHAR(50),
+    amount VARCHAR(20),
+    payment_status VARCHAR(20) DEFAULT 'pending',
+    remarks TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_competition_date (competition_date),
+    INDEX idx_status (status),
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================

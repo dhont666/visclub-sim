@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inschrijvingen - Visclub SiM Admin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
+    <style>
+        .registrations-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        .filters-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #2c5f7d;
+            color: white;
+            border-color: #2c5f7d;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 32px;
+            margin: 0 0 5px 0;
+            color: #2c5f7d;
+        }
+        .stat-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .registrations-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #2c5f7d;
+            color: white;
+        }
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge.confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-view {
+            background: #007bff;
+            color: white;
+        }
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .no-data i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="registrations-container">
+        <div class="page-header">
+            <div>
+                <h1 style="margin: 0 0 5px 0; color: #2c5f7d;">
+                    <i class="fas fa-clipboard-list"></i> Wedstrijd Inschrijvingen
+                </h1>
+                <p style="margin: 0; color: #666;">Beheer alle inkomende wedstrijd inschrijvingen</p>
+            </div>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Terug naar Dashboard
+            </a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalRegistrations">0</h3>
+                <p>Totaal Inschrijvingen</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingRegistrations" style="color: #ffc107;">0</h3>
+                <p>In Behandeling</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="paidRegistrations" style="color: #28a745;">0</h3>
+                <p>Betaald</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalAmount" style="color: #2c5f7d;">€0,00</h3>
+                <p>Totaal Bedrag</p>
+            </div>
+        </div>
+
+        <div class="filters-bar">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-list"></i> Alle
+            </button>
+            <button class="filter-btn" data-filter="pending">
+                <i class="fas fa-clock"></i> In Behandeling
+            </button>
+            <button class="filter-btn" data-filter="paid">
+                <i class="fas fa-check-circle"></i> Betaald
+            </button>
+            <button class="filter-btn" data-filter="confirmed">
+                <i class="fas fa-thumbs-up"></i> Bevestigd
+            </button>
+        </div>
+
+        <div class="registrations-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Naam</th>
+                        <th>Partner</th>
+                        <th>Wedstrijd</th>
+                        <th>Type</th>
+                        <th>Betaalwijze</th>
+                        <th>Bedrag</th>
+                        <th>Status</th>
+                        <th>Datum</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody id="registrationsTableBody">
+                    <tr>
+                        <td colspan="10" class="no-data">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>Geen inschrijvingen gevonden</h3>
+                            <p>Er zijn nog geen wedstrijd inschrijvingen ontvangen.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="admin-auth.js"></script>
+    <script>
+        let registrations = [];
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for auth
+            while (!window.adminAuth || !adminAuth.authComplete) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            await loadRegistrations();
+            setupFilters();
+        });
+
+        async function loadRegistrations() {
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`${API_BASE_URL}/public-registrations`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    registrations = result.data || [];
+                    renderTable();
+                    updateStats();
+                } else {
+                    console.error('Error loading registrations:', result.error);
+                }
+            } catch (error) {
+                console.error('Error fetching registrations:', error);
+            }
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderTable();
+                });
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('registrationsTableBody');
+
+            let filtered = registrations;
+            if (currentFilter !== 'all') {
+                filtered = registrations.filter(r => {
+                    if (currentFilter === 'paid') {
+                        return r.payment_status === 'paid';
+                    }
+                    return r.status === currentFilter;
+                });
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="no-data">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>Geen inschrijvingen gevonden</h3>
+                            <p>Er zijn geen inschrijvingen met dit filter.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Sort by date descending
+            filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            tbody.innerHTML = filtered.map(reg => {
+                const partnerName = reg.partner_first_name && reg.partner_last_name
+                    ? `${reg.partner_first_name} ${reg.partner_last_name}`
+                    : '-';
+
+                const statusClass = reg.payment_status === 'paid' ? 'paid' : reg.status;
+
+                return `
+                    <tr>
+                        <td>${reg.id}</td>
+                        <td><strong>${reg.first_name} ${reg.last_name}</strong><br>
+                            <small style="color: #666;">${reg.email || 'Geen email'}</small>
+                        </td>
+                        <td>${partnerName}</td>
+                        <td>${reg.competition_date}<br>
+                            <small style="color: #666;">${reg.competition_name}</small>
+                        </td>
+                        <td><span class="badge">${reg.registration_type === 'koppel' ? 'Koppel' : 'Solo'}</span></td>
+                        <td>${reg.payment_method === 'qr' ? 'QR Code' : 'Ter plaatse'}</td>
+                        <td><strong>${reg.amount || '-'}</strong><br>
+                            <small style="color: #666;">${reg.payment_reference || ''}</small>
+                        </td>
+                        <td><span class="badge ${statusClass}">${getStatusLabel(reg.payment_status, reg.status)}</span></td>
+                        <td>${formatDate(reg.created_at)}</td>
+                        <td>
+                            <div class="action-btns">
+                                ${reg.payment_status !== 'paid' ? `
+                                    <button class="btn-small btn-approve" onclick="markAsPaid(${reg.id})" title="Markeer als betaald">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="btn-small btn-view" onclick="viewDetails(${reg.id})" title="Bekijk details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const total = registrations.length;
+            const pending = registrations.filter(r => r.status === 'pending').length;
+            const paid = registrations.filter(r => r.payment_status === 'paid').length;
+
+            const totalAmount = registrations.reduce((sum, r) => {
+                if (r.amount) {
+                    const amount = parseFloat(r.amount.replace('€', '').replace(',', '.'));
+                    return sum + (isNaN(amount) ? 0 : amount);
+                }
+                return sum;
+            }, 0);
+
+            document.getElementById('totalRegistrations').textContent = total;
+            document.getElementById('pendingRegistrations').textContent = pending;
+            document.getElementById('paidRegistrations').textContent = paid;
+            document.getElementById('totalAmount').textContent = `€${totalAmount.toFixed(2).replace('.', ',')}`;
+        }
+
+        async function markAsPaid(id) {
+            if (!confirm('Markeer deze inschrijving als betaald?')) return;
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`${API_BASE_URL}/public-registrations/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payment_status: 'paid',
+                        status: 'confirmed'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Inschrijving gemarkeerd als betaald');
+                    await loadRegistrations();
+                } else {
+                    alert('❌ Fout bij updaten: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error updating registration:', error);
+                alert('❌ Fout bij updaten van inschrijving');
+            }
+        }
+
+        function viewDetails(id) {
+            const reg = registrations.find(r => r.id === id);
+            if (!reg) return;
+
+            const partnerInfo = reg.partner_first_name && reg.partner_last_name
+                ? `\n\nPartner: ${reg.partner_first_name} ${reg.partner_last_name}`
+                : '';
+
+            const remarks = reg.remarks ? `\n\nOpmerkingen: ${reg.remarks}` : '';
+
+            alert(`Inschrijving Details (#${reg.id})
+
+Naam: ${reg.first_name} ${reg.last_name}
+Email: ${reg.email || '-'}
+Telefoon: ${reg.phone || '-'}${partnerInfo}
+
+Wedstrijd: ${reg.competition_date} - ${reg.competition_name}
+Type: ${reg.registration_type === 'koppel' ? 'Koppel' : 'Solo'}
+
+Betaalwijze: ${reg.payment_method === 'qr' ? 'QR Code' : 'Ter plaatse'}
+Referentie: ${reg.payment_reference || '-'}
+Bedrag: ${reg.amount || '-'}
+
+Status: ${getStatusLabel(reg.payment_status, reg.status)}${remarks}
+
+Aangemaakt: ${formatDate(reg.created_at)}`);
+        }
+
+        function getStatusLabel(paymentStatus, status) {
+            if (paymentStatus === 'paid') return 'Betaald';
+            if (status === 'confirmed') return 'Bevestigd';
+            if (status === 'pending') return 'In Behandeling';
+            if (status === 'cancelled') return 'Geannuleerd';
+            return status;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('nl-BE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

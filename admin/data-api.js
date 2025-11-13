@@ -449,6 +449,45 @@ class DataAPI {
 
     // --- Permits ---
     async getPermits() {
+        // Try API first if not in local mode
+        if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (token) {
+                    const response = await fetch(`${this.API_BASE_URL}/permits`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            // Transform API data to match expected format
+                            return result.data.map(permit => ({
+                                id: permit.id,
+                                firstName: permit.applicant_name.split(' ')[0] || '',
+                                lastName: permit.applicant_name.split(' ').slice(1).join(' ') || '',
+                                email: permit.email,
+                                phone: permit.phone || '',
+                                street: permit.address ? permit.address.split(',')[0] : '',
+                                city: permit.address ? permit.address.split(',')[1]?.trim() : '',
+                                postal: '',
+                                permitType: permit.permit_type || 'jaarvergunning',
+                                status: permit.status,
+                                applicationDate: permit.application_date || permit.created_at,
+                                approvedAt: permit.approved_date,
+                                notes: permit.notes || ''
+                            }));
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching permits from API:', error);
+            }
+        }
+
+        // Fallback to localStorage
         return await this.load('permits');
     }
 
@@ -471,6 +510,33 @@ class DataAPI {
     }
 
     async updatePermit(id, updates) {
+        // Try API first if not in local mode
+        if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (token) {
+                    const response = await fetch(`${this.API_BASE_URL}/permits/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updates)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating permit via API:', error);
+            }
+        }
+
+        // Fallback to localStorage
         const permits = await this.getPermits();
         const index = permits.findIndex(p => p.id === id);
         if (index > -1) {

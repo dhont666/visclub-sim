@@ -547,6 +547,125 @@ try {
     }
 
     // =============================================================================
+    // PERMITS ENDPOINTS
+    // =============================================================================
+
+    // GET /permits (Protected - Admin only)
+    if ($path === 'permits' && $method === 'GET') {
+        Auth::requireAuth();
+
+        $status = $_GET['status'] ?? null;
+
+        $sql = 'SELECT p.*, m.name as member_name
+                FROM permits p
+                LEFT JOIN members m ON p.member_id = m.id';
+        $params = [];
+
+        if ($status) {
+            $sql .= ' WHERE p.status = ?';
+            $params[] = $status;
+        }
+
+        $sql .= ' ORDER BY p.application_date DESC';
+
+        $permits = $db->fetchAll($sql, $params);
+        sendResponse(['success' => true, 'data' => $permits]);
+    }
+
+    // POST /permits (Public - No auth required for permit applications)
+    if ($path === 'permits' && $method === 'POST') {
+        // Validate required fields
+        $required = ['applicant_name', 'email'];
+        foreach ($required as $field) {
+            if (empty($input[$field])) {
+                sendError("Field '$field' is required", 400);
+            }
+        }
+
+        // Sanitize inputs
+        $applicantName = sanitizeInput($input['applicant_name']);
+        $email = filter_var($input['email'], FILTER_VALIDATE_EMAIL);
+        $phone = sanitizeInput($input['phone'] ?? '');
+        $address = sanitizeInput($input['address'] ?? '');
+        $permitType = sanitizeInput($input['permit_type'] ?? 'algemeen');
+        $notes = sanitizeInput($input['notes'] ?? '');
+
+        if (!$email) {
+            sendError('Invalid email address', 400);
+        }
+
+        // Insert into database
+        $sql = 'INSERT INTO permits (applicant_name, email, phone, address, permit_type, notes, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+        $params = [
+            $applicantName,
+            $email,
+            $phone,
+            $address,
+            $permitType,
+            $notes,
+            'pending'
+        ];
+
+        $db->execute($sql, $params);
+        $newId = $db->lastInsertId();
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Vergunningsaanvraag ontvangen',
+            'id' => $newId
+        ], 201);
+    }
+
+    // PUT /permits/:id (Protected - Admin only)
+    if (preg_match('/^permits\/(\d+)$/', $path, $matches) && $method === 'PUT') {
+        Auth::requireAuth();
+
+        $id = $matches[1];
+
+        $sql = 'UPDATE permits SET ';
+        $updates = [];
+        $params = [];
+
+        if (isset($input['status'])) {
+            $updates[] = 'status = ?';
+            $params[] = $input['status'];
+
+            // If approved, set approved_date
+            if ($input['status'] === 'approved') {
+                $updates[] = 'approved_date = NOW()';
+            }
+        }
+
+        if (isset($input['notes'])) {
+            $updates[] = 'notes = ?';
+            $params[] = $input['notes'];
+        }
+
+        if (isset($input['member_id'])) {
+            $updates[] = 'member_id = ?';
+            $params[] = $input['member_id'];
+        }
+
+        if (empty($updates)) {
+            sendError('No fields to update', 400);
+        }
+
+        $sql .= implode(', ', $updates) . ' WHERE id = ?';
+        $params[] = $id;
+
+        $rowCount = $db->execute($sql, $params);
+
+        if ($rowCount === 0) {
+            sendError('Permit not found', 404);
+        }
+
+        $permit = $db->fetchOne('SELECT * FROM permits WHERE id = ?', [$id]);
+        sendResponse(['success' => true, 'data' => $permit]);
+    }
+
+    // =============================================================================
     // PUBLIC CONTACT MESSAGES ENDPOINTS (NO AUTH REQUIRED)
     // =============================================================================
 

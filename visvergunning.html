@@ -269,9 +269,64 @@
     </button>
 
     <!-- Vis Advies Bot Scripts -->
+    <!-- Config moet EERST geladen worden -->
+    <script src="config.js"></script>
+
     <script src="bot/weer-vangst-bot.js"></script>
     <script src="bot/bot-chat-interface.js"></script>
 
     <script src="script.js"></script>
+    <script>
+        // Permit form submission handler
+        document.getElementById('permitForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verzenden...';
+
+            // Collect form data
+            const formData = {
+                applicant_name: `${document.getElementById('permitFirstName').value} ${document.getElementById('permitLastName').value}`,
+                email: document.getElementById('permitEmail').value,
+                phone: document.getElementById('permitPhone').value,
+                address: `${document.getElementById('permitStreet').value}, ${document.getElementById('permitCity').value} ${document.getElementById('permitPostal').value}`,
+                permit_type: 'jaarvergunning',
+                notes: `Geboortedatum: ${document.getElementById('permitBirthdate').value}\nRijksregisternummer: ${document.getElementById('permitRijksregisternummer').value}`
+            };
+
+            try {
+                // Send to API
+                const response = await fetch(`${API_BASE_URL}/permits`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    alert('✅ Aanvraag Ontvangen!\n\nUw visvergunning aanvraag is succesvol ingediend.\n\nU ontvangt een bevestigingsmail zodra uw aanvraag is behandeld.\n\nReferentie nummer: #' + result.id);
+
+                    // Reset form
+                    this.reset();
+
+                    console.log('📋 Vergunningsaanvraag verzonden:', result);
+                } else {
+                    throw new Error(result.error || 'Fout bij verzenden');
+                }
+            } catch (error) {
+                console.error('Error sending permit application:', error);
+                alert('❌ Er is een fout opgetreden bij het verzenden van uw aanvraag.\n\nProbeer het later opnieuw of neem contact op via email.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            }
+        });
+    </script>
 </body>
 </html>

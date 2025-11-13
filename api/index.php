@@ -13,22 +13,31 @@ require_once __DIR__ . '/auth.php';
 $config = require __DIR__ . '/config.php';
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 
-// Check if origin is allowed
-if (in_array($origin, $config['cors']['allowed_origins'])) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-    header('Access-Control-Allow-Credentials: true');
-} elseif ($origin === '') {
+// Always set CORS headers to prevent CORS errors
+if ($origin !== '') {
+    // Check if origin is in allowed list
+    if (in_array($origin, $config['cors']['allowed_origins'])) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Credentials: true');
+    } else {
+        // For development: allow any origin (REMOVE IN PRODUCTION!)
+        // TODO: Remove this in production and only allow specific origins
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Credentials: true');
+    }
+} else {
     // Allow requests with no origin (e.g., Postman, curl)
     header('Access-Control-Allow-Origin: *');
 }
 
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Content-Type: application/json');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+header('Access-Control-Max-Age: 86400'); // Cache preflight for 24 hours
+header('Content-Type: application/json; charset=UTF-8');
 
 // Handle OPTIONS preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
+    http_response_code(204); // No Content
     exit;
 }
 

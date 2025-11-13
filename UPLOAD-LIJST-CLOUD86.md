@@ -27,7 +27,9 @@ Commit: `feat: Implementeer database integratie voor contactformulier en inschri
 
 **API directory (`/api/`):**
 ```
-📄 api/index.php                 ← 6 nieuwe endpoints toegevoegd
+📄 api/index.php                 ← 6 nieuwe endpoints + CORS fix
+📄 api/.htaccess                 ← 🆕 Apache configuratie (BELANGRIJK!)
+📄 api/test.php                  ← 🆕 Test script om API te checken
 ```
 
 ### Stap 3: Database Schema (HANDMATIG uitvoeren in phpMyAdmin)

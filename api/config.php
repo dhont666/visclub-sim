@@ -24,7 +24,12 @@ if ($isProduction) {
 // =============================================================================
 // ⚠️  TODO: Update these values in Cloud86 Plesk!
 // Get these from: Plesk → Databases → Your Database
-define('DB_HOST', 'localhost');  // Cloud86 MySQL host
+//
+// IMPORTANT: Voor Cloud86/Plesk gebruik je meestal:
+// - DB_HOST: 'localhost' (ZONDER poort!)
+// - Als localhost niet werkt, probeer: '127.0.0.1'
+// - De poort (3306) wordt automatisch gebruikt, niet in hostname zetten!
+define('DB_HOST', 'localhost');  // Cloud86 MySQL host (gebruik localhost, NIET localhost:3306)
 define('DB_NAME', 'your_database_name');  // ⚠️  CHANGE THIS!
 define('DB_USER', 'your_database_user');  // ⚠️  CHANGE THIS!
 define('DB_PASS', 'your_database_password');  // ⚠️  CHANGE THIS!

@@ -65,6 +65,9 @@ credentials/
 *.key
 *.cert
 
+# API config with database credentials (use api/config.php.example instead)
+api/config.php
+
 # Python (for test scripts)
 __pycache__/
 *.py[cod]

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Permit Handler</title>
+</head>
+<body>
+    <h1>Test Permit Handler Priority</h1>
+    <p>This page tests the permit form handler to verify only the custom handler runs.</p>
+
+    <form id="permitForm" data-has-custom-handler="true">
+        <input type="text" id="permitFirstName" name="firstName" value="Test" required>
+        <input type="text" id="permitLastName" name="lastName" value="User" required>
+        <input type="email" id="permitEmail" name="email" value="test@example.com" required>
+        <input type="tel" id="permitPhone" name="phone" value="123456789" required>
+        <input type="text" id="permitStreet" name="street" value="Test Street 1" required>
+        <input type="text" id="permitCity" name="city" value="Test City" required>
+        <input type="text" id="permitPostal" name="postal" value="1234" required>
+        <input type="date" id="permitBirthdate" name="birthdate" value="1990-01-01" required>
+        <input type="text" id="permitRijksregisternummer" name="rijksregisternummer" value="12345678901" required>
+        <select id="permitType" name="permitType" required>
+            <option value="year">Jaarvergunning</option>
+        </select>
+        <textarea id="permitRemarks" name="remarks">Test remarks</textarea>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="results" style="margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+        <h3>Console Output:</h3>
+        <div id="console-output" style="font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <script>
+        // Intercept console.log to display on page
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleOutput.textContent += args.join(' ') + '\n';
+        };
+    </script>
+
+    <!-- Config must be loaded first -->
+    <script>
+        // Inline config for testing
+        window.API_BASE_URL = 'http://localhost:8000/api';
+    </script>
+
+    <!-- Custom permit handler loads BEFORE script.js -->
+    <script>
+        const permitForm = document.getElementById('permitForm');
+        if (permitForm) {
+            console.log('✅ Custom permit handler attached (inline script)');
+        }
+        permitForm?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            console.log('🎯 Custom API handler running (this is correct!)');
+
+            const formData = {
+                applicant_name: `${document.getElementById('permitFirstName').value} ${document.getElementById('permitLastName').value}`,
+                email: document.getElementById('permitEmail').value,
+                phone: document.getElementById('permitPhone').value,
+                address: `${document.getElementById('permitStreet').value}, ${document.getElementById('permitCity').value} ${document.getElementById('permitPostal').value}`,
+                permit_type: 'jaarvergunning',
+                notes: `Geboortedatum: ${document.getElementById('permitBirthdate').value}\nRijksregisternummer: ${document.getElementById('permitRijksregisternummer').value}`
+            };
+
+            console.log('📋 Would send to API:', formData);
+            alert('Custom handler ran successfully! Check console output.');
+        });
+    </script>
+
+    <!-- Load script.js AFTER custom handler -->
+    <script src="script.js"></script>
+
+    <script>
+        console.log('\n--- Test Instructions ---');
+        console.log('1. You should see "Custom permit handler attached"');
+        console.log('2. You should see "skipping localStorage fallback"');
+        console.log('3. Click submit and verify only custom handler runs');
+        console.log('4. If you see localStorage fallback data, the fix FAILED');
+    </script>
+</body>
+</html>

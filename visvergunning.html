@@ -280,13 +280,19 @@
     <script src="bot/weer-vangst-bot.js"></script>
     <script src="bot/bot-chat-interface.js"></script>
 
-    <script src="script.js"></script>
+    <!-- Custom permit form handler MUST load BEFORE script.js -->
     <script>
         // Permit form submission handler (uses API instead of localStorage)
         // Note: Form has data-has-custom-handler="true" to prevent script.js fallback
+        // This script loads BEFORE script.js to ensure it attaches first
         const permitForm = document.getElementById('permitForm');
+        if (permitForm) {
+            console.log('✅ Custom permit handler attached (visvergunning.html inline script)');
+        }
         permitForm?.addEventListener('submit', async function(e) {
             e.preventDefault();
+            e.stopImmediatePropagation(); // Prevent other handlers from running
+            console.log('🎯 Custom API handler running (this is correct!)');
 
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.innerHTML;
@@ -338,5 +344,8 @@
             }
         });
     </script>
+
+    <!-- Load script.js AFTER custom handler to ensure data-has-custom-handler check works -->
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,46 @@
+================================
+PERMIT FORM FIX - QUICK START
+================================
+
+PROBLEM FIXED:
+- Permit form was using localStorage handler instead of API handler
+- Caused error: "Field 'applicant_name' is required"
+
+THE FIX:
+✅ 1. Script loading order corrected (custom handler BEFORE script.js)
+✅ 2. Explicit attribute check (=== 'true' instead of !)
+✅ 3. Event propagation control (stopImmediatePropagation)
+
+FILES MODIFIED:
+- visvergunning.html (script order + stopImmediatePropagation)
+- script.js (improved check + debug logging)
+
+HOW TO TEST:
+1. Open visvergunning.html in browser
+2. Open browser console (F12)
+3. Fill and submit the form
+4. Look for: "🎯 Custom API handler running (this is correct!)"
+5. Should NOT see: "🗂️ Permit application data (localStorage fallback)"
+
+AUTOMATED CHECK:
+Run: node verify-permit-fix.js
+All checks should show green ✓
+
+EXPECTED CONSOLE OUTPUT:
+✅ Custom permit handler attached (visvergunning.html inline script)
+⏭️ Permit form has custom handler - skipping localStorage fallback
+[submit form]
+🎯 Custom API handler running (this is correct!)
+📋 Sending permit to API: {applicant_name: "...", ...}
+
+DOCUMENTATION:
+- PERMIT-HANDLER-FIX.md = Full technical details
+- CHANGES-SUMMARY.md = All changes made
+- test-permit-handler.html = Test page
+
+ROLLBACK:
+git checkout HEAD -- visvergunning.html script.js
+(but this will bring back the bug)
+
+QUESTIONS?
+Check console output - it tells you which handler is running and why.

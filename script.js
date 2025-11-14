@@ -758,14 +758,21 @@ async function loadWeather() {
 // NOTE: visvergunning.html has its own submit handler that uses the API
 // Only add this localStorage-based handler if the page doesn't have one already
 const permitForm = document.getElementById('permitForm');
-if (permitForm && !permitForm.dataset.hasCustomHandler) {
+if (permitForm) {
+    if (permitForm.dataset.hasCustomHandler === 'true') {
+        console.log('⏭️ Permit form has custom handler - skipping localStorage fallback');
+    } else {
+        console.log('📝 Adding localStorage-based permit handler from script.js');
+    }
+}
+if (permitForm && permitForm.dataset.hasCustomHandler !== 'true') {
     permitForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
 
-    console.log('Permit application data:', data);
+    console.log('🗂️ Permit application data (localStorage fallback):', data);
 
     // Get existing applications to check for duplicates
     const applications = JSON.parse(localStorage.getItem('mock_permits') || '[]');

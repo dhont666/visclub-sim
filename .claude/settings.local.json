@@ -12,7 +12,11 @@
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
       "Bash(awk:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git pull:*)",
+      "Bash(for file in admin-chat.html contact-berichten.html index.html inschrijvingen.html klassement-beheer.html leden.html login.html settings.html vergunningen.html weging.html)",
+      "Bash(do sed -i 's/src=\"\"config\\.js\"\"/src=\"\"..\\/config.js\"\"/g' \"$file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

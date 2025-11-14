@@ -1,48 +1,40 @@
 /**
  * Visclub SiM - Public Website Configuration
- * Auto-detects environment and configures API endpoints
+ * FIXED VERSION - Simple and bulletproof
  */
 
 (function() {
     // Detect environment
-    const hostname = window.location.hostname;
-    const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
-    const isProduction = !isLocal;
+    var hostname = window.location.hostname;
+    var isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
 
-    // Configure based on environment
-    const CONFIG = {
-        // Environment detection
-        environment: isProduction ? 'production' : 'development',
+    // Set API URL based on environment
+    var apiUrl = 'https://www.visclubsim.be/api';
+    if (isLocal) {
+        apiUrl = 'http://localhost/vissersclub-sim-website/api';
+    }
+
+    // Create config object
+    var CONFIG = {
+        environment: isLocal ? 'development' : 'production',
         isLocal: isLocal,
-
-        // API Configuration
-        API_BASE_URL: isLocal ? 'http://localhost/vissersclub-sim-website/api' : 'https://www.visclubsim.be/api',
-
-        // Cache Configuration
-        CACHE_TTL: 5 * 60 * 1000,  // 5 minutes cache for public data
-
-        // Feature Flags
+        API_BASE_URL: apiUrl,
+        CACHE_TTL: 300000,
         FEATURES: {
-            realtime: false,  // Realtime updates disabled for public site
-            caching: true     // Enable caching for better performance
+            realtime: false,
+            caching: true
         },
-
-        // Debug Configuration (only in development)
         DEBUG: isLocal
     };
 
-    // Log configuration (only in development)
-    if (CONFIG.DEBUG) {
-        console.log('🔧 Public Configuration loaded:', {
-            environment: CONFIG.environment,
-            apiBaseUrl: CONFIG.API_BASE_URL
-        });
-    }
-
     // Make config globally available
     window.CONFIG = CONFIG;
+    window.API_BASE_URL = apiUrl;
 
-    // Also export API_BASE_URL directly for backward compatibility
-    window.API_BASE_URL = CONFIG.API_BASE_URL;
+    // Debug log
+    if (isLocal) {
+        console.log('🔧 Configuration loaded:', CONFIG);
+    }
 
+    console.log('✅ API_BASE_URL set to:', apiUrl);
 })();

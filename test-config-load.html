@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Config Test</title>
+</head>
+<body>
+    <h1>Config Load Test</h1>
+    <div id="results"></div>
+
+    <script src="config.js"></script>
+    <script>
+        const results = document.getElementById('results');
+
+        // Test if config loaded
+        if (typeof window.CONFIG !== 'undefined') {
+            results.innerHTML = `
+                <h2 style="color: green;">✅ Config Loaded Successfully!</h2>
+                <h3>Configuration:</h3>
+                <pre>${JSON.stringify(window.CONFIG, null, 2)}</pre>
+                <h3>API_BASE_URL:</h3>
+                <p><code>${window.API_BASE_URL}</code></p>
+            `;
+            console.log('✅ CONFIG:', window.CONFIG);
+            console.log('✅ API_BASE_URL:', window.API_BASE_URL);
+        } else {
+            results.innerHTML = `
+                <h2 style="color: red;">❌ Config Failed to Load!</h2>
+                <p>window.CONFIG is undefined</p>
+            `;
+            console.error('❌ CONFIG not loaded');
+        }
+    </script>
+</body>
+</html>

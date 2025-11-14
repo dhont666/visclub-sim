@@ -280,69 +280,82 @@
     <script src="bot/weer-vangst-bot.js"></script>
     <script src="bot/bot-chat-interface.js"></script>
 
-    <!-- Custom permit form handler MUST load BEFORE script.js -->
+    <!-- Custom permit form handler - BLOCKING VERSION -->
+    <!-- This script uses capture phase and stopImmediatePropagation to ensure it runs FIRST -->
     <script>
-        // Permit form submission handler (uses API instead of localStorage)
-        // Note: Form has data-has-custom-handler="true" to prevent script.js fallback
-        // This script loads BEFORE script.js to ensure it attaches first
-        const permitForm = document.getElementById('permitForm');
-        if (permitForm) {
-            console.log('✅ Custom permit handler attached (visvergunning.html inline script)');
-        }
-        permitForm?.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            e.stopImmediatePropagation(); // Prevent other handlers from running
-            console.log('🎯 Custom API handler running (this is correct!)');
+        // IMMEDIATELY block any other submit handlers by using capture: true
+        // This ensures we intercept the event BEFORE any bubbling handlers (like script.js)
+        (function() {
+            console.log('🚀 CUSTOM PERMIT HANDLER LOADING (capture phase, blocking mode)');
 
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verzenden...';
+            const permitForm = document.getElementById('permitForm');
 
-            // Collect form data
-            const formData = {
-                applicant_name: `${document.getElementById('permitFirstName').value} ${document.getElementById('permitLastName').value}`,
-                email: document.getElementById('permitEmail').value,
-                phone: document.getElementById('permitPhone').value,
-                address: `${document.getElementById('permitStreet').value}, ${document.getElementById('permitCity').value} ${document.getElementById('permitPostal').value}`,
-                permit_type: 'jaarvergunning',
-                notes: `Geboortedatum: ${document.getElementById('permitBirthdate').value}\nRijksregisternummer: ${document.getElementById('permitRijksregisternummer').value}`
-            };
-
-            console.log('📋 Sending permit to API:', formData);
-            console.log('🌐 API URL:', `${API_BASE_URL}/permits`);
-
-            try {
-                // Send to API
-                const response = await fetch(`${API_BASE_URL}/permits`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Show success message
-                    alert('✅ Aanvraag Ontvangen!\n\nUw visvergunning aanvraag is succesvol ingediend.\n\nU ontvangt een bevestigingsmail zodra uw aanvraag is behandeld.\n\nReferentie nummer: #' + result.id);
-
-                    // Reset form
-                    this.reset();
-
-                    console.log('📋 Vergunningsaanvraag verzonden:', result);
-                } else {
-                    throw new Error(result.error || 'Fout bij verzenden');
-                }
-            } catch (error) {
-                console.error('Error sending permit application:', error);
-                alert('❌ Er is een fout opgetreden bij het verzenden van uw aanvraag.\n\nProbeer het later opnieuw of neem contact op via email.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
+            if (!permitForm) {
+                console.error('❌ Permit form not found!');
+                return;
             }
-        });
+
+            console.log('✅ Custom permit handler attached with capture:true (visvergunning.html)');
+
+            // Use capture: true to run in capture phase (BEFORE any other handlers)
+            permitForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation(); // Block ALL other handlers
+
+                console.log('🎯 CUSTOM API HANDLER RUNNING (this is correct!)');
+                console.log('🔒 All other handlers blocked via stopImmediatePropagation');
+
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verzenden...';
+
+                // Collect form data
+                const formData = {
+                    applicant_name: `${document.getElementById('permitFirstName').value} ${document.getElementById('permitLastName').value}`,
+                    email: document.getElementById('permitEmail').value,
+                    phone: document.getElementById('permitPhone').value,
+                    address: `${document.getElementById('permitStreet').value}, ${document.getElementById('permitCity').value} ${document.getElementById('permitPostal').value}`,
+                    permit_type: 'jaarvergunning',
+                    notes: `Geboortedatum: ${document.getElementById('permitBirthdate').value}\nRijksregisternummer: ${document.getElementById('permitRijksregisternummer').value}`
+                };
+
+                console.log('📋 Sending permit to API:', formData);
+                console.log('🌐 API URL:', `${API_BASE_URL}/permits`);
+
+                try {
+                    // Send to API
+                    const response = await fetch(`${API_BASE_URL}/permits`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Show success message
+                        alert('✅ Aanvraag Ontvangen!\n\nUw visvergunning aanvraag is succesvol ingediend.\n\nU ontvangt een bevestigingsmail zodra uw aanvraag is behandeld.\n\nReferentie nummer: #' + result.id);
+
+                        // Reset form
+                        this.reset();
+
+                        console.log('📋 Vergunningsaanvraag verzonden:', result);
+                    } else {
+                        throw new Error(result.error || 'Fout bij verzenden');
+                    }
+                } catch (error) {
+                    console.error('Error sending permit application:', error);
+                    alert('❌ Er is een fout opgetreden bij het verzenden van uw aanvraag.\n\nProbeer het later opnieuw of neem contact op via email.');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            }, true); // ⚠️ IMPORTANT: capture: true makes this run FIRST
+        })();
     </script>
 
     <!-- Load script.js AFTER custom handler to ensure data-has-custom-handler check works -->

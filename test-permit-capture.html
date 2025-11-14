@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Permit Handler - Capture Phase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2c5f7d;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Test: Permit Form Handler (Capture Phase)</h1>
+    <p><strong>Expected behavior:</strong> Only the CUSTOM handler should run, blocking script.js fallback.</p>
+
+    <div id="logContainer" class="log">
+        <h3>Console Log:</h3>
+        <div id="logOutput"></div>
+    </div>
+
+    <form id="permitForm" data-has-custom-handler="true">
+        <div class="form-group">
+            <label for="permitFirstName">First Name:</label>
+            <input type="text" id="permitFirstName" name="firstName" value="Kevin" required>
+        </div>
+        <div class="form-group">
+            <label for="permitLastName">Last Name:</label>
+            <input type="text" id="permitLastName" name="lastName" value="Dhont" required>
+        </div>
+        <div class="form-group">
+            <label for="permitEmail">Email:</label>
+            <input type="email" id="permitEmail" name="email" value="kevin@test.com" required>
+        </div>
+        <div class="form-group">
+            <label for="permitPhone">Phone:</label>
+            <input type="tel" id="permitPhone" name="phone" value="0123456789" required>
+        </div>
+        <div class="form-group">
+            <label for="permitStreet">Street:</label>
+            <input type="text" id="permitStreet" name="street" value="Test Street 1" required>
+        </div>
+        <div class="form-group">
+            <label for="permitCity">City:</label>
+            <input type="text" id="permitCity" name="city" value="Merksplas" required>
+        </div>
+        <div class="form-group">
+            <label for="permitPostal">Postal Code:</label>
+            <input type="text" id="permitPostal" name="postal" value="2330" required>
+        </div>
+        <div class="form-group">
+            <label for="permitBirthdate">Birthdate:</label>
+            <input type="date" id="permitBirthdate" name="birthdate" value="1990-01-01" required>
+        </div>
+        <div class="form-group">
+            <label for="permitRijksregisternummer">Rijksregisternummer:</label>
+            <input type="text" id="permitRijksregisternummer" name="rijksregisternummer" value="90.01.01-123.45" required>
+        </div>
+        <button type="submit">Submit Permit</button>
+    </form>
+
+    <!-- Mock API_BASE_URL -->
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        // Log to both console and page
+        function log(message, type = 'info') {
+            console.log(message);
+            const logOutput = document.getElementById('logOutput');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logOutput.appendChild(entry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        log('Page loaded - handlers will be attached below', 'info');
+    </script>
+
+    <!-- CUSTOM HANDLER (capture phase) -->
+    <script>
+        (function() {
+            log('🚀 CUSTOM PERMIT HANDLER LOADING (capture phase, blocking mode)', 'success');
+
+            const permitForm = document.getElementById('permitForm');
+
+            if (!permitForm) {
+                log('❌ Permit form not found!', 'error');
+                return;
+            }
+
+            log('✅ Custom permit handler attached with capture:true', 'success');
+
+            // Use capture: true to run in capture phase (BEFORE any other handlers)
+            permitForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation(); // Block ALL other handlers
+
+                log('🎯 CUSTOM API HANDLER RUNNING (this is correct!)', 'success');
+                log('🔒 All other handlers blocked via stopImmediatePropagation', 'success');
+
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Sending...';
+
+                // Collect form data
+                const formData = {
+                    applicant_name: `${document.getElementById('permitFirstName').value} ${document.getElementById('permitLastName').value}`,
+                    email: document.getElementById('permitEmail').value,
+                    phone: document.getElementById('permitPhone').value,
+                    address: `${document.getElementById('permitStreet').value}, ${document.getElementById('permitCity').value} ${document.getElementById('permitPostal').value}`,
+                    permit_type: 'jaarvergunning',
+                    notes: `Geboortedatum: ${document.getElementById('permitBirthdate').value}\nRijksregisternummer: ${document.getElementById('permitRijksregisternummer').value}`
+                };
+
+                log('📋 Form data collected: ' + JSON.stringify(formData, null, 2), 'info');
+                log('🌐 Would send to API: ' + API_BASE_URL + '/permits', 'info');
+
+                // Simulate API call
+                setTimeout(() => {
+                    log('✅ Mock API call successful!', 'success');
+                    alert('✅ Custom handler worked! Check the log above.');
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }, 500);
+
+            }, true); // ⚠️ IMPORTANT: capture: true makes this run FIRST
+        })();
+    </script>
+
+    <!-- SIMULATE script.js FALLBACK HANDLER (this should NOT run) -->
+    <script>
+        log('📜 script.js loaded (simulating fallback handler)', 'info');
+
+        const permitForm = document.getElementById('permitForm');
+        if (permitForm) {
+            if (permitForm.dataset.hasCustomHandler === 'true') {
+                log('⏭️ Permit form has custom handler - skipping localStorage fallback', 'info');
+            } else {
+                log('📝 Adding localStorage-based permit handler from script.js', 'info');
+            }
+        }
+
+        // This should NOT run because of capture:true + stopImmediatePropagation
+        if (permitForm && permitForm.dataset.hasCustomHandler !== 'true') {
+            permitForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                log('❌ WRONG HANDLER RUNNING! (script.js fallback)', 'error');
+                alert('❌ WRONG HANDLER! The script.js fallback should not run!');
+            });
+        } else {
+            log('✓ Script.js fallback handler skipped due to data-has-custom-handler="true"', 'success');
+        }
+    </script>
+</body>
+</html>

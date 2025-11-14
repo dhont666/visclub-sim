@@ -755,9 +755,12 @@ async function loadWeather() {
 }
 
 // Permit Form Submission
+// NOTE: visvergunning.html has its own submit handler that uses the API
+// Only add this localStorage-based handler if the page doesn't have one already
 const permitForm = document.getElementById('permitForm');
-permitForm?.addEventListener('submit', function(e) {
-    e.preventDefault();
+if (permitForm && !permitForm.dataset.hasCustomHandler) {
+    permitForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
@@ -807,7 +810,8 @@ permitForm?.addEventListener('submit', function(e) {
 
     // Reset form
     this.reset();
-});
+    });
+}
 
 // Load published draw results on homepage
 function loadPublishedDrawResults() {

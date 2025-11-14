@@ -282,8 +282,14 @@
 
     <script src="script.js"></script>
     <script>
-        // Permit form submission handler
-        document.getElementById('permitForm').addEventListener('submit', async function(e) {
+        // Mark form as having custom handler to prevent script.js from adding its own
+        const permitForm = document.getElementById('permitForm');
+        if (permitForm) {
+            permitForm.dataset.hasCustomHandler = 'true';
+        }
+
+        // Permit form submission handler (uses API instead of localStorage)
+        permitForm?.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const submitButton = this.querySelector('button[type="submit"]');

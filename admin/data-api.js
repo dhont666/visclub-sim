@@ -519,22 +519,48 @@ class DataAPI {
                     if (response.ok) {
                         const result = await response.json();
                         if (result.success) {
+                            console.log('✅ Fetched permits from API:', result.data);
                             // Transform API data to match expected format
-                            return result.data.map(permit => ({
-                                id: permit.id,
-                                firstName: permit.applicant_name.split(' ')[0] || '',
-                                lastName: permit.applicant_name.split(' ').slice(1).join(' ') || '',
-                                email: permit.email,
-                                phone: permit.phone || '',
-                                street: permit.address ? permit.address.split(',')[0] : '',
-                                city: permit.address ? permit.address.split(',')[1]?.trim() : '',
-                                postal: '',
-                                permitType: permit.permit_type || 'jaarvergunning',
-                                status: permit.status,
-                                applicationDate: permit.application_date || permit.created_at,
-                                approvedAt: permit.approved_date,
-                                notes: permit.notes || ''
-                            }));
+                            return result.data.map(permit => {
+                                // Parse address: "Street 123, City PostalCode" or "Street 123, PostalCode City"
+                                let street = '', city = '', postal = '';
+                                if (permit.address) {
+                                    const parts = permit.address.split(',');
+                                    street = parts[0]?.trim() || '';
+                                    if (parts[1]) {
+                                        // Extract city and postal from "PostalCode City" or "City PostalCode"
+                                        const cityPart = parts[1].trim();
+                                        const match = cityPart.match(/(\d{4})\s*(.+)|(.+?)\s*(\d{4})/);
+                                        if (match) {
+                                            postal = match[1] || match[4] || '';
+                                            city = match[2] || match[3] || '';
+                                        } else {
+                                            city = cityPart;
+                                        }
+                                    }
+                                }
+
+                                // Parse name: "FirstName LastName"
+                                const nameParts = (permit.applicant_name || '').split(' ');
+                                const firstName = nameParts[0] || '';
+                                const lastName = nameParts.slice(1).join(' ') || '';
+
+                                return {
+                                    id: permit.id,
+                                    firstName: firstName,
+                                    lastName: lastName,
+                                    email: permit.email,
+                                    phone: permit.phone || '',
+                                    street: street,
+                                    city: city,
+                                    postal: postal,
+                                    permitType: permit.permit_type || 'jaarvergunning',
+                                    status: permit.status,
+                                    applicationDate: permit.application_date || permit.created_at,
+                                    approvedAt: permit.approved_date,
+                                    notes: permit.notes || ''
+                                };
+                            });
                         }
                     }
                 }

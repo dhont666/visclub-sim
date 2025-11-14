@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Inline Config</title>
+    <script>
+    // Inline config - can't fail!
+    (function() {
+        var apiUrl = 'https://www.visclubsim.be/api';
+        window.API_BASE_URL = apiUrl;
+        window.CONFIG = { API_BASE_URL: apiUrl };
+        console.log('✅ API_BASE_URL:', apiUrl);
+    })();
+    </script>
+</head>
+<body>
+    <h1>Test Config</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+    document.write('<p>API_BASE_URL: ' + (window.API_BASE_URL || 'NOT FOUND!') + '</p>');
+
+    async function testAPI() {
+        var result = document.getElementById('result');
+        result.textContent = 'Testing...';
+
+        try {
+            var response = await fetch(API_BASE_URL + '/permits', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    applicant_name: 'Test ' + Date.now(),
+                    email: 'test' + Date.now() + '@test.com',
+                    phone: '0499123456',
+                    address: 'Test 1, 2350 Test',
+                    permit_type: 'jaarvergunning',
+                    notes: 'Inline test'
+                })
+            });
+
+            var data = await response.json();
+            result.textContent = 'SUCCESS! ID: ' + data.id + '\n\n' + JSON.stringify(data, null, 2);
+            result.style.background = '#d4edda';
+            result.style.padding = '20px';
+        } catch(e) {
+            result.textContent = 'ERROR: ' + e.message;
+            result.style.background = '#f8d7da';
+            result.style.padding = '20px';
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Permit Form</title>
+    <script src="config.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #2c5f7d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover {
+            background: #1e4558;
+        }
+        #log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #2c5f7d;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Permit Form Submission</h1>
+        <p>Deze pagina test exact wat er gebeurt bij het submitten van een permit.</p>
+
+        <form id="testForm">
+            <div class="form-group">
+                <label>Naam:</label>
+                <input type="text" id="name" value="Debug Test User" required>
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="debug@test.com" required>
+            </div>
+            <button type="submit">📤 Test Submit</button>
+        </form>
+
+        <div id="log">Wachten op form submit...</div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📝';
+            log.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+
+        // Check if config is loaded
+        addLog('Checking configuration...');
+        if (window.API_BASE_URL) {
+            addLog(`✅ API_BASE_URL found: ${window.API_BASE_URL}`, 'success');
+        } else {
+            addLog('❌ API_BASE_URL NOT found!', 'error');
+        }
+
+        // Check localStorage
+        addLog('Checking localStorage for mock_permits...');
+        const existing = localStorage.getItem('mock_permits');
+        if (existing) {
+            const permits = JSON.parse(existing);
+            addLog(`Found ${permits.length} permits in localStorage`);
+        } else {
+            addLog('No permits in localStorage');
+        }
+
+        // Form submission
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            addLog('Form submitted!');
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            const formData = {
+                applicant_name: name,
+                email: email,
+                phone: '0499123456',
+                address: 'Teststraat 1, 2350 Test',
+                permit_type: 'jaarvergunning',
+                notes: 'Debug test submission @ ' + new Date().toISOString()
+            };
+
+            addLog('Prepared form data:');
+            addLog(JSON.stringify(formData, null, 2));
+
+            addLog('Sending POST request to API...');
+            addLog(`URL: ${API_BASE_URL}/permits`);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/permits`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                addLog(`Response status: ${response.status} ${response.statusText}`);
+
+                const result = await response.json();
+                addLog('Response data:');
+                addLog(JSON.stringify(result, null, 2));
+
+                if (response.ok && result.success) {
+                    addLog(`✅ SUCCESS! Permit ID: ${result.id}`, 'success');
+                    addLog('Now check: https://visclubsim.be/api/view-permits.php', 'success');
+                } else {
+                    addLog(`❌ FAILED: ${result.error || 'Unknown error'}`, 'error');
+                }
+
+            } catch (error) {
+                addLog(`❌ EXCEPTION: ${error.message}`, 'error');
+                addLog(error.stack);
+            }
+        });
+
+        // Check if script.js would interfere
+        addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        addLog('Checking for script.js interference...');
+
+        const permitForm = document.getElementById('testForm');
+        if (permitForm) {
+            addLog(`Form found: ${permitForm.id}`);
+            addLog(`Has data-hasCustomHandler: ${permitForm.dataset.hasCustomHandler || 'NO'}`);
+
+            // Count event listeners (can't directly check, but we can test)
+            permitForm.dataset.hasCustomHandler = 'true';
+            addLog('Set data-hasCustomHandler = true (to prevent script.js conflict)');
+        }
+    </script>
+</body>
+</html>

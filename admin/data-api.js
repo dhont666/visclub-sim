@@ -510,14 +510,18 @@ class DataAPI {
             try {
                 const token = localStorage.getItem('admin_token');
                 if (token) {
+                    console.log('🔍 Fetching permits from API:', `${this.API_BASE_URL}/permits`);
                     const response = await fetch(`${this.API_BASE_URL}/permits`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
 
+                    console.log('📡 API Response status:', response.status);
+
                     if (response.ok) {
                         const result = await response.json();
+                        console.log('📦 API Response data:', result);
                         if (result.success) {
                             console.log('✅ Fetched permits from API:', result.data);
                             // Transform API data to match expected format
@@ -561,15 +565,26 @@ class DataAPI {
                                     notes: permit.notes || ''
                                 };
                             });
+                        } else {
+                            console.warn('⚠️ API returned success=false:', result);
                         }
+                    } else {
+                        console.error('❌ API request failed:', response.status, response.statusText);
+                        const errorText = await response.text();
+                        console.error('Error response:', errorText);
                     }
+                } else {
+                    console.warn('⚠️ No admin token found, using localStorage');
                 }
             } catch (error) {
-                console.error('Error fetching permits from API:', error);
+                console.error('❌ Error fetching permits from API:', error);
             }
+        } else {
+            console.log('📂 Using LOCAL_MODE, loading from localStorage');
         }
 
         // Fallback to localStorage
+        console.log('⬇️ Falling back to localStorage for permits');
         return await this.load('permits');
     }
 

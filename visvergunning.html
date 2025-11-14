@@ -288,6 +288,16 @@
         (function() {
             console.log('🚀 CUSTOM PERMIT HANDLER LOADING (capture phase, blocking mode)');
 
+            // Ensure API_BASE_URL is defined (fallback if config.js hasn't loaded yet)
+            if (typeof window.API_BASE_URL === 'undefined') {
+                const hostname = window.location.hostname;
+                const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+                window.API_BASE_URL = isLocal
+                    ? 'http://localhost/vissersclub-sim-website/api'
+                    : 'https://www.visclubsim.be/api';
+                console.log('⚙️ API_BASE_URL set inline (config.js not loaded yet):', window.API_BASE_URL);
+            }
+
             const permitForm = document.getElementById('permitForm');
 
             if (!permitForm) {

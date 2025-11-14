@@ -562,7 +562,12 @@ class DataAPI {
                                     status: permit.status,
                                     applicationDate: permit.application_date || permit.created_at,
                                     approvedAt: permit.approved_date,
-                                    notes: permit.notes || ''
+                                    approvedBy: permit.approved_by || null,
+                                    approvedDate: permit.approved_date || null,
+                                    notes: permit.notes || '',
+                                    remarks: permit.notes || '', // Alias for compatibility
+                                    birthdate: null, // Not stored in permits table
+                                    rijksregisternummer: null // Stored in notes field
                                 };
                             });
                         } else {

@@ -433,11 +433,67 @@ class DataAPI {
 
     // --- Payments ---
     async getPayments() {
+        // Payments are now tracked via public_registrations table
+        // Map registrations to payment format for backward compatibility
+        if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`${this.API_BASE_URL}/public-registrations`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    // Map to payment format
+                    return result.data.map(reg => ({
+                        id: reg.id,
+                        registrationId: reg.id,
+                        amount: reg.amount || '0',
+                        status: reg.payment_status || 'pending',
+                        method: reg.payment_method || 'qr',
+                        reference: reg.payment_reference || '',
+                        paidAt: reg.payment_status === 'paid' ? reg.created_at : null,
+                        createdAt: reg.created_at
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching payments from API:', error);
+            }
+        }
+
+        // Fallback to localStorage
         return await this.load('payments');
     }
 
     async updatePaymentStatus(id, status, method) {
-        const payments = await this.getPayments();
+        // Update payment status via public_registrations endpoint
+        if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`${this.API_BASE_URL}/public-registrations/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payment_status: status,
+                        payment_method: method
+                    })
+                });
+
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+                return false;
+            }
+        }
+
+        // Fallback to localStorage
+        const payments = await this.load('payments');
         const index = payments.findIndex(p => p.id === id);
         if (index > -1) {
             payments[index] = { ...payments[index], status, method, paidAt: new Date().toISOString() };

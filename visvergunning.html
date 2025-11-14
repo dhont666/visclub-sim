@@ -275,7 +275,10 @@
 
     <!-- Vis Advies Bot Scripts -->
     <!-- Config moet EERST geladen worden -->
-    <script src="config.js"></script>
+    <!-- Inline config to avoid loading issues -->
+    <script>
+    (function(){var a='https://www.visclubsim.be/api';window.API_BASE_URL=a;window.CONFIG={API_BASE_URL:a};console.log('✅ API_BASE_URL:',a);})();
+    </script>
 
     <script src="bot/weer-vangst-bot.js"></script>
     <script src="bot/bot-chat-interface.js"></script>

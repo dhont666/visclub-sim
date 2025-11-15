@@ -1,0 +1,225 @@
+═══════════════════════════════════════════════════════════════════
+  COMPLETE UPLOAD CHECKLIST - Visclub SiM naar Cloud86
+═══════════════════════════════════════════════════════════════════
+
+⚠️  BELANGRIJK: Upload ALLE bestanden hieronder!
+Het probleem is waarschijnlijk dat niet alle bestanden zijn geüpload.
+
+═══════════════════════════════════════════════════════════════════
+  STAP 1: API FOLDER (KRITISCH!)
+═══════════════════════════════════════════════════════════════════
+
+Upload naar: public_html/api/
+
+[ ] api/index.php          ← Bevat alle API routes (GET/POST/PUT/DELETE)
+[ ] api/config.php         ← Database credentials (PAS DEZE AAN!)
+[ ] api/database.php       ← Database connectie klasse
+[ ] api/auth.php           ← JWT authenticatie
+[ ] api/.htaccess          ← URL rewriting (ZEER BELANGRIJK!)
+[ ] api/test.php           ← Test script (optioneel)
+
+⚠️  NA UPLOAD: Pas api/config.php aan met je Cloud86 database gegevens!
+
+═══════════════════════════════════════════════════════════════════
+  STAP 2: ADMIN PANEL
+═══════════════════════════════════════════════════════════════════
+
+Upload naar: public_html/admin/
+
+CONFIGURATIE BESTANDEN:
+[ ] admin/config.js        ← API configuratie
+[ ] admin/admin-auth.js    ← Authenticatie systeem
+[ ] admin/data-api.js      ← Data API wrapper
+
+CORE BESTANDEN:
+[ ] admin/admin-script.js  ← Dashboard logica
+[ ] admin/admin-style.css  ← Styling
+
+HTML PAGINA'S:
+[ ] admin/index.html       ← Dashboard
+[ ] admin/login.html       ← Login pagina
+[ ] admin/admin-nav.html   ← Navigatie component
+
+[ ] admin/plaatsentrekking.html   ← Plaatsentrekking
+[ ] admin/inschrijvingen.html     ← Inschrijvingen beheer
+[ ] admin/leden.html              ← Ledenbeheer
+[ ] admin/klassement-beheer.html  ← Klassement
+[ ] admin/weging.html             ← Weging
+[ ] admin/vergunningen.html       ← Vergunningen beheer
+[ ] admin/contact-berichten.html  ← Contact berichten
+[ ] admin/admin-chat.html         ← Admin chat
+[ ] admin/settings.html           ← Instellingen
+
+HELPER BESTANDEN:
+[ ] admin/calendar-data.js        ← Kalender data
+
+═══════════════════════════════════════════════════════════════════
+  STAP 3: PUBLIC WEBSITE
+═══════════════════════════════════════════════════════════════════
+
+Upload naar: public_html/
+
+CONFIGURATIE:
+[ ] config.js              ← Public website config
+
+HTML PAGINA'S:
+[ ] index.html             ← Entry point (redirect)
+[ ] home.html              ← Homepage
+[ ] kalender.html          ← Wedstrijd kalender
+[ ] inschrijven.html       ← Inschrijvingsformulier ⭐ AANGEPAST
+[ ] inschrijvingen.html    ← Inschrijvingen overzicht
+[ ] klassement.html        ← Klassement weergave
+[ ] leden.html             ← Ledenlijst
+[ ] visvergunning.html     ← Vergunningsaanvraag formulier
+[ ] contact.html           ← Contact formulier
+[ ] weer.html              ← Weersvoorspelling
+[ ] gallerij.html          ← Fotogallerij
+[ ] route.html             ← Route/locatie
+
+JAVASCRIPT:
+[ ] script.js              ← Main JavaScript (bevat calendarData!)
+[ ] klassement-data.js     ← Klassement data
+
+CSS:
+[ ] style.css              ← Main stylesheet
+
+OVERIGE:
+[ ] favicon.ico
+[ ] logo.png (als aanwezig)
+
+═══════════════════════════════════════════════════════════════════
+  STAP 4: CONFIGURATIE AANPASSEN (OP SERVER!)
+═══════════════════════════════════════════════════════════════════
+
+1. Open api/config.php via Plesk File Manager
+
+2. Pas aan:
+   ```php
+   'database' => [
+       'host' => 'localhost',
+       'name' => 'JOUW_DATABASE_NAAM',      ← ⚠️ AANPASSEN!
+       'user' => 'JOUW_DATABASE_USER',      ← ⚠️ AANPASSEN!
+       'pass' => 'JOUW_DATABASE_WACHTWOORD' ← ⚠️ AANPASSEN!
+   ],
+   'jwt' => [
+       'secret' => 'VERANDER_DIT_NAAR_RANDOM_STRING_64_CHARS', ← ⚠️ AANPASSEN!
+       'expiry' => 86400
+   ]
+   ```
+
+3. Sla op
+
+═══════════════════════════════════════════════════════════════════
+  STAP 5: DATABASE SCHEMA IMPORTEREN
+═══════════════════════════════════════════════════════════════════
+
+1. Log in op phpMyAdmin via Plesk
+
+2. Selecteer je database
+
+3. Klik op "Import"
+
+4. Upload bestand: database/COMPLETE-SCHEMA.sql
+
+5. Klik "Go"
+
+6. Verifieer dat deze tabellen zijn aangemaakt:
+   - admin_users
+   - members
+   - registrations
+   - permits
+   - competitions
+   - results
+   - contact_messages
+   - draws
+
+═══════════════════════════════════════════════════════════════════
+  STAP 6: TEST DE API
+═══════════════════════════════════════════════════════════════════
+
+Open in browser:
+
+1. Test health check:
+   https://www.visclubsim.be/api/health
+
+   Verwacht: {"status":"ok","timestamp":"...","database":"connected"}
+
+2. Als je 404 krijgt:
+   - api/ folder is niet correct geüpload
+   - .htaccess werkt niet
+
+3. Als je 500 krijgt:
+   - Database configuratie is fout
+   - Database bestaat niet
+   - PHP errors (check error logs in Plesk)
+
+4. Als je JSON ziet:
+   ✅ API WERKT!
+
+═══════════════════════════════════════════════════════════════════
+  STAP 7: TEST ADMIN PANEL
+═══════════════════════════════════════════════════════════════════
+
+1. Ga naar: https://www.visclubsim.be/admin/login.html
+
+2. Login met:
+   - Username: kevin.dhont
+   - Password: KevinDhont2026!
+
+3. Check of:
+   - Login werkt
+   - Dashboard laadt
+   - Je naam rechtsboven staat
+   - Recent activity toont data
+   - Alle menu items werken
+
+═══════════════════════════════════════════════════════════════════
+  STAP 8: TEST PUBLIC FORMULIEREN
+═══════════════════════════════════════════════════════════════════
+
+1. Test inschrijvingsformulier:
+   https://www.visclubsim.be/inschrijven.html
+
+2. Test vergunningsformulier:
+   https://www.visclubsim.be/visvergunning.html
+
+3. Controleer in admin panel of data verschijnt
+
+═══════════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════
+
+Als DELETE nog steeds 404 geeft:
+
+1. Check of api/.htaccess correct is geüpload
+
+2. Check Apache mod_rewrite in Plesk:
+   - Hosting Settings
+   - Apache & nginx Settings
+   - Zorg dat mod_rewrite enabled is
+
+3. Check file permissions:
+   - api/ folder: 755
+   - api/index.php: 644
+   - api/.htaccess: 644
+
+Als POST 400 geeft:
+
+1. Open browser console (F12)
+2. Bekijk de request payload
+3. Check of alle required fields aanwezig zijn
+4. Check API error message in response
+
+═══════════════════════════════════════════════════════════════════
+  BELANGRIJKE OPMERKINGEN
+═══════════════════════════════════════════════════════════════════
+
+⚠️  Zorg dat PHP versie 7.4 of hoger is (check in Plesk)
+⚠️  Zorg dat MySQLi extension enabled is
+⚠️  Zorg dat mod_rewrite enabled is in Apache
+✅  Na upload moet ALLES werken zonder extra config
+✅  Als 1 ding niet werkt, check of ALLE bestanden geüpload zijn
+
+═══════════════════════════════════════════════════════════════════
+
+Veel succes! Laat me weten bij welke stap je vastloopt.

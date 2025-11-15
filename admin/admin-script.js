@@ -7,6 +7,7 @@
 let allRegistrations = [];
 let allMembers = [];
 let allPayments = [];
+let allPermits = [];
 
 // Initialize everything when DOM is ready
 window.addEventListener('DOMContentLoaded', async function() {
@@ -290,6 +291,9 @@ async function loadDashboardData() {
 
         allPayments = await window.dataAPI.getPayments();
         console.log(`✅ Loaded ${allPayments.length} payments`);
+
+        allPermits = await window.dataAPI.getPermits();
+        console.log(`✅ Loaded ${allPermits.length} permits`);
 
         // Update statistics
         await updateDashboardStats();
@@ -1510,6 +1514,38 @@ function updateRecentActivity() {
             type: 'registration'
         });
     });
+
+    // Add recent permit applications
+    if (allPermits && allPermits.length > 0) {
+        allPermits.slice(-10).reverse().forEach(permit => {
+            const statusColors = {
+                'pending': '#ffc107',
+                'approved': '#28a745',
+                'rejected': '#dc3545'
+            };
+            const statusIcons = {
+                'pending': 'fa-hourglass-half',
+                'approved': 'fa-check-circle',
+                'rejected': 'fa-times-circle'
+            };
+            const statusText = {
+                'pending': 'In behandeling',
+                'approved': 'Goedgekeurd',
+                'rejected': 'Afgewezen'
+            };
+            const applicantName = `${permit.firstName || ''} ${permit.lastName || ''}`.trim() || 'Onbekend';
+            const permitTypeLabel = permit.permitType === 'jaarvergunning' ? 'Jaarvergunning' : 'Wedstrijdvisser';
+
+            activities.push({
+                icon: statusIcons[permit.status] || 'fa-file-contract',
+                iconColor: statusColors[permit.status] || '#667eea',
+                text: `Vergunningsaanvraag: ${applicantName}`,
+                subtext: `${permitTypeLabel} - ${statusText[permit.status] || permit.status}`,
+                time: permit.appliedAt ? timeAgo(new Date(permit.appliedAt)) : (permit.applicationDate ? timeAgo(new Date(permit.applicationDate)) : 'Recent'),
+                type: 'permit'
+            });
+        });
+    }
 
     // Check for recent draws
     if (window.calendarData) {

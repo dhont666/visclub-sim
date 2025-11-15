@@ -538,7 +538,12 @@ color: #999;
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} definitief wilt verwijderen?`)) {
                 try {
                     console.log('🗑️ Deleting permit...');
-                    await window.dataAPI.deletePermit(id);
+                    const result = await window.dataAPI.deletePermit(id);
+
+                    // Check if deletion was successful
+                    if (!result) {
+                        throw new Error('Verwijderen mislukt - geen bevestiging ontvangen');
+                    }
 
                     closeModal();
 
@@ -547,7 +552,7 @@ color: #999;
                     console.log('🔄 Reloading applications with filter:', currentFilter);
                     await loadApplications(currentFilter);
 
-                    alert('✅ Aanvraag verwijderd.');
+                    alert('✅ Aanvraag succesvol verwijderd!');
                 } catch (error) {
                     console.error('Error deleting permit:', error);
                     alert('❌ Fout bij verwijderen vergunning: ' + error.message);

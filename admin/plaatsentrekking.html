@@ -441,7 +441,17 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                     document.getElementById('compStatus').innerHTML = '<span class="badge" style="background: #ffc107;">Nog niet getrokken</span>';
                     showParticipants();
                 }
-                fixedPositions = [];
+
+                // Load saved fixed positions for this competition
+                const fixedKey = `fixed_${competition.datum.replace(/-/g, '_')}`;
+                const savedFixed = localStorage.getItem(fixedKey);
+                if (savedFixed) {
+                    fixedPositions = JSON.parse(savedFixed);
+                    console.log('✅ Loaded saved fixed positions:', fixedPositions);
+                } else {
+                    fixedPositions = [];
+                }
+
                 selectedParticipants = [];
                 updateFixedPositionsUI();
             } catch (error) {
@@ -591,8 +601,16 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
             if (index > -1) {
                 availableSpots.splice(index, 1);
             }
+
+            // Save fixed positions to localStorage
+            if (selectedCompetition) {
+                const fixedKey = `fixed_${selectedCompetition.datum.replace(/-/g, '_')}`;
+                localStorage.setItem(fixedKey, JSON.stringify(fixedPositions));
+                console.log('✅ Fixed positions saved to localStorage');
+            }
+
             updateFixedPositionsUI();
-            renderVijverkaartWithSelection(); 
+            renderVijverkaartWithSelection();
             document.getElementById('fixedName').value = '';
             document.getElementById('fixedSpot').value = '';
             updateSelectedParticipants();
@@ -620,8 +638,16 @@ Maak de trekkingsresultaten zichtbaar op de homepage voor alle bezoekers
                 availableSpots.push(spot);
                 availableSpots.sort((a, b) => a - b);
             }
+
+            // Save updated fixed positions to localStorage
+            if (selectedCompetition) {
+                const fixedKey = `fixed_${selectedCompetition.datum.replace(/-/g, '_')}`;
+                localStorage.setItem(fixedKey, JSON.stringify(fixedPositions));
+                console.log('✅ Fixed positions updated in localStorage');
+            }
+
             updateFixedPositionsUI();
-            renderVijverkaartWithSelection(); 
+            renderVijverkaartWithSelection();
             updateSelectedParticipants();
         }
         async function startDraw() {

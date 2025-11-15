@@ -688,13 +688,24 @@ class DataAPI {
                         if (result.success) {
                             console.log('✅ Deleted permit via API');
                             return true;
+                        } else {
+                            throw new Error(result.error || 'API returned success=false');
                         }
                     } else {
-                        console.error('❌ API delete failed:', response.status, response.statusText);
+                        const errorText = await response.text();
+                        throw new Error(`API delete failed with status ${response.status}: ${errorText}`);
                     }
+                } else {
+                    throw new Error('No authentication token found');
                 }
             } catch (error) {
                 console.error('❌ Error deleting permit via API:', error);
+                // If backend fails and offline fallback is disabled, throw error
+                if (!this.config.ENABLE_OFFLINE_FALLBACK) {
+                    throw error;
+                }
+                // Otherwise fall through to localStorage fallback
+                console.warn('⚠️ Falling back to localStorage delete');
             }
         }
 
@@ -708,7 +719,12 @@ class DataAPI {
         permits = permits.filter(p => p.id !== id && String(p.id) !== String(id));
         const afterCount = permits.length;
 
-        console.log(`Removed ${beforeCount - afterCount} permit(s)`);
+        const removedCount = beforeCount - afterCount;
+        console.log(`Removed ${removedCount} permit(s)`);
+
+        if (removedCount === 0) {
+            throw new Error('Permit niet gevonden in lokale opslag');
+        }
 
         await this.save('permits', permits);
         console.log('✅ Permits saved to storage');

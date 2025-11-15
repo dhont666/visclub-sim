@@ -429,6 +429,10 @@ html
                 members = await window.dataAPI.getMembers();
 
                 console.log('📋 Loaded members:', members);
+                console.log('📊 Total members count:', members.length);
+
+                // Ensure all members are shown regardless of status
+                // Don't filter by is_active or status fields
 
                 let filteredMembers = members;
 

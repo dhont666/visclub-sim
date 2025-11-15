@@ -287,8 +287,26 @@ oninput="autoResize(this)"
 <script src="admin-auth.js"></script>
 <script>
         let chatMessages = JSON.parse(localStorage.getItem('admin_chat_messages') || '[]');
-        let currentAdmin = localStorage.getItem('admin_name') || 'Admin';
-        document.addEventListener('DOMContentLoaded', () => {
+        let currentAdmin = 'Admin';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for auth to be ready
+            let retries = 0;
+            while (!window.adminAuth || !window.adminAuth.currentUser) {
+                if (retries > 30) {
+                    console.error('❌ Auth not loaded');
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            // Get current user name from adminAuth
+            if (window.adminAuth && window.adminAuth.currentUser) {
+                currentAdmin = window.adminAuth.currentUser.name || window.adminAuth.currentUser.username || 'Admin';
+                console.log('✅ Current admin:', currentAdmin);
+            }
+
             loadMessages();
             scrollToBottom();
             setInterval(loadMessages, 5000);
@@ -312,17 +330,16 @@ oninput="autoResize(this)"
                 const isOwn = msg.sender === currentAdmin;
                 if (msg.sender !== lastSender) {
                     if (lastSender !== null) {
-                        html += '</div>'; 
+                        html += '</div>';
                     }
                     html += `<div class="message-group ${isOwn ? 'own' : ''}">`;
-                    if (!isOwn) {
-                        html += `
-                            <div class="message-sender">
-                                <i class="fas fa-user-circle"></i>
-                                <strong>${msg.sender}</strong>
-                            </div>
-                        `;
-                    }
+                    // Always show sender name for ALL messages
+                    html += `
+                        <div class="message-sender">
+                            <i class="fas fa-user-circle"></i>
+                            <strong>${msg.sender || 'Onbekend'}</strong>
+                        </div>
+                    `;
                 }
                 html += `
                     <div class="message">

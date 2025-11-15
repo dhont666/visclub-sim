@@ -1,0 +1,69 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - UPLOAD DEBUG BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+UPLOAD DEZE 2 BESTANDEN:
+
+1. Via Plesk File Manager → public_html/admin/
+   - Upload: admin/index.html
+   - Upload: admin/admin-auth.js
+   - Overschrijf bestaande bestanden
+
+═══════════════════════════════════════════════════════════════════════════════
+🧪 TEST DAARNA
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Clear browser cache (CTRL + SHIFT + R)
+2. Open browser console (F12)
+3. Ga naar Console tab
+4. Ga naar: https://www.visclubsim.be/admin/login.html
+5. Login met kevin.dhont / KevinDhont2026!
+6. LAAT DE CONSOLE OPEN en kijk naar de berichten
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 WAT TE ZOEKEN IN DE CONSOLE
+═══════════════════════════════════════════════════════════════════════════════
+
+Na login zou je DEZE berichten moeten zien:
+
+✅ "🔧 Admin Login Configured"
+✅ "📡 Login response: ok: true"
+✅ "✅ Login successful!"
+✅ "🔄 Redirecting to index.html..."
+
+--- PAGINA LAADT index.html ---
+
+✅ "🔐 Checking authentication..."
+✅ "🔑 Token found: true"
+✅ "🔐 Backend API mode - checking token..."
+✅ "🔑 Stored token exists: true"
+✅ "🌐 API Base URL: https://www.visclubsim.be/api"
+✅ "📡 Fetching auth/verify from: https://www.visclubsim.be/api/auth/verify"
+✅ "📡 Auth verify response: ok: true, status: 200"
+✅ "✅ Token verified! User data: {user: {...}}"
+✅ "👤 Current user set: {...}"
+✅ "✅ On dashboard, staying here!"
+
+--- OF ALS HET FOUT GAAT: ---
+
+❌ "❌ Token verification failed!"
+❌ "Status: 401 Unauthorized" (of andere status)
+❌ "Response body: ..." (foutmelding)
+❌ "🔄 Not on login page, redirecting to login..."
+
+OF:
+
+❌ "❌ Exception during token verification:"
+❌ "Error details: {name: ..., message: ...}"
+
+═══════════════════════════════════════════════════════════════════════════════
+📸 STUUR MIJ
+═══════════════════════════════════════════════════════════════════════════════
+
+Maak een screenshot van ALLE console berichten vanaf "🔧 Admin Login Configured"
+tot en met het laatste bericht.
+
+Dit laat me EXACT zien waar het fout gaat!
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

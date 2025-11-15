@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - FIX LOGIN REDIRECT PROBLEEM
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEEM:
+Je kunt inloggen maar wordt meteen teruggestuurd naar login pagina.
+
+OORZAAK:
+admin/index.html laadt verkeerde config bestand (../config.js in plaats van config.js)
+
+OPLOSSING:
+Upload 1 bestand opnieuw:
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ UPLOAD DIT BESTAND
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Via Plesk File Manager:
+   - Navigeer naar: public_html/admin/
+   - Upload: admin/index.html
+   - Overschrijf bestaande
+
+═══════════════════════════════════════════════════════════════════════════════
+🧪 TEST NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Clear browser cache (CTRL + SHIFT + R)
+2. Ga naar: https://www.visclubsim.be/admin/login.html
+3. Login met:
+   Username: kevin.dhont
+   Password: KevinDhont2026!
+4. Je zou naar dashboard moeten gaan EN blijven (niet teruggestuurd)
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 WAT IS GEREPAREERD
+═══════════════════════════════════════════════════════════════════════════════
+
+VOOR (FOUT):
+- admin/index.html laadt ../config.js (public site config)
+- Verkeerde API_BASE_URL wordt gebruikt
+- Token verificatie faalt
+- Redirect terug naar login
+
+NA (CORRECT):
+- admin/index.html laadt config.js (admin config)
+- Juiste API_BASE_URL: https://www.visclubsim.be/api
+- Token verificatie slaagt
+- Dashboard blijft geladen
+
+TECHNISCHE DETAILS:
+- Regel 10: <script src="../config.js"></script> → <script src="config.js"></script>
+- Verwijderd: Dubbele script tags onderaan (admin-auth.js, data-api.js)
+- Scripts worden nu 1x geladen in <head> in juiste volgorde:
+  1. config.js (configuratie)
+  2. admin-auth.js (authenticatie)
+  3. data-api.js (API calls)
+
+═══════════════════════════════════════════════════════════════════════════════
+❓ ALS HET NOG STEEDS NIET WERKT
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Open browser console (F12)
+2. Ga naar Console tab
+3. Login opnieuw
+4. Zoek naar deze berichten:
+   ✅ "🔧 Configuration loaded"
+   ✅ "📡 Login response: ok: true"
+   ✅ "✅ Login successful!"
+   ✅ "🔄 Redirecting to index.html..."
+   ✅ "🔐 Checking authentication..."
+   ✅ "📡 Verify response: 200 true"
+   ✅ "✅ Token verified successfully"
+
+5. Als je RODE fouten ziet, stuur screenshot naar mij
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

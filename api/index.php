@@ -197,6 +197,62 @@ try {
         ]);
     }
 
+    // POST /auth/change-password
+    if ($path === 'auth/change-password' && $method === 'POST') {
+        $payload = Auth::requireAuth();
+
+        if (empty($input['currentPassword']) || empty($input['newPassword'])) {
+            sendError('Current password and new password required', 400);
+        }
+
+        // Validate new password strength
+        $newPassword = $input['newPassword'];
+        if (strlen($newPassword) < 8) {
+            sendError('Password must be at least 8 characters', 400);
+        }
+        if (!preg_match('/[A-Z]/', $newPassword)) {
+            sendError('Password must contain at least one uppercase letter', 400);
+        }
+        if (!preg_match('/[a-z]/', $newPassword)) {
+            sendError('Password must contain at least one lowercase letter', 400);
+        }
+        if (!preg_match('/[0-9]/', $newPassword)) {
+            sendError('Password must contain at least one number', 400);
+        }
+
+        // Get current user from database
+        $user = $db->fetchOne(
+            'SELECT * FROM admin_users WHERE id = ?',
+            [$payload['userId']]
+        );
+
+        if (!$user) {
+            sendError('User not found', 404);
+        }
+
+        // Verify current password
+        if (!Auth::verifyPassword($input['currentPassword'], $user['password_hash'])) {
+            sendError('Current password is incorrect', 401);
+        }
+
+        // Hash new password
+        $newPasswordHash = Auth::hashPassword($newPassword);
+
+        // Update password in database
+        $db->execute(
+            'UPDATE admin_users SET password_hash = ?, updated_at = NOW() WHERE id = ?',
+            [$newPasswordHash, $user['id']]
+        );
+
+        // Log password change
+        error_log("Password changed for user ID: " . $user['id'] . " (username: " . $user['username'] . ")");
+
+        sendResponse([
+            'success' => true,
+            'message' => 'Password changed successfully'
+        ]);
+    }
+
     // =============================================================================
     // MEMBERS ENDPOINTS (Protected)
     // =============================================================================
@@ -547,6 +603,36 @@ try {
     }
 
     // =============================================================================
+    // PAYMENTS ENDPOINTS (Protected)
+    // =============================================================================
+
+    // GET /payments
+    if ($path === 'payments' && $method === 'GET') {
+        Auth::requireAuth();
+
+        // Get payments from registrations table (payment_status and payment_date fields)
+        $sql = 'SELECT
+                    reg.id,
+                    reg.competition_id,
+                    reg.member_id,
+                    reg.payment_status,
+                    reg.payment_date,
+                    reg.payment_amount,
+                    reg.payment_method,
+                    m.name as member_name,
+                    c.name as competition_name,
+                    c.date as competition_date
+                FROM registrations reg
+                INNER JOIN members m ON reg.member_id = m.id
+                INNER JOIN competitions c ON reg.competition_id = c.id
+                WHERE reg.payment_status IS NOT NULL
+                ORDER BY reg.payment_date DESC';
+
+        $payments = $db->fetchAll($sql);
+        sendResponse(['success' => true, 'data' => $payments]);
+    }
+
+    // =============================================================================
     // PERMITS ENDPOINTS
     // =============================================================================
 
@@ -648,6 +734,33 @@ try {
             $params[] = $input['member_id'];
         }
 
+        // Approval metadata
+        if (isset($input['approvedBy'])) {
+            $updates[] = 'approved_by = ?';
+            $params[] = $input['approvedBy'];
+        }
+
+        if (isset($input['approvedDate'])) {
+            $updates[] = 'approved_date = ?';
+            $params[] = $input['approvedDate'];
+        }
+
+        // Rejection metadata
+        if (isset($input['rejectedBy'])) {
+            $updates[] = 'rejected_by = ?';
+            $params[] = $input['rejectedBy'];
+        }
+
+        if (isset($input['rejectedDate'])) {
+            $updates[] = 'rejected_date = ?';
+            $params[] = $input['rejectedDate'];
+        }
+
+        if (isset($input['rejectionReason'])) {
+            $updates[] = 'rejection_reason = ?';
+            $params[] = $input['rejectionReason'];
+        }
+
         if (empty($updates)) {
             sendError('No fields to update', 400);
         }
@@ -663,6 +776,20 @@ try {
 
         $permit = $db->fetchOne('SELECT * FROM permits WHERE id = ?', [$id]);
         sendResponse(['success' => true, 'data' => $permit]);
+    }
+
+    // DELETE /permits/:id (Protected - Admin only)
+    if (preg_match('/^permits\/(\d+)$/', $path, $matches) && $method === 'DELETE') {
+        Auth::requireAuth();
+
+        $id = $matches[1];
+        $rowCount = $db->execute('DELETE FROM permits WHERE id = ?', [$id]);
+
+        if ($rowCount === 0) {
+            sendError('Permit not found', 404);
+        }
+
+        sendResponse(['success' => true, 'message' => 'Permit deleted successfully']);
     }
 
     // =============================================================================

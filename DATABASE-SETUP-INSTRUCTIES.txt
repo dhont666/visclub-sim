@@ -1,0 +1,131 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - DATABASE SETUP INSTRUCTIES
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ BELANGRIJK: Voer deze stappen uit VOOR je de website gebruikt!
+
+═══════════════════════════════════════════════════════════════════════════════
+STAP 1: ADMIN USERS AANMAKEN
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Log in op Cloud86 Plesk
+2. Ga naar: Databases → phpMyAdmin
+3. Selecteer je database (bijv. visclub_sim of dbnaam_...)
+4. Klik op "SQL" tab bovenaan
+5. Open bestand: CREATE-ADMIN-USERS.sql
+6. Kopieer HELE inhoud
+7. Plak in SQL venster
+8. Klik "Go" / "Uitvoeren"
+
+✅ Je zou moeten zien:
+   - Query OK, 3 rows inserted
+   - Tabel met 3 gebruikers
+
+📋 LOGIN CREDENTIALS:
+   Username: kevin.dhont     | Password: KevinDhont2026!
+   Username: kevin.vandun    | Password: KevinVD2026!
+   Username: maarten.borghs  | Password: MaartenB2026!
+
+⚠️ Wijzig deze wachtwoorden NA eerste login via Admin → Settings!
+
+═══════════════════════════════════════════════════════════════════════════════
+STAP 2: PERMITS TABLE UPDATEN
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Blijf in phpMyAdmin
+2. Klik opnieuw op "SQL" tab
+3. Open bestand: UPDATE-PERMITS-TABLE.sql
+4. Kopieer inhoud
+5. Plak in SQL venster
+6. Klik "Go" / "Uitvoeren"
+
+✅ Je zou moeten zien:
+   - Query OK
+   - Tabel beschrijving met nieuwe kolommen:
+     - approved_by
+     - approved_date
+     - rejected_by
+     - rejected_date
+     - rejection_reason
+
+═══════════════════════════════════════════════════════════════════════════════
+STAP 3: BESTANDEN UPLOADEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Zie: UPLOAD-COMPLETE-FIX.txt voor complete lijst
+
+Minimaal uploaden:
+1. api/index.php
+2. admin/login.html
+3. admin/vergunningen.html
+4. admin/data-api.js
+5. admin/admin-nav.html
+6. gallerij.html
+
+═══════════════════════════════════════════════════════════════════════════════
+STAP 4: TESTEN
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Ga naar: https://www.visclubsim.be/admin/login.html
+2. Clear browser cache (Ctrl+Shift+Delete)
+3. Hard refresh (Ctrl+F5)
+4. Login met een van de credentials hierboven
+5. Check console (F12) voor errors
+
+✅ Verwacht gedrag:
+   - "✅ Login successful" in console
+   - Redirect naar dashboard
+   - Je naam verschijnt rechtsboven (bijv. "Kevin Dhont")
+   - Geen 401 errors in console
+
+═══════════════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+❌ "Invalid credentials"
+   → Check of SQL script correct uitgevoerd is
+   → Verifieer username (geen hoofdletters, met punt)
+   → Check wachtwoord (exact zoals hierboven, hoofdlettergevoelig)
+
+❌ "Endpoint not found"
+   → Check of api/index.php correct geüpload is
+   → Test: https://www.visclubsim.be/api/health
+   → Moet JSON response geven: {"status":"ok",...}
+
+❌ 401 Unauthorized errors
+   → Betekent dat login niet gelukt is
+   → Of token is verlopen
+   → Log uit en log opnieuw in
+
+❌ "User not found" na login
+   → admin_users table heeft geen data
+   → Run CREATE-ADMIN-USERS.sql opnieuw
+
+═══════════════════════════════════════════════════════════════════════════════
+DATABASE BACKUP
+═══════════════════════════════════════════════════════════════════════════════
+
+Maak ALTIJD een backup voor je wijzigingen maakt:
+
+1. In phpMyAdmin
+2. Selecteer database
+3. Klik "Export" tab
+4. Kies "Quick" method
+5. Format: SQL
+6. Klik "Go"
+7. Bewaar het .sql bestand veilig
+
+═══════════════════════════════════════════════════════════════════════════════
+VOLGENDE STAPPEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Na succesvolle setup:
+
+1. ✅ Login werkt
+2. ✅ Test vergunningen goedkeuren/afwijzen/verwijderen
+3. ✅ Wijzig je wachtwoord (Settings → Change Password)
+4. ✅ Test alle admin functies
+5. ✅ Maak database backup
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

@@ -1,0 +1,92 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - FINALE COMPLETE UPLOAD LIJST
+═══════════════════════════════════════════════════════════════════════════════
+Upload ALLE onderstaande bestanden naar Cloud86
+
+STATUS: Je bent ingelogd maar wordt teruggestuurd naar login
+OPLOSSING: Upload deze bestanden + delete generate-admin-hashes.php
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ VERPLICHT - UPLOAD DEZE BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+API (public_html/api/):
+├── index.php
+├── config.php
+├── database.php
+├── auth.php
+└── .htaccess
+
+ADMIN (public_html/admin/):
+├── login.html
+├── index.html
+├── config.js
+├── admin-auth.js
+├── admin-script.js
+├── admin-style.css
+├── admin-nav.html
+├── data-api.js
+├── vergunningen.html
+├── contact-berichten.html
+├── inschrijvingen.html
+├── leden.html
+├── settings.html
+├── plaatsentrekking.html
+├── klassement-beheer.html
+├── weging.html
+└── admin-chat.html
+
+PUBLIC (public_html/):
+└── gallerij.html
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️ VERWIJDER VAN SERVER
+═══════════════════════════════════════════════════════════════════════════════
+
+DELETE:
+└── public_html/generate-admin-hashes.php (BELANGRIJK!)
+
+═══════════════════════════════════════════════════════════════════════════════
+📋 STAP-VOOR-STAP
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Via Plesk File Manager:
+   - Navigeer naar public_html/api/
+   - Upload alle API bestanden
+   - Overschrijf bestaande
+
+2. Via Plesk File Manager:
+   - Navigeer naar public_html/admin/
+   - Upload alle ADMIN bestanden
+   - Overschrijf bestaande
+
+3. Via Plesk File Manager:
+   - Navigeer naar public_html/
+   - Upload gallerij.html
+   - DELETE generate-admin-hashes.php
+
+4. Test:
+   - Clear browser cache
+   - Ga naar https://www.visclubsim.be/admin/login.html
+   - Login met kevin.dhont / KevinDhont2026!
+   - Zou naar dashboard moeten gaan
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 ALS HET NOG STEEDS NIET WERKT
+═══════════════════════════════════════════════════════════════════════════════
+
+Probeer LOCAL MODE:
+
+1. Edit admin/config.js op de server
+2. Verander regel 24:
+   VAN: USE_LOCAL_MODE: false,
+   NAAR: USE_LOCAL_MODE: true,
+
+3. Login opnieuw
+   Username: kevin.dhont
+   Password: KevinDhont2026!
+
+Local mode slaat alles op in je browser (geen database nodig).
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

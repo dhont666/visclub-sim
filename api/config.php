@@ -30,9 +30,9 @@ if ($isProduction) {
 // - Als localhost niet werkt, probeer: '127.0.0.1'
 // - De poort (3306) wordt automatisch gebruikt, niet in hostname zetten!
 define('DB_HOST', 'localhost');  // Cloud86 MySQL host (gebruik localhost, NIET localhost:3306)
-define('DB_NAME', 'your_database_name');  // ⚠️  CHANGE THIS!
-define('DB_USER', 'your_database_user');  // ⚠️  CHANGE THIS!
-define('DB_PASS', 'your_database_password');  // ⚠️  CHANGE THIS!
+define('DB_NAME', 'visclubsim');  // Fixed: lowercase for Linux case-sensitivity!
+define('DB_USER', 'VisclubDhont');
+define('DB_PASS', 'Kutwijf666');
 define('DB_CHARSET', 'utf8mb4');
 
 // Security check: Prevent deployment with default credentials

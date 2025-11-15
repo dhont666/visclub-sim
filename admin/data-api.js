@@ -275,7 +275,9 @@ class DataAPI {
                     throw { status: response.status, message: await response.text() };
                 }
 
-                const data = await response.json();
+                const result = await response.json();
+                // API returns {success: true, data: [...]} format
+                const data = result.data || result || [];
                 this.cache[type] = data;
                 console.log(`✅ Loaded ${data.length} ${type} from Backend API`);
                 return data;
@@ -508,7 +510,7 @@ class DataAPI {
         // Try API first if not in local mode
         if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
             try {
-                const token = localStorage.getItem('admin_token');
+                const token = this.getToken();
                 if (token) {
                     console.log('🔍 Fetching permits from API:', `${this.API_BASE_URL}/permits`);
                     const response = await fetch(`${this.API_BASE_URL}/permits`, {
@@ -615,8 +617,9 @@ class DataAPI {
         // Try API first if not in local mode
         if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
             try {
-                const token = localStorage.getItem('admin_token');
+                const token = this.getToken();
                 if (token) {
+                    console.log('🔄 Updating permit via API:', id, updates);
                     const response = await fetch(`${this.API_BASE_URL}/permits/${id}`, {
                         method: 'PUT',
                         headers: {
@@ -626,15 +629,24 @@ class DataAPI {
                         body: JSON.stringify(updates)
                     });
 
+                    console.log('📡 Update response status:', response.status);
+
                     if (response.ok) {
                         const result = await response.json();
+                        console.log('📦 Update result:', result);
                         if (result.success) {
+                            console.log('✅ Permit updated via API');
                             return true;
                         }
+                    } else {
+                        const errorText = await response.text();
+                        console.error('❌ API update failed:', response.status, errorText);
                     }
+                } else {
+                    console.warn('⚠️ No token found for API update');
                 }
             } catch (error) {
-                console.error('Error updating permit via API:', error);
+                console.error('❌ Error updating permit via API:', error);
             }
         }
 
@@ -654,6 +666,39 @@ class DataAPI {
 
     async deletePermit(id) {
         console.log('🗑️ deletePermit called with ID:', id, typeof id);
+
+        // Try API first if not in local mode
+        if (!this.USE_LOCAL_MODE && this.API_BASE_URL) {
+            try {
+                const token = this.getToken();
+                if (token) {
+                    console.log('🔍 Deleting permit via API:', `${this.API_BASE_URL}/permits/${id}`);
+                    const response = await fetch(`${this.API_BASE_URL}/permits/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    console.log('📡 API Delete Response status:', response.status);
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('📦 API Delete Response:', result);
+                        if (result.success) {
+                            console.log('✅ Deleted permit via API');
+                            return true;
+                        }
+                    } else {
+                        console.error('❌ API delete failed:', response.status, response.statusText);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error deleting permit via API:', error);
+            }
+        }
+
+        // Fallback to localStorage
         let permits = await this.getPermits();
         console.log('📋 Current permits before delete:', permits.length);
         console.log('All permit IDs:', permits.map(p => ({ id: p.id, type: typeof p.id })));

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar Data Test</title>
+    <script src="config.js"></script>
+    <script src="calendar-data.js"></script>
+</head>
+<body>
+    <h1>Calendar Data Test</h1>
+    <div id="output"></div>
+
+    <script>
+        console.log('🔍 Testing calendar data availability...');
+        console.log('window.calendarData exists?', typeof window.calendarData !== 'undefined');
+        console.log('window.calendarData value:', window.calendarData);
+
+        const output = document.getElementById('output');
+
+        if (window.calendarData && Array.isArray(window.calendarData)) {
+            output.innerHTML = `
+                <p style="color: green;">✅ Calendar data is available!</p>
+                <p>Total events: ${window.calendarData.length}</p>
+                <h3>Events:</h3>
+                <ul>
+                    ${window.calendarData.map(event => `
+                        <li><strong>${event.datum}</strong> (${event.dag}) - ${event.wedstrijdtype} - ${event.tijd} - ${event.prijs}</li>
+                    `).join('')}
+                </ul>
+            `;
+        } else {
+            output.innerHTML = `
+                <p style="color: red;">❌ Calendar data is NOT available!</p>
+                <p>Type: ${typeof window.calendarData}</p>
+                <p>Value: ${window.calendarData}</p>
+                <h3>Debugging:</h3>
+                <ul>
+                    <li>Check browser console (F12)</li>
+                    <li>Check if ../script.js loads without errors</li>
+                    <li>Check if calendarData is defined in script.js</li>
+                </ul>
+            `;
+        }
+
+        // Also check what scripts are loaded
+        console.log('📜 Loaded scripts:');
+        document.querySelectorAll('script').forEach(script => {
+            console.log('  -', script.src || 'inline');
+        });
+    </script>
+</body>
+</html>

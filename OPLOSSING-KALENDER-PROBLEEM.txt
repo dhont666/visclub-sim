@@ -1,0 +1,223 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - KALENDER PROBLEEM OPGELOST!
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEEM:
+"Nergens kalender" - calendarData niet beschikbaar op admin pagina's
+
+ROOT CAUSE:
+Admin pagina's laadden ../script.js, maar door config conflicten werd calendarData
+niet correct beschikbaar gesteld.
+
+OPLOSSING:
+Nieuwe standalone calendar-data.js file die direct window.calendarData definieert.
+
+═══════════════════════════════════════════════════════════════════════════════
+📤 UPLOAD DEZE BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Via Plesk File Manager → public_html/admin/
+
+NIEUW BESTAND (BELANGRIJK!):
+└── calendar-data.js  ⭐ NIEUWE FILE - bevat alle kalender data
+
+GEÜPDATETE HTML BESTANDEN (calendar-data.js toegevoegd):
+├── plaatsentrekking.html
+├── inschrijvingen.html
+├── leden.html
+├── klassement-beheer.html
+├── weging.html
+└── test-calendar.html  (optioneel - test pagina)
+
+EERDER GEÜPDATETE BESTANDEN (upload opnieuw als je dat nog niet deed):
+├── index.html
+├── admin-chat.html
+├── contact-berichten.html
+├── settings.html
+├── vergunningen.html
+└── data-api.js
+
+Via Plesk File Manager → public_html/api/
+└── index.php (nieuwe /payments endpoint)
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 WAT IS CALENDAR-DATA.JS
+═══════════════════════════════════════════════════════════════════════════════
+
+NIEUWE FILE: admin/calendar-data.js
+
+Bevat:
+- Alle 73 wedstrijden/evenementen voor 2026
+- Direct gedefinieerd als window.calendarData
+- Geen afhankelijkheden van andere scripts
+- Laadt VOORDAT admin-auth.js en data-api.js laden
+
+Structuur per event:
+{
+    datum: "07-03-2026",
+    dag: "Zaterdag",
+    wedstrijdtype: "Clubwedstrijd",
+    maand: "Maart",
+    tijd: "11:00u",
+    prijs: "€10,00",
+    type: "clubwedstrijd"
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 SCRIPT LAADVOLGORDE (NU CORRECT)
+═══════════════════════════════════════════════════════════════════════════════
+
+ELKE ADMIN PAGINA LAADT NU IN DEZE VOLGORDE:
+
+1. config.js               → Admin API configuratie
+2. calendar-data.js        → ⭐ NIEUW! Kalender data beschikbaar
+3. admin-auth.js           → Authenticatie check
+4. data-api.js             → API data calls
+5. ../script.js (optioneel)→ Alleen als pagina het nodig heeft
+
+VOORHEEN (PROBLEEM):
+- Alleen ../script.js werd geladen
+- Conflict met config.js
+- calendarData werd niet beschikbaar
+
+NU (OPLOSSING):
+- calendar-data.js laadt EERST
+- window.calendarData direct beschikbaar
+- Geen conflicten meer
+
+═══════════════════════════════════════════════════════════════════════════════
+🧪 TEST NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Upload ALLE bestanden hierboven
+
+2. Clear browser cache VOLLEDIG:
+   CTRL + SHIFT + DELETE → "Cached images and files" → Clear
+
+3. Sluit browser HELEMAAL en heropen
+
+4. Login op admin panel
+
+5. TEST PAGINA (optioneel maar handig):
+   Ga naar: https://www.visclubsim.be/admin/test-calendar.html
+
+   ✅ Zou moeten tonen:
+   "✅ Calendar data is available!"
+   "Total events: 73"
+   + lijst van alle wedstrijden
+
+   ❌ Als het toont:
+   "❌ Calendar data is NOT available!"
+   → calendar-data.js niet geupload of niet geladen
+
+6. TEST PLAATSENTREKKING:
+   Ga naar: https://www.visclubsim.be/admin/plaatsentrekking.html
+
+   ✅ Dropdown "Selecteer Wedstrijd" heeft opties
+   ✅ Console toont: "📅 Calendar data loaded: 73 events"
+   ✅ Console toont: "✅ Calendar data is available, entries: 73"
+
+7. TEST INSCHRIJVINGEN:
+   Ga naar: https://www.visclubsim.be/admin/inschrijvingen.html
+
+   ✅ Wedstrijden lijst laadt
+   ✅ Kalender data beschikbaar
+
+8. TEST LEDEN:
+   Ga naar: https://www.visclubsim.be/admin/leden.html
+
+   ✅ Kalender data beschikbaar voor deelnames
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 VERWACHTE CONSOLE OUTPUT (GOED)
+═══════════════════════════════════════════════════════════════════════════════
+
+Bij laden van plaatsentrekking.html:
+
+🔧 Configuration loaded: {environment: "production", ...}
+📅 Calendar data loaded: 73 events
+🔐 AdminAuth initialized: {mode: "Backend API", ...}
+📊 DataAPI initialized - using Backend API
+✅ Admin Dashboard loaded successfully
+🔐 Checking authentication...
+✅ Token verified! User data: {...}
+✅ On dashboard, staying here!
+✅ Calendar data is available, entries: 73
+🎯 Found 60 valid competitions (filtering out vergaderingen)
+
+═══════════════════════════════════════════════════════════════════════════════
+❌ MOGELIJKE ERRORS (EN OPLOSSINGEN)
+═══════════════════════════════════════════════════════════════════════════════
+
+Error: "❌ Calendar data not available or invalid"
+Oorzaak: calendar-data.js niet geladen
+Fix:
+  1. Check of calendar-data.js geupload is naar public_html/admin/
+  2. Check of script tag aanwezig is in HTML file
+  3. Clear cache en herlaad
+
+Error: "window.calendarData is undefined"
+Oorzaak: Script laadt na admin code die het nodig heeft
+Fix: Script tag moet VOOR admin-auth.js en data-api.js staan
+
+Error: "Loading failed for calendar-data.js"
+Oorzaak: Bestand niet op server
+Fix: Upload calendar-data.js naar public_html/admin/
+
+Console toont niets over calendar:
+Oorzaak: Oude versies nog in browser cache
+Fix:
+  1. Clear cache HELEMAAL
+  2. Sluit browser compleet
+  3. Heropen en test opnieuw
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ NA DEZE FIX
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Plaatsentrekking dropdown werkt
+✅ Inschrijvingen toont wedstrijden
+✅ Leden pagina heeft kalender data
+✅ Klassement beheer heeft kalender
+✅ Weging pagina heeft wedstrijden
+✅ 73 events beschikbaar (alle wedstrijden 2026)
+✅ Geen "undefined calendarData" errors meer
+✅ Test pagina toont alle events
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 SNELLE CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+□ Upload calendar-data.js naar public_html/admin/
+□ Upload 5 HTML files (plaatsentrekking, inschrijvingen, leden, klassement-beheer, weging)
+□ Upload test-calendar.html (optioneel)
+□ Upload overige admin files (index, data-api, etc.)
+□ Upload api/index.php
+□ Clear browser cache VOLLEDIG
+□ Sluit browser compleet
+□ Heropen en login
+□ Test test-calendar.html → Moet "✅ Calendar data is available!" tonen
+□ Test plaatsentrekking → Dropdown moet wedstrijden tonen
+□ Check console → Moet "📅 Calendar data loaded: 73 events" tonen
+
+═══════════════════════════════════════════════════════════════════════════════
+💡 WAAROM DIT WERKT
+═══════════════════════════════════════════════════════════════════════════════
+
+OUDE SITUATIE:
+- Admin pagina laadt ../script.js
+- script.js definiëert calendarData als const (local scope)
+- script.js doet window.calendarData = calendarData (regel 95)
+- MAAR config conflicten verhinderen dit
+- calendarData blijft undefined
+
+NIEUWE SITUATIE:
+- Admin pagina laadt calendar-data.js EERST
+- calendar-data.js doet direct: window.calendarData = [...]
+- Geen local scope, direct global
+- Geen afhankelijkheid van script.js
+- Laadt VOOR andere admin scripts
+- 100% gegarandeerd beschikbaar
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

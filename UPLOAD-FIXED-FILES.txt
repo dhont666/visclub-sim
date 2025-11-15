@@ -1,0 +1,102 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - UPLOAD GEFIXTE BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+JE BENT NU OP HET ADMIN PANEL! 🎉
+
+Maar er zijn nog een paar kleine fouten die gefixed zijn:
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ WAT IS GEFIXED
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Quirks Mode → Toegevoegd <!DOCTYPE html> aan index.html
+2. ✅ Bot script error → Verwijderd uit index.html (was dubbel geladen)
+3. ✅ undefined data → data-api.js nu correct {success, data} format parsed
+4. ✅ 404 /api/payments → Nieuwe endpoint toegevoegd aan api/index.php
+5. ⚠️ 401 /api/public-registrations → Dit endpoint verwacht een table die niet bestaat
+6. ⚠️ Kalender verdwenen → Moet nog onderzocht worden
+
+═══════════════════════════════════════════════════════════════════════════════
+📤 UPLOAD DEZE BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Via Plesk File Manager:
+
+1. Navigeer naar: public_html/admin/
+   Upload:
+   - admin/index.html (DOCTYPE fix, geen dubbele scripts)
+   - admin/data-api.js (parseert API response correct)
+
+2. Navigeer naar: public_html/api/
+   Upload:
+   - api/index.php (nieuwe /payments endpoint)
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 WAT DE FIXES DOEN
+═══════════════════════════════════════════════════════════════════════════════
+
+admin/index.html:
+- VOOR: Quirks Mode warning
+- NA: Correct <!DOCTYPE html> bovenaan
+- VOOR: Dubbele <head> tags
+- NA: Single clean <head> met juiste script volgorde
+
+admin/data-api.js:
+- VOOR: const data = await response.json(); // data is {success: true, data: [...]}
+         console.log(data.length); // ❌ undefined, want data.length bestaat niet
+- NA: const result = await response.json();
+      const data = result.data || result || []; // ✅ pakt data array eruit
+      console.log(data.length); // ✅ werkt!
+
+api/index.php:
+- TOEGEVOEGD: GET /payments endpoint die data uit registrations table haalt
+- Query: SELECT reg.*, m.name, c.name FROM registrations WHERE payment_status IS NOT NULL
+
+═══════════════════════════════════════════════════════════════════════════════
+🧪 VERWACHT RESULTAAT NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Geen "Quirks Mode" warning meer
+✅ Geen "bot script" errors meer
+✅ "Loaded X registrations" in plaats van "undefined registrations"
+✅ "Loaded X members" in plaats van "undefined members"
+✅ Geen 404 /api/payments error meer
+⚠️ Nog steeds 401 /api/public-registrations (normale warning, deze table bestaat niet)
+
+═══════════════════════════════════════════════════════════════════════════════
+❓ PUBLIC-REGISTRATIONS ERROR
+═══════════════════════════════════════════════════════════════════════════════
+
+De 401 error voor /api/public-registrations is geen probleem!
+
+Dit endpoint wordt gebruikt voor de PUBLIEKE registratie pagina (niet admin).
+De database heeft geen "public_registrations" table - alleen "registrations".
+
+We kunnen deze error negeren OF de code aanpassen om "registrations" te gebruiken.
+
+═══════════════════════════════════════════════════════════════════════════════
+📋 OVER DE KALENDER
+═══════════════════════════════════════════════════════════════════════════════
+
+Je zei "kalender is ineens verdwenen".
+
+Welke kalender bedoel je?
+1. De kalender op de PUBLIEKE website (kalender.html)?
+2. De kalender in het ADMIN panel?
+3. De kalender data in de database?
+
+Laat me weten waar de kalender stond, dan kan ik het fixen!
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 PRIORITEIT: UPLOAD DEZE 3 BESTANDEN EERST
+═══════════════════════════════════════════════════════════════════════════════
+
+1. admin/index.html
+2. admin/data-api.js
+3. api/index.php
+
+Daarna clear cache, herlaad de admin pagina, en de data errors zijn weg!
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

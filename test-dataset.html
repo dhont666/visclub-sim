@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dataset Test</title>
+</head>
+<body>
+    <form id="testForm" data-has-custom-handler="true">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('testForm');
+        console.log('Form exists:', !!form);
+        console.log('dataset.hasCustomHandler:', form.dataset.hasCustomHandler);
+        console.log('Type:', typeof form.dataset.hasCustomHandler);
+        console.log('Check result:', !form.dataset.hasCustomHandler);
+
+        if (form && !form.dataset.hasCustomHandler) {
+            console.log('✅ Handler would be attached (BAD - should not happen)');
+        } else {
+            console.log('❌ Handler would NOT be attached (GOOD)');
+        }
+    </script>
+</body>
+</html>

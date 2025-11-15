@@ -140,10 +140,26 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    <!-- Load config first -->
+    <script src="config.js"></script>
+
     <!-- Vis Advies Bot Scripts -->
     <script src="bot/weer-vangst-bot.js"></script>
     <script src="bot/bot-chat-interface.js"></script>
 
     <script src="script.js"></script>
+
+    <script>
+        // Debug: Check if calendarData is loaded
+        console.log('📅 Calendar page loaded');
+        console.log('calendarData available?', typeof window.calendarData !== 'undefined');
+        console.log('calendarData length:', window.calendarData?.length);
+
+        if (!window.calendarData) {
+            console.error('❌ calendarData is not defined! Calendar will not load.');
+        } else {
+            console.log('✅ calendarData loaded successfully:', window.calendarData.length, 'events');
+        }
+    </script>
 </body>
 </html>

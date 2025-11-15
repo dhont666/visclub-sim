@@ -87,40 +87,74 @@ class AdminAuth {
             }
         } else {
             // Backend API modus
+            console.log('🔐 Backend API mode - checking token...');
+            console.log('🔑 Stored token exists:', !!storedToken);
+            console.log('🌐 API Base URL:', this.API_BASE_URL);
+
             if (storedToken) {
                 try {
+                    console.log('📡 Fetching auth/verify from:', `${this.API_BASE_URL}/auth/verify`);
                     const response = await fetch(`${this.API_BASE_URL}/auth/verify`, {
-                        method: 'POST',
+                        method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${storedToken}`
                         }
                     });
 
+                    console.log('📡 Auth verify response:', {
+                        ok: response.ok,
+                        status: response.status,
+                        statusText: response.statusText
+                    });
+
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('✅ Token verified! User data:', data);
                         this.currentUser = { ...data.user, token: storedToken };
                         this.updateUserDisplay();
+                        console.log('👤 Current user set:', this.currentUser);
+                        console.log('🔍 Auth complete flag set to true');
+                        this.authComplete = true;
+
                         if (isLoginPage) {
+                            console.log('🔄 On login page, redirecting to dashboard...');
                             window.location.href = 'index.html';
+                        } else {
+                            console.log('✅ On dashboard, staying here!');
                         }
                     } else {
+                        console.error('❌ Token verification failed!');
+                        console.error('Status:', response.status, response.statusText);
+                        const errorText = await response.text();
+                        console.error('Response body:', errorText);
                         console.warn('Token verificatie mislukt, omleiden naar login.');
                         this.clearAuth();
                         if (!isLoginPage) {
+                            console.log('🔄 Not on login page, redirecting to login...');
                             window.location.href = 'login.html';
                         }
                     }
                 } catch (e) {
-                    console.error('Fout bij token verificatie:', e);
+                    console.error('❌ Exception during token verification:', e);
+                    console.error('Error details:', {
+                        name: e.name,
+                        message: e.message,
+                        stack: e.stack
+                    });
                     this.clearAuth();
                     if (!isLoginPage) {
+                        console.log('🔄 Exception occurred, redirecting to login...');
                         window.location.href = 'login.html';
                     }
                 }
             } else {
+                console.warn('⚠️ No token found in storage');
                 this.currentUser = null;
                 if (!isLoginPage) {
+                    console.log('🔄 No token and not on login page, redirecting to login...');
                     window.location.href = 'login.html';
+                } else {
+                    console.log('📄 No token but on login page, staying here');
                 }
             }
         }

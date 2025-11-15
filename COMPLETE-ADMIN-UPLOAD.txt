@@ -1,0 +1,132 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - COMPLETE ADMIN PANEL UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEEM ANALYSE:
+- Server heeft nog OUDE versie van admin-auth.js (gebruikt POST ipv GET)
+- Server heeft nog OUDE versie van index.html (laadt bot script)
+- Dit veroorzaakt de redirect loop
+
+OPLOSSING:
+Upload ALLE admin bestanden opnieuw om zeker te zijn dat alles up-to-date is.
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ UPLOAD ALLE ONDERSTAANDE BESTANDEN
+═══════════════════════════════════════════════════════════════════════════════
+
+Via Plesk File Manager → Navigeer naar: public_html/admin/
+
+Upload deze bestanden (overschrijf bestaande):
+
+CORE BESTANDEN:
+├── config.js
+├── admin-auth.js  ⚠️ KRITIEK - bevat GET fix voor auth/verify
+├── admin-script.js
+├── admin-style.css
+├── admin-nav.html
+└── data-api.js
+
+ADMIN PAGINA'S:
+├── login.html
+├── index.html  ⚠️ KRITIEK - laadt geen bot script meer
+├── vergunningen.html
+├── contact-berichten.html
+├── inschrijvingen.html
+├── leden.html
+├── settings.html
+├── plaatsentrekking.html
+├── klassement-beheer.html
+├── weging.html
+└── admin-chat.html
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️ BELANGRIJK: OVERSCHRIJF ALLES
+═══════════════════════════════════════════════════════════════════════════════
+
+Selecteer ALLE bestanden in je lokale admin/ folder en upload ze in 1 keer.
+Kies "Overschrijf bestaande bestanden" als er om gevraagd wordt.
+
+═══════════════════════════════════════════════════════════════════════════════
+🧪 TEST NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Clear browser cache HELEMAAL:
+   - CTRL + SHIFT + DELETE
+   - Selecteer "Cached images and files"
+   - Klik "Clear data"
+
+2. Sluit browser HELEMAAL en heropen
+
+3. Open browser console (F12)
+
+4. Ga naar: https://www.visclubsim.be/admin/login.html
+
+5. Login met kevin.dhont / KevinDhont2026!
+
+6. Lees de console berichten - je zou nu moeten zien:
+   ✅ "🔐 Backend API mode - checking token..."
+   ✅ "📡 Fetching auth/verify from: https://www.visclubsim.be/api/auth/verify"
+   ✅ "📡 Auth verify response: ok: true, status: 200"
+   ✅ "✅ On dashboard, staying here!"
+
+7. GEEN bot script errors meer!
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 WAT IS GEFIXED
+═══════════════════════════════════════════════════════════════════════════════
+
+OUDE VERSIE (OP SERVER):
+❌ admin-auth.js gebruikt POST voor auth/verify
+❌ index.html laadt bot script (bestaat niet)
+❌ Token verificatie faalt
+❌ Redirect loop naar login
+
+NIEUWE VERSIE (NA UPLOAD):
+✅ admin-auth.js gebruikt GET voor auth/verify
+✅ index.html laadt GEEN bot script
+✅ Token verificatie werkt
+✅ Dashboard blijft geladen
+
+═══════════════════════════════════════════════════════════════════════════════
+❓ ALS HET NOG STEEDS NIET WERKT
+═══════════════════════════════════════════════════════════════════════════════
+
+Controleer in browser console:
+
+1. Zie je "XHRPOST https://www.visclubsim.be/api/auth/verify"?
+   → Oude admin-auth.js nog op server, upload opnieuw
+
+2. Zie je "XHRGET https://www.visclubsim.be/api/auth/verify"?
+   ✅ Goede versie! Kijk naar de status code:
+   - Status 200: Token is geldig, zou moeten blijven
+   - Status 401: Token is ongeldig, check database users
+   - Status 404: Endpoint bestaat niet, check api/index.php
+
+3. Zie je "Loading failed for bot script"?
+   → Oude index.html nog op server, upload opnieuw
+
+4. Zie je "✅ On dashboard, staying here!"?
+   ✅ GELUKT! Het werkt!
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 SNELLE UPLOAD VIA PLESK
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Log in op Plesk
+2. Ga naar File Manager
+3. Navigeer naar: public_html/admin/
+4. Klik "Upload Files"
+5. Selecteer ALLE bestanden uit je lokale admin/ folder
+6. Klik "Open"
+7. Wacht tot upload compleet is
+8. Ververs de pagina om te bevestigen
+
+OF VIA FTP:
+1. Open FileZilla (of andere FTP client)
+2. Verbind met je server
+3. Ga naar /public_html/admin/
+4. Sleep ALLE bestanden uit je lokale admin/ folder naar de server
+5. Kies "Overschrijf" als er om gevraagd wordt
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

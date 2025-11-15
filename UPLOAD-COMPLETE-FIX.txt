@@ -1,0 +1,228 @@
+═══════════════════════════════════════════════════════════════════════════════
+VISCLUB SIM - COMPLETE FIX - UPLOAD INSTRUCTIES
+═══════════════════════════════════════════════════════════════════════════════
+Datum: 2025-11-14
+Status: KLAAR VOOR UPLOAD
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ KRITIEKE FIXES GEÏMPLEMENTEERD
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Admin Login Fixed
+   - Config path gecorrigeerd (admin/config.js ipv ../config.js)
+
+2. ✅ Vergunningen Knoppen Fixed
+   - DELETE endpoint toegevoegd aan API
+   - UPDATE endpoint uitgebreid met approval/rejection metadata
+   - Event delegation geïmplementeerd
+   - Type-safe ID vergelijking
+   - Cache clearing toegevoegd
+
+3. ✅ Admin Naam in Header
+   - Dynamische naam display toegevoegd
+   - Fallback naar localStorage/sessionStorage
+   - Multi-tab sync via storage event
+
+4. ✅ Wachtwoord Wijzigen Functionaliteit
+   - API endpoint /auth/change-password toegevoegd
+   - Password strength validatie (client + server)
+   - Bcrypt hashing
+   - Current password verificatie
+
+5. ✅ Demo Fotos Verwijderd
+   - 4 Unsplash placeholder images verwijderd uit gallerij
+
+6. ✅ Terug naar Overzicht Buttons
+   - Alle admin pages hebben al correcte back buttons
+
+7. ✅ Mobile Menu
+   - Werkt correct (geen dropdown nodig - flat menu)
+
+═══════════════════════════════════════════════════════════════════════════════
+📤 BESTANDEN OM TE UPLOADEN NAAR CLOUD86
+═══════════════════════════════════════════════════════════════════════════════
+
+UPLOAD DEZE BESTANDEN (in volgorde):
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 1. API BACKEND (KRITIEK!)                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\api\index.php
+   Server: public_html/api/index.php
+
+   ✅ Toegevoegd:
+      - DELETE /permits/:id endpoint
+      - PUT /permits/:id extended (approval/rejection metadata)
+      - POST /auth/change-password endpoint
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 2. ADMIN PANEL                                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\admin\login.html
+   Server: public_html/admin/login.html
+
+   ✅ Fixed: Config path (admin/config.js)
+
+   ───────────────────────────────────────────────────────────────────────────
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\admin\vergunningen.html
+   Server: public_html/admin/vergunningen.html
+
+   ✅ Fixed: Event delegation, type-safe IDs, cache clearing
+
+   ───────────────────────────────────────────────────────────────────────────
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\admin\data-api.js
+   Server: public_html/admin/data-api.js
+
+   ✅ Fixed: Token handling, DELETE endpoint, logging
+
+   ───────────────────────────────────────────────────────────────────────────
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\admin\admin-nav.html
+   Server: public_html/admin/admin-nav.html
+
+   ✅ Added: Dynamic admin name display
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 3. PUBLIC WEBSITE                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+   Lokaal: C:\Users\kevin\Desktop\Viswebsite2\vissersclub-sim-website\gallerij.html
+   Server: public_html/gallerij.html
+
+   ✅ Removed: 4 demo Unsplash images
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 UPLOAD PROCEDURE
+═══════════════════════════════════════════════════════════════════════════════
+
+Via Plesk File Manager:
+1. Log in op Cloud86 Plesk
+2. Ga naar Files → File Manager
+3. Navigeer naar public_html/
+4. Upload elk bestand naar de juiste locatie
+5. Overschrijf bestaande bestanden
+
+Via FTP/SFTP:
+1. Verbind met Cloud86 server
+2. Navigeer naar public_html/
+3. Upload alle bestanden
+4. Check timestamps om te verifiëren
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ TEST PROCEDURE NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ADMIN LOGIN TESTEN
+   ☐ Ga naar https://www.visclubsim.be/admin/login.html
+   ☐ Clear browser cache (Ctrl+Shift+Delete)
+   ☐ Hard refresh (Ctrl+F5)
+   ☐ Login met je credentials
+   ☐ Check of je naam rechtsboven verschijnt (ipv "Admin")
+
+2. VERGUNNINGEN KNOPPEN TESTEN
+   ☐ Ga naar Visvergunning Aanvragen
+   ☐ Open browser console (F12 → Console)
+   ☐ Klik op "Goedkeuren" button
+   ☐ Check console logs:
+      - "Button clicked: {action: 'approve', id: '...'}"
+      - "🔍 approveApplication called with id: ..."
+      - "💾 Updating permit status to approved..."
+   ☐ Verifieer dat aanvraag verplaatst naar "Goedgekeurd"
+   ☐ Test "Afwijzen" button → moet verdwijnen
+   ☐ Test "Verwijderen" button → moet verdwijnen
+
+3. WACHTWOORD WIJZIGEN TESTEN
+   ☐ Ga naar Settings (nog niet geïmplementeerd in menu)
+   ☐ Wijzig wachtwoord
+   ☐ Log uit en log in met nieuw wachtwoord
+
+4. GALLERIJ CHECKEN
+   ☐ Ga naar https://www.visclubsim.be/gallerij.html
+   ☐ Verifieer dat demo fotos weg zijn
+   ☐ Alleen lokale images blijven over
+
+═══════════════════════════════════════════════════════════════════════════════
+⚠️ BELANGRIJKE OPMERKINGEN
+═══════════════════════════════════════════════════════════════════════════════
+
+1. DATABASE SCHEMA
+   Zorg dat de permits table deze kolommen heeft:
+   - approved_by VARCHAR(100)
+   - approved_date DATETIME
+   - rejected_by VARCHAR(100)
+   - rejected_date DATETIME
+   - rejection_reason TEXT
+
+   Als deze kolommen niet bestaan, run dit SQL statement:
+
+   ALTER TABLE permits
+   ADD COLUMN approved_by VARCHAR(100),
+   ADD COLUMN approved_date DATETIME,
+   ADD COLUMN rejected_by VARCHAR(100),
+   ADD COLUMN rejected_date DATETIME,
+   ADD COLUMN rejection_reason TEXT;
+
+2. ADMIN CREDENTIALS
+   Check database admin_users table voor login credentials.
+   Standaard bcrypt passwords zijn ingesteld.
+
+3. API BASE URL
+   Automatisch ingesteld op:
+   - Production: https://www.visclubsim.be/api
+   - Local: http://localhost/vissersclub-sim-website/api
+
+═══════════════════════════════════════════════════════════════════════════════
+📋 OPENSTAANDE TAKEN (NIET GEÏMPLEMENTEERD)
+═══════════════════════════════════════════════════════════════════════════════
+
+Deze features zijn NIET in deze upload:
+
+❌ Plaatsentrekking Visualisatie
+   - Vijver tekening met genummerde visplaatsen
+   - Plaats selectie/uitsluiting functionaliteit
+   → Vereist custom SVG/Canvas visualisatie
+
+❌ Email Mailbox Configuratie
+   - Moet via Cloud86 Plesk Emailbeheer
+   → Technische configuratie buiten code
+
+❌ Settings Page in Menu
+   - Settings.html bestaat maar staat niet in menu
+   → Voeg toe aan admin-nav.html indien gewenst
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 VERWACHTE RESULTAAT NA UPLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Admin login werkt
+✅ Je naam verschijnt in header (ipv "Admin")
+✅ Vergunningen goedkeuren/afwijzen/verwijderen werkt
+✅ Data updates zichtbaar in real-time
+✅ Gallerij zonder demo fotos
+✅ Alle admin pages hebben "Terug naar Overzicht"
+✅ Mobile menu werkt correct
+
+═══════════════════════════════════════════════════════════════════════════════
+📞 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+Als iets niet werkt:
+
+1. Check browser console (F12) voor errors
+2. Check API responses in Network tab
+3. Verifieer dat alle bestanden correct geüpload zijn
+4. Check timestamps van bestanden op server
+5. Clear browser cache + hard refresh
+6. Check database schema (zie punt 1 bij Belangrijke Opmerkingen)
+
+Bij "endpoint not found":
+- Check .htaccess in api/ folder
+- Verifieer mod_rewrite enabled in Plesk
+- Test direct: https://www.visclubsim.be/api/health
+
+═══════════════════════════════════════════════════════════════════════════════
+EOF

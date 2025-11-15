@@ -79,7 +79,7 @@ display: none;
 }
 </style>
 <!-- Load config first -->
-<script src="../config.js"></script>
+<script src="config.js"></script>
 </head><body><div class="login-container"><h2><i class="fas fa-user-shield"></i> Admin Login</h2><form id="loginForm"><div class="form-group"><label for="username">Gebruikersnaam</label><input type="text" id="username" name="username" required></div><div class="form-group"><label for="password">Wachtwoord</label><input type="password" id="password" name="password" required></div><button type="submit" class="btn-login">Login</button><p id="errorMsg" class="error-message"></p></form></div>
 <script>
         // Use global config
@@ -117,16 +117,26 @@ display: none;
 
                 const data = await response.json();
 
+                console.log('📡 Login response:', { ok: response.ok, status: response.status, hasToken: !!data.token, data });
+
                 if (response.ok && data.token) {
-                    console.log('✅ Login successful');
+                    console.log('✅ Login successful!');
+                    console.log('🔑 Token:', data.token.substring(0, 20) + '...');
+                    console.log('👤 User:', data.user);
 
                     // Store auth data
                     localStorage.setItem('visclubsim_token', data.token);
                     localStorage.setItem('visclubsim_admin', JSON.stringify(data.user || { username: user }));
 
+                    console.log('💾 Stored in localStorage');
+                    console.log('🔄 Redirecting to index.html...');
+
                     // Redirect to dashboard
-                    window.location.href = 'index.html';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 100);
                 } else {
+                    console.error('❌ Login failed:', data);
                     document.getElementById('errorMsg').textContent = data.error || 'Ongeldige gebruikersnaam of wachtwoord';
                     document.getElementById('errorMsg').style.display = 'block';
                 }

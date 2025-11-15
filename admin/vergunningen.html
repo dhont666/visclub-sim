@@ -1,6 +1,6 @@
 html
 <!-- Load config first, before any other scripts -->
-<script src="../config.js"></script>
+<script src="config.js"></script>
 <!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Visvergunning Aanvragen - Visclub SiM Admin</title><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="stylesheet" href="admin-style.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
 .permits-container {
 max-width: 1400px;
@@ -227,8 +227,8 @@ color: #999;
 </button><button class="filter-btn" data-filter="pending"><i class="fas fa-clock"></i> In afwachting
 </button><button class="filter-btn" data-filter="approved"><i class="fas fa-check"></i> Goedgekeurd
 </button><button class="filter-btn" data-filter="rejected"><i class="fas fa-times"></i> Afgewezen
-</button><button class="filter-btn" data-filter="new" onclick="showNewApplicationForm()" style="background: #28a745; color: white; margin-left: auto;"><i class="fas fa-plus"></i> Nieuwe Aanvraag
-</button></div></div><div class="stats-bar"><div class="stat-box"><h3 id="totalApplications">0</h3><p>Totaal Aanvragen</p></div><div class="stat-box"><h3 id="pendingApplications" style="color: #ffc107;">0</h3><p>In Afwachting</p></div><div class="stat-box"><h3 id="approvedApplications" style="color: #28a745;">0</h3><p>Goedgekeurd</p></div><div class="stat-box"><h3 id="rejectedApplications" style="color: #dc3545;">0</h3><p>Afgewezen</p></div></div><div class="permits-grid" id="permitsGrid"><div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;"><i class="fas fa-file-contract" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i><h3 style="color: #999;">Geen aanvragen gevonden</h3><p style="color: #999;">Er zijn nog geen visvergunning aanvragen ontvangen.</p></div></div></div><div class="modal" id="detailsModal"><div class="modal-content"><div class="modal-header"><h2 id="modalTitle" style="margin: 0; color: #2c5f7d;">Aanvraag Details</h2><button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
+</button><button class="filter-btn" data-action="newApplication" style="background: #28a745; color: white; margin-left: auto;"><i class="fas fa-plus"></i> Nieuwe Aanvraag
+</button></div></div><div class="stats-bar"><div class="stat-box"><h3 id="totalApplications">0</h3><p>Totaal Aanvragen</p></div><div class="stat-box"><h3 id="pendingApplications" style="color: #ffc107;">0</h3><p>In Afwachting</p></div><div class="stat-box"><h3 id="approvedApplications" style="color: #28a745;">0</h3><p>Goedgekeurd</p></div><div class="stat-box"><h3 id="rejectedApplications" style="color: #dc3545;">0</h3><p>Afgewezen</p></div></div><div class="permits-grid" id="permitsGrid"><div style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;"><i class="fas fa-file-contract" style="font-size: 64px; color: #ddd; margin-bottom: 20px;"></i><h3 style="color: #999;">Geen aanvragen gevonden</h3><p style="color: #999;">Er zijn nog geen visvergunning aanvragen ontvangen.</p></div></div></div><div class="modal" id="detailsModal"><div class="modal-content"><div class="modal-header"><h2 id="modalTitle" style="margin: 0; color: #2c5f7d;">Aanvraag Details</h2><button class="close-modal" data-action="closeModal"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
 <script src="admin-auth.js"></script>
 <script src="data-api.js"></script>
 <script>
@@ -254,7 +254,9 @@ color: #999;
         async function loadApplications(filter = 'all') {
             const grid = document.getElementById('permitsGrid');
             try {
-                console.log('📊 Loading permits from dataAPI...');
+                console.log('📊 Loading permits from dataAPI with filter:', filter);
+                // Clear cache to force fresh data
+                window.dataAPI.cache.permits = null;
                 applications = await window.dataAPI.getPermits();
                 console.log('📋 Loaded permits:', applications);
                 applications = applications.map(app => {
@@ -288,7 +290,7 @@ color: #999;
                 }
                 filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
                 grid.innerHTML = filteredApplications.map(app => `
-                <div class="permit-card ${app.status}">
+                <div class="permit-card ${app.status}" data-permit-id="${app.id}">
                     <div class="permit-header">
                         <div class="applicant-info">
                             <h4><i class="fas fa-user"></i> ${app.firstName} ${app.lastName}</h4>
@@ -330,26 +332,26 @@ color: #999;
                         </div>
                     ` : ''}
                     <div class="permit-actions">
-                        <button class="action-btn view" onclick="viewDetails('${app.id}')">
+                        <button class="action-btn view" data-action="view" data-id="${app.id}">
                             <i class="fas fa-eye"></i> Bekijken
                         </button>
                         ${app.status === 'pending' ? `
-                            <button class="action-btn approve" onclick="approveApplication('${app.id}')">
+                            <button class="action-btn approve" data-action="approve" data-id="${app.id}">
                                 <i class="fas fa-check"></i> Goedkeuren
                             </button>
-                            <button class="action-btn reject" onclick="rejectApplication('${app.id}')">
+                            <button class="action-btn reject" data-action="reject" data-id="${app.id}">
                                 <i class="fas fa-times"></i> Afwijzen
                             </button>
                         ` : ''}
                         ${app.status === 'approved' ? `
-                            <button class="action-btn" style="background: #17a2b8;" onclick="addAsMember('${app.id}', 'wedstrijd')">
+                            <button class="action-btn" style="background: #17a2b8;" data-action="addMember" data-id="${app.id}" data-type="wedstrijd">
                                 <i class="fas fa-trophy"></i> + Wedstrijd Lid
                             </button>
-                            <button class="action-btn" style="background: #28a745;" onclick="addAsMember('${app.id}', 'vergunning')">
+                            <button class="action-btn" style="background: #28a745;" data-action="addMember" data-id="${app.id}" data-type="vergunning">
                                 <i class="fas fa-fish"></i> + Vergunning Lid
                             </button>
                         ` : ''}
-                        <button class="action-btn delete" onclick="deleteApplication('${app.id}')">
+                        <button class="action-btn delete" data-action="delete" data-id="${app.id}">
                             <i class="fas fa-trash"></i> Verwijderen
                         </button>
                     </div>
@@ -371,8 +373,13 @@ color: #999;
             });
         }
         function viewDetails(id) {
-            const app = applications.find(a => a.id === id);
-            if (!app) return;
+            console.log('🔍 viewDetails called with id:', id, typeof id);
+            const app = applications.find(a => String(a.id) === String(id));
+            if (!app) {
+                console.error('❌ Application not found with id:', id);
+                alert('Aanvraag niet gevonden!');
+                return;
+            }
             currentApplicationId = id;
             document.getElementById('modalTitle').textContent = `Aanvraag: ${app.firstName} ${app.lastName}`;
             document.getElementById('modalBody').innerHTML = `
@@ -423,14 +430,14 @@ color: #999;
             `;
             document.getElementById('modalFooter').innerHTML = `
                 ${app.status === 'pending' ? `
-                    <button class="action-btn approve" onclick="approveApplication('${app.id}')">
+                    <button class="action-btn approve" data-action="approve" data-id="${app.id}">
                         <i class="fas fa-check"></i> Goedkeuren & Toevoegen als Lid
                     </button>
-                    <button class="action-btn reject" onclick="rejectApplication('${app.id}')">
+                    <button class="action-btn reject" data-action="reject" data-id="${app.id}">
                         <i class="fas fa-times"></i> Afwijzen
                     </button>
                 ` : ''}
-                <button class="action-btn delete" onclick="deleteApplication('${app.id}')">
+                <button class="action-btn delete" data-action="delete" data-id="${app.id}">
                     <i class="fas fa-trash"></i> Verwijderen
                 </button>
             `;
@@ -445,21 +452,36 @@ color: #999;
             currentApplicationId = null;
         }
         async function approveApplication(id) {
-            const app = applications.find(a => a.id === id);
-            if (!app) return;
+            console.log('🔍 approveApplication called with id:', id, typeof id);
+            const app = applications.find(a => String(a.id) === String(id));
+            if (!app) {
+                console.error('❌ Application not found with id:', id);
+                alert('Aanvraag niet gevonden!');
+                return;
+            }
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} wilt goedkeuren?\n\nDeze persoon wordt automatisch toegevoegd aan de ledenlijst.`)) {
                 try {
                     app.status = 'approved';
                     app.approvedBy = adminAuth.getCurrentUser()?.name || 'Admin';
                     app.approvedDate = new Date().toISOString();
+
+                    console.log('💾 Updating permit status to approved...');
                     await window.dataAPI.updatePermit(id, {
                         status: 'approved',
                         approvedBy: app.approvedBy,
                         approvedDate: app.approvedDate
                     });
+
+                    console.log('👤 Adding as member...');
                     await addToMembers(app);
-                    await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+
                     closeModal();
+
+                    // Reload with current filter
+                    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+                    console.log('🔄 Reloading applications with filter:', currentFilter);
+                    await loadApplications(currentFilter);
+
                     alert('✅ Aanvraag goedgekeurd!\n\n' + app.firstName + ' ' + app.lastName + ' is toegevoegd aan de ledenlijst.');
                 } catch (error) {
                     console.error('Error approving permit:', error);
@@ -468,8 +490,13 @@ color: #999;
             }
         }
         async function rejectApplication(id) {
-            const app = applications.find(a => a.id === id);
-            if (!app) return;
+            console.log('🔍 rejectApplication called with id:', id, typeof id);
+            const app = applications.find(a => String(a.id) === String(id));
+            if (!app) {
+                console.error('❌ Application not found with id:', id);
+                alert('Aanvraag niet gevonden!');
+                return;
+            }
             const reason = prompt('Optioneel: Geef een reden voor afwijzing:');
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} wilt afwijzen?`)) {
                 try {
@@ -477,14 +504,22 @@ color: #999;
                     app.rejectedBy = adminAuth.getCurrentUser()?.name || 'Admin';
                     app.rejectedDate = new Date().toISOString();
                     app.rejectionReason = reason || '';
+
+                    console.log('💾 Updating permit status to rejected...');
                     await window.dataAPI.updatePermit(id, {
                         status: 'rejected',
                         rejectedBy: app.rejectedBy,
                         rejectedDate: app.rejectedDate,
                         rejectionReason: app.rejectionReason
                     });
-                    await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+
                     closeModal();
+
+                    // Reload with current filter
+                    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+                    console.log('🔄 Reloading applications with filter:', currentFilter);
+                    await loadApplications(currentFilter);
+
                     alert('❌ Aanvraag afgewezen.');
                 } catch (error) {
                     console.error('Error rejecting permit:', error);
@@ -493,13 +528,26 @@ color: #999;
             }
         }
         async function deleteApplication(id) {
-            const app = applications.find(a => a.id === id);
-            if (!app) return;
+            console.log('🔍 deleteApplication called with id:', id, typeof id);
+            const app = applications.find(a => String(a.id) === String(id));
+            if (!app) {
+                console.error('❌ Application not found with id:', id);
+                alert('Aanvraag niet gevonden!');
+                return;
+            }
             if (confirm(`Weet je zeker dat je de aanvraag van ${app.firstName} ${app.lastName} definitief wilt verwijderen?`)) {
                 try {
+                    console.log('🗑️ Deleting permit...');
                     await window.dataAPI.deletePermit(id);
-                    await loadApplications(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+
                     closeModal();
+
+                    // Reload with current filter
+                    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+                    console.log('🔄 Reloading applications with filter:', currentFilter);
+                    await loadApplications(currentFilter);
+
+                    alert('✅ Aanvraag verwijderd.');
                 } catch (error) {
                     console.error('Error deleting permit:', error);
                     alert('❌ Fout bij verwijderen vergunning: ' + error.message);
@@ -527,8 +575,10 @@ color: #999;
             }
         }
         async function addAsMember(permitId, type) {
-            const app = applications.find(a => a.id === permitId);
+            console.log('🔍 addAsMember called with id:', permitId, 'type:', type);
+            const app = applications.find(a => String(a.id) === String(permitId));
             if (!app) {
+                console.error('❌ Application not found with id:', permitId);
                 alert('❌ Vergunning niet gevonden.');
                 return;
             }
@@ -646,10 +696,10 @@ color: #999;
                 </form>
             `;
             modalFooter.innerHTML = `
-                <button onclick="closeModal()" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                <button data-action="closeModal" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     <i class="fas fa-times"></i> Annuleren
                 </button>
-                <button onclick="submitNewApplication()" style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                <button data-action="submitNewApplication" style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     <i class="fas fa-save"></i> Aanvraag Toevoegen
                 </button>
             `;
@@ -722,6 +772,45 @@ color: #999;
         document.getElementById('detailsModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // Event delegation for all buttons
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const id = btn.dataset.id;
+            const type = btn.dataset.type;
+
+            console.log('Button clicked:', { action, id, type });
+
+            switch(action) {
+                case 'view':
+                    viewDetails(id);
+                    break;
+                case 'approve':
+                    approveApplication(id);
+                    break;
+                case 'reject':
+                    rejectApplication(id);
+                    break;
+                case 'delete':
+                    deleteApplication(id);
+                    break;
+                case 'addMember':
+                    addAsMember(id, type);
+                    break;
+                case 'newApplication':
+                    showNewApplicationForm();
+                    break;
+                case 'closeModal':
+                    closeModal();
+                    break;
+                case 'submitNewApplication':
+                    submitNewApplication();
+                    break;
             }
         });
     </script>

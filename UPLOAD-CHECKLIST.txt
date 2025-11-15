@@ -1,0 +1,29 @@
+UPLOAD CHECKLIST - Vergunningen Admin Fix
+==========================================
+
+Datum: 2025-11-14
+
+Upload deze bestanden naar Cloud86:
+
+1. admin/vergunningen.html  →  public_html/admin/vergunningen.html
+2. admin/data-api.js        →  public_html/admin/data-api.js
+
+Stappen om te verifiëren:
+-------------------------
+1. Upload beide bestanden
+2. Clear browser cache (Ctrl+Shift+Delete)
+3. Hard refresh de pagina (Ctrl+F5)
+4. Open Console (F12)
+5. Kijk of je ziet: "DataAPI ready"
+6. Klik op een knop
+7. Kijk of je ziet: "Button clicked: {action: ..., id: ...}"
+
+Als je "Button clicked" NIET ziet:
+- Bestand is NIET correct geüpload
+- Check of het bestand op de server de juiste datum/tijd heeft
+- Upload opnieuw
+
+Als je WEL "Button clicked" ziet maar niets gebeurt:
+- Check of je ziet: "🔍 approveApplication called with id: ..."
+- Check of je API errors ziet in de console
+- Stuur alle console output
